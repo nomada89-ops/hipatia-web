@@ -549,10 +549,10 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
                 </button>
             </header>
 
-            <div className="flex-1 flex flex-col items-center justify-center w-full max-w-6xl overflow-y-auto">
+            <div className="flex-1 flex flex-col items-center justify-start pt-12 w-full max-w-6xl overflow-y-auto custom-scrollbar">
                 {/* Branding Central - Hero Style */}
-                <div className="text-center mb-12 animate-fade-in-up space-y-4 shrink-0">
-                    <h1 className="text-5xl md:text-6xl font-black text-slate-900 leading-tight tracking-tight">
+                <div className="text-center mb-12 animate-fade-in-up space-y-4 shrink-0 px-4">
+                    <h1 className="text-5xl md:text-6xl font-black text-slate-900 leading-[1.15] tracking-tight pb-2">
                         Centraliza, <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600">Potencia</span> y Simplifica.
                     </h1>
                     <p className="text-slate-500 font-medium text-xl md:text-2xl max-w-2xl mx-auto">
