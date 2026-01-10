@@ -1,7 +1,5 @@
-'use client';
-
-import InverterDashboard from './solar/inverters/page';
+import { redirect } from 'next/navigation';
 
 export default function Home() {
-  return <InverterDashboard />;
+  redirect('/exam-correction');
 }
