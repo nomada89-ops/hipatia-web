@@ -1,0 +1,59 @@
+
+import { NextResponse } from 'next/server';
+import Papa from 'papaparse';
+
+// Google Sheet ID and Tab Name
+const SHEET_ID = '1dHWNQg0w6GfZoMO4qTZFc-GGm-bZqO9bZ08Fv7LCWR8';
+const SHEET_NAME = 'Detalle Inversores';
+
+export async function GET() {
+    try {
+        const csvUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_NAME)}`;
+
+        console.log(`Fetching solar data from: ${csvUrl}`);
+        const response = await fetch(csvUrl, { cache: 'no-store' });
+
+        if (!response.ok) {
+            throw new Error(`Failed to fetch Google Sheet: ${response.statusText}`);
+        }
+
+        const csvText = await response.text();
+
+        const parsed = Papa.parse(csvText, {
+            header: true,
+            skipEmptyLines: true,
+            transform: (value: string, field: string | number) => {
+                // Fields needing number conversion with comma handling
+                const numberFields = ['power_ac', 'power_dc', 'voltage', 'current', 'efficiency', 'temperature'];
+                if (numberFields.includes(field as string)) {
+                    if (typeof value === 'string') {
+                        // Replace comma with dot and parse float
+                        const normalized = value.replace(',', '.');
+                        const num = parseFloat(normalized);
+                        return isNaN(num) ? 0 : num;
+                    }
+                    return value;
+                }
+                return value;
+            },
+            dynamicTyping: true, // For other fields
+        });
+
+        if (parsed.errors.length > 0) {
+            console.warn('CSV Parse Errors:', parsed.errors);
+        }
+
+        return NextResponse.json({
+            success: true,
+            data: parsed.data,
+            meta: parsed.meta
+        });
+
+    } catch (error) {
+        console.error('Error fetching inverter data:', error);
+        return NextResponse.json(
+            { success: false, error: 'Failed to fetch inverter data' },
+            { status: 500 }
+        );
+    }
+}

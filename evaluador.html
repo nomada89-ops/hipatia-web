@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Evaluador IA Pro</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+
+    <!-- Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- FontAwesome & Google Fonts -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        }
+                    },
+                    animation: {
+                        'spin-slow': 'spin 3s linear infinite',
+                        'fade-in': 'fadeIn 0.5s ease-out',
+                        'slide-up': 'slideUp 0.5s ease-out',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #f8fafc;
+            /* Slate-50 */
+        }
+
+        .paper-shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* Markdown/HTML result styling */
+        .prose h1 {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 0.5em;
+            color: #1e293b;
+        }
+
+        .prose h2 {
+            font-size: 1.25em;
+            font-weight: bold;
+            margin-top: 1em;
+            margin-bottom: 0.5em;
+            color: #334155;
+        }
+
+        .prose p {
+            margin-bottom: 0.75em;
+            line-height: 1.6;
+            color: #475569;
+        }
+
+        .prose ul {
+            list-style-type: disc;
+            padding-left: 1.5em;
+            margin-bottom: 0.75em;
+        }
+
+        .prose table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1em;
+        }
+
+        .prose th,
+        .prose td {
+            border: 1px solid #e2e8f0;
+            padding: 0.5em;
+            text-align: left;
+        }
+
+        .prose th {
+            background-color: #f1f5f9;
+            font-weight: 600;
+        }
+
+        .checkmark-circle {
+            stroke-dasharray: 166;
+            stroke-dashoffset: 166;
+            stroke-width: 2;
+            stroke-miterlimit: 10;
+            stroke: #10b981;
+            fill: none;
+            animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+        }
+
+        @keyframes stroke {
+            100% {
+                stroke-dashoffset: 0;
+            }
+        }
+    </style>
+</head>
+
+<body class="text-slate-800 antialiased min-h-screen flex flex-col">
+
+    <div id="root"></div>
+
+    <script type="text/babel">
+        // --- Constants ---
+        // Using the same webhook for both for now, or a placeholder for the rubric generator if distinct behavior needed.
+        // The prompt specifically gives one endpoint for "Formulario B".
+        // For Form A, it says "Sends a POST to the Webhook". I'll use a separate configurable const.
+        // Assuming the same endpoint handles different payloads or a different one is needed. 
+        // I will use a dummy endpoint for A or the same one if generic. Let's use the provided one for B.
+        const WEBHOOK_URL_CORRECTION = "https://n8n-n8n.ehqtcd.easypanel.host/webhook/examen-correcto";
+        const WEBHOOK_URL_RUBRIC = "https://n8n-n8n.ehqtcd.easypanel.host/webhook/examen-correcto"; // Placeholder/Same for now
+
+        const { useState, useEffect, useRef } = React;
+
+        // --- Icons ---
+        const IconTools = () => <i className="fas fa-tools text-3xl mb-4 text-indigo-500"></i>;
+        const IconExam = () => <i className="fas fa-file-signature text-3xl mb-4 text-emerald-500"></i>;
+        const IconUpload = () => <i className="fas fa-cloud-upload-alt mr-2"></i>;
+        const IconBack = () => <i className="fas fa-arrow-left mr-1"></i>;
+        const IconCopy = () => <i className="fas fa-copy mr-1"></i>;
+        const IconCheck = () => <i className="fas fa-check mr-1"></i>;
+
+        // --- Components ---
+
+        // 1. Landing View
+        const Landing = ({ onNavigate }) => {
+            return (
+                <div className="flex flex-col items-center justify-center min-h-screen p-6 animate-fade-in">
+                    <div className="text-center mb-12">
+                        <h1 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-emerald-600 mb-4">
+                            Evaluador IA Pro
+                        </h1>
+                        <p className="text-slate-500 text-lg max-w-2xl mx-auto">
+                            La herramienta definitiva para docentes. Crea rúbricas y corrige exámenes en segundos con Inteligencia Artificial.
+                        </p>
+                    </div>
+
+                    <div className="grid md:grid-cols-2 gap-8 max-w-4xl w-full">
+                        {/* Card A */}
+                        <div
+                            onClick={() => onNavigate('formA')}
+                            className="group bg-white rounded-2xl p-8 border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer flex flex-col items-center text-center"
+                        >
+                            <div className="bg-indigo-50 p-4 rounded-full mb-6 group-hover:bg-indigo-100 transition-colors">
+                                <IconTools />
+                            </div>
+                            <h2 className="text-2xl font-bold text-slate-800 mb-3">Generador de Rúbricas</h2>
+                            <p className="text-slate-500">
+                                Sube tus apuntes o temario (PDF) y obtén una tabla de criterios de evaluación detallada.
+                            </p>
+                            <span className="mt-6 text-indigo-600 font-medium group-hover:underline">Comenzar &rarr;</span>
+                        </div>
+
+                        {/* Card B */}
+                        <div
+                            onClick={() => onNavigate('formB')}
+                            className="group bg-white rounded-2xl p-8 border border-slate-200 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all cursor-pointer flex flex-col items-center text-center"
+                        >
+                            <div className="bg-emerald-50 p-4 rounded-full mb-6 group-hover:bg-emerald-100 transition-colors">
+                                <IconExam />
+                            </div>
+                            <h2 className="text-2xl font-bold text-slate-800 mb-3">Corregir Exámenes</h2>
+                            <p className="text-slate-500">
+                                Sube la foto de un examen y obtén una corrección inmediata basada en tus criterios.
+                            </p>
+                            <span className="mt-6 text-emerald-600 font-medium group-hover:underline">Comenzar &rarr;</span>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // 2. Form A (Rubric Generator)
+        const FormRubrica = ({ onBack }) => {
+            const [file, setFile] = useState(null);
+            const [instructions, setInstructions] = useState("");
+            const [loading, setLoading] = useState(false);
+            const [result, setResult] = useState(null);
+            const [copied, setCopied] = useState(false);
+
+            const handleSubmit = async (e) => {
+                e.preventDefault();
+                if (!file) return alert("Por favor selecciona un archivo PDF.");
+
+                setLoading(true);
+                const formData = new FormData();
+                formData.append('material_referencia', file);
+                formData.append('instrucciones_extra', instructions);
+                // Flag to tell server this is a rubric generation request if needed
+                formData.append('type', 'rubric_generation');
+
+                try {
+                    const response = await fetch(WEBHOOK_URL_RUBRIC, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (!response.ok) throw new Error("Error en la petición");
+
+                    const text = await response.text();
+                    setResult(text);
+                } catch (error) {
+                    console.error(error);
+                    alert("Ocurrió un error al generar la rúbrica. Verifica la conexión.");
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            const handleCopy = () => {
+                navigator.clipboard.writeText(result);
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
+            };
+
+            if (result) {
+                return (
+                    <div className="min-h-screen py-10 px-4 flex flex-col items-center animate-fade-in relative">
+                        <button onClick={onBack} className="absolute top-6 left-6 text-slate-500 hover:text-slate-800 flex items-center">
+                            <IconBack /> Volver al inicio
+                        </button>
+                        <div className="max-w-3xl w-full bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
+                            <div className="bg-indigo-600 px-6 py-4 flex justify-between items-center text-white">
+                                <h3 className="font-bold text-lg"><i className="fas fa-table mr-2"></i> Rúbrica Generada</h3>
+                                <button
+                                    onClick={handleCopy}
+                                    className="bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded-md text-sm transition font-medium flex items-center"
+                                >
+                                    {copied ? <><IconCheck /> Copiado</> : <><IconCopy /> Copiar</>}
+                                </button>
+                            </div>
+                            <div className="p-6">
+                                <textarea
+                                    readOnly
+                                    value={result}
+                                    className="w-full h-96 p-4 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 font-mono focus:outline-none resize-none"
+                                ></textarea>
+                                <div className="mt-4 flex justify-end">
+                                    <button
+                                        onClick={() => setResult(null)}
+                                        className="text-indigo-600 font-medium hover:text-indigo-800"
+                                    >
+                                        Generar otra rúbrica
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+
+            return (
+                <div className="min-h-screen flex items-center justify-center p-4 animate-slide-up relative">
+                    <button onClick={onBack} className="absolute top-6 left-6 text-slate-500 hover:text-slate-800 flex items-center">
+                        <IconBack /> Volver
+                    </button>
+                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg p-8 border border-slate-100">
+                        <div className="text-center mb-8">
+                            <div className="bg-indigo-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-indigo-600">
+                                <i className="fas fa-magic text-2xl"></i>
+                            </div>
+                            <h2 className="text-2xl font-bold text-slate-800">Generador de Rúbricas</h2>
+                            <p className="text-slate-500 text-sm mt-1">Sube tus apuntes y deja que la IA organice los criterios.</p>
+                        </div>
+
+                        <form onSubmit={handleSubmit} className="space-y-6">
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-2">
+                                    Material de Referencia (PDF)
+                                </label>
+                                <div className="relative border-2 border-dashed border-slate-300 rounded-lg p-6 hover:bg-slate-50 transition-colors text-center cursor-pointer group">
+                                    <input
+                                        type="file"
+                                        accept="application/pdf"
+                                        onChange={(e) => setFile(e.target.files[0])}
+                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                        required
+                                    />
+                                    <div className="flex flex-col items-center pointer-events-none">
+                                        <i className="fas fa-file-pdf text-3xl text-slate-400 mb-2 group-hover:text-indigo-500 transition-colors"></i>
+                                        <span className="text-sm text-slate-600 font-medium">
+                                            {file ? file.name : "Arrastra tu archivo o haz clic aquí"}
+                                        </span>
+                                        {!file && <span className="text-xs text-slate-400 mt-1">Solo formato PDF</span>}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-2">
+                                    Instrucciones Extra (Opcional)
+                                </label>
+                                <textarea
+                                    className="w-full border border-slate-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition"
+                                    rows="3"
+                                    placeholder="Ej: Nivel de exigencia alto, enfocar en gramática..."
+                                    value={instructions}
+                                    onChange={(e) => setInstructions(e.target.value)}
+                                ></textarea>
+                            </div>
+
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className={`w-full py-3 px-4 rounded-lg text-white font-medium shadow-lg hover:shadow-xl transition-all flex items-center justify-center ${loading ? 'bg-indigo-400 cursor-not-allowed' : 'bg-indigo-600 hover:bg-indigo-700'}`}
+                            >
+                                {loading ? (
+                                    <><i className="fas fa-circle-notch fa-spin mr-2"></i> Generando...</>
+                                ) : (
+                                    "Generar Criterios"
+                                )}
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            );
+        };
+
+        // 3. Form B (Corrector de Exámenes)
+        const FormCorreccion = ({ onBack, onSuccess }) => {
+            const [assignmentId, setAssignmentId] = useState("");
+            const [studentId, setStudentId] = useState("");
+            const [manualRubric, setManualRubric] = useState(false);
+            const [rubricText, setRubricText] = useState("");
+            const [file, setFile] = useState(null);
+
+            const [loading, setLoading] = useState(false);
+            const [loadingStep, setLoadingStep] = useState(0);
+
+            const steps = ["Leyendo caligrafía...", "Analizando respuestas...", "Consultando base de datos...", "Aplicando criterios...", "Generando informe final..."];
+
+            useEffect(() => {
+                let interval;
+                if (loading) {
+                    interval = setInterval(() => {
+                        setLoadingStep(prev => (prev + 1) % steps.length);
+                    }, 2500);
+                }
+                return () => clearInterval(interval);
+            }, [loading]);
+
+            const handleSubmit = async (e) => {
+                e.preventDefault();
+                if (!file) return alert("Sube una foto del examen.");
+
+                setLoading(true);
+                const formData = new FormData();
+                formData.append('assignment_id', assignmentId);
+                formData.append('alumno_id', studentId);
+                formData.append('file', file);
+
+                if (manualRubric) {
+                    formData.append('guia_correccion', rubricText);
+                }
+
+                try {
+                    const response = await fetch(WEBHOOK_URL_CORRECTION, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    // IMPORTANT: The response is pure HTML
+                    const htmlContent = await response.text();
+                    onSuccess(htmlContent);
+                } catch (error) {
+                    console.error(error);
+                    alert("Error al corregir el examen. Por favor intenta de nuevo.");
+                    setLoading(false);
+                }
+            };
+
+            if (loading) {
+                return (
+                    <div className="fixed inset-0 bg-white/90 z-50 flex flex-col items-center justify-center backdrop-blur-sm animate-fade-in">
+                        <div className="relative mb-8">
+                            <div className="w-24 h-24 border-4 border-slate-100 rounded-full"></div>
+                            <div className="w-24 h-24 border-4 border-emerald-500 rounded-full border-t-transparent animate-spin absolute top-0 left-0"></div>
+                            <i className="fas fa-brain absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-2xl text-emerald-600 animate-pulse"></i>
+                        </div>
+                        <h3 className="text-xl font-bold text-slate-800 mb-2 animate-pulse">{steps[loadingStep]}</h3>
+                        <p className="text-slate-500">Esto puede tomar unos segundos.</p>
+                    </div>
+                );
+            }
+
+            return (
+                <div className="min-h-screen flex items-center justify-center p-4 animate-slide-up relative">
+                    <button onClick={onBack} className="absolute top-6 left-6 text-slate-500 hover:text-slate-800 flex items-center">
+                        <IconBack /> Volver
+                    </button>
+                    <div className="bg-white rounded-2xl shadow-xl w-full max-w-xl p-8 border border-slate-100">
+                        <div className="text-center mb-6">
+                            <div className="bg-emerald-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 text-emerald-600">
+                                <i className="fas fa-check-double text-2xl"></i>
+                            </div>
+                            <h2 className="text-2xl font-bold text-slate-800">Corrector de Exámenes</h2>
+                        </div>
+
+                        <form onSubmit={handleSubmit} className="space-y-5">
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-xs font-bold uppercase text-slate-500 mb-1">ID Tarea (Baserow)</label>
+                                    <input
+                                        type="text"
+                                        className="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                                        placeholder="HISTORIA-TEMA1"
+                                        value={assignmentId}
+                                        onChange={(e) => setAssignmentId(e.target.value)}
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-bold uppercase text-slate-500 mb-1">ID Alumno</label>
+                                    <input
+                                        type="text"
+                                        className="w-full bg-slate-50 border border-slate-300 rounded-lg p-2.5 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                                        placeholder="JUAN-PEREZ"
+                                        value={studentId}
+                                        onChange={(e) => setStudentId(e.target.value)}
+                                        required
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="flex items-center justify-between bg-slate-50 p-3 rounded-lg border border-slate-200">
+                                <span className="text-sm font-medium text-slate-700">¿Añadir Rúbrica Manual?</span>
+                                <label className="relative inline-flex items-center cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        className="sr-only peer"
+                                        checked={manualRubric}
+                                        onChange={(e) => setManualRubric(e.target.checked)}
+                                    />
+                                    <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-emerald-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                                </label>
+                            </div>
+
+                            {manualRubric && (
+                                <div className="animate-fade-in">
+                                    <label className="block text-xs font-bold uppercase text-slate-500 mb-1">Rúbrica / Guía de Corrección</label>
+                                    <textarea
+                                        className="w-full bg-slate-50 border border-slate-300 rounded-lg p-3 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none"
+                                        rows="4"
+                                        value={rubricText}
+                                        onChange={(e) => setRubricText(e.target.value)}
+                                        placeholder="Pega aquí los criterios específicos..."
+                                    ></textarea>
+                                </div>
+                            )}
+
+                            <div>
+                                <label className="block text-xs font-bold uppercase text-slate-500 mb-1">Foto del Examen</label>
+                                <div className="relative border-2 border-dashed border-emerald-300/50 bg-emerald-50/30 rounded-lg p-6 hover:bg-emerald-50/50 transition-colors text-center cursor-pointer group">
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={(e) => setFile(e.target.files[0])}
+                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                        required
+                                    />
+                                    <div className="flex flex-col items-center pointer-events-none">
+                                        <i className="fas fa-camera text-3xl text-emerald-400 mb-2 group-hover:text-emerald-600 transition-colors"></i>
+                                        <span className="text-sm text-slate-600 font-medium">
+                                            {file ? file.name : "Toma una foto o sube un archivo"}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button
+                                type="submit"
+                                className="w-full py-3.5 px-4 rounded-lg text-white font-bold shadow-lg shadow-emerald-500/30 hover:shadow-emerald-500/50 transition-all bg-emerald-500 hover:bg-emerald-600 active:scale-[0.98]"
+                            >
+                                Corregir Examen
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            );
+        };
+
+        // 4. Result View
+        const ResultView = ({ htmlContent, onReset }) => {
+            return (
+                <div className="min-h-screen py-8 px-4 bg-slate-100 flex justify-center animate-fade-in">
+                    <div className="w-full max-w-4xl relative">
+                        {/* Paper Effect Container */}
+                        <div className="bg-white p-8 md:p-12 shadow-2xl rounded-sm paper-shadow min-h-[80vh] relative">
+                            {/* Decorative holes */}
+                            <div className="hidden md:flex flex-col absolute left-2 top-0 bottom-0 justify-around py-12">
+                                {[...Array(6)].map((_, i) => (
+                                    <div key={i} className="w-3 h-3 rounded-full bg-slate-100 shadow-inner mb-4"></div>
+                                ))}
+                            </div>
+
+                            {/* Content */}
+                            <div className="ml-0 md:ml-8 prose max-w-none">
+                                {/* The Header of the paper */}
+                                <div className="border-b-2 border-slate-800 pb-4 mb-8 flex justify-between items-center">
+                                    <div>
+                                        <h1 className="text-3xl font-serif text-slate-900 m-0">Informe de Corrección</h1>
+                                        <p className="text-slate-500 text-sm mt-1">Generado por IA Pro</p>
+                                    </div>
+                                    <div className="w-16 h-16 rounded-full border-4 border-emerald-500 flex items-center justify-center">
+                                        <span className="text-emerald-700 font-bold text-xl">A+</span>
+                                    </div>
+                                </div>
+
+                                {/* Render HTML content safely */}
+                                <div
+                                    dangerouslySetInnerHTML={{ __html: htmlContent }}
+                                    className="font-serif text-lg leading-relaxed text-slate-800"
+                                />
+
+                                <div className="mt-12 pt-8 border-t border-slate-200 text-center">
+                                    <p className="text-sm text-slate-400 italic">Este documento ha sido generado automáticamente.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Floating Action Button */}
+                        <button
+                            onClick={onReset}
+                            className="fixed bottom-8 right-8 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full px-6 py-4 shadow-lg hover:shadow-2xl transition-all transform hover:scale-105 flex items-center gap-2 font-bold z-10"
+                        >
+                            <i className="fas fa-plus"></i> Nueva Corrección
+                        </button>
+                    </div>
+                </div>
+            );
+        };
+
+        // --- Main App ---
+        const App = () => {
+            const [view, setView] = useState('landing'); // landing, formA, formB, result
+            const [resultHtml, setResultHtml] = useState("");
+
+            const handleNavigate = (target) => {
+                setView(target);
+            };
+
+            const handleCorrectionSuccess = (html) => {
+                setResultHtml(html);
+                setView('result');
+            };
+
+            const handleReset = () => {
+                setResultHtml("");
+                setView('landing');
+            };
+
+            return (
+                <>
+                    {view === 'landing' && <Landing onNavigate={handleNavigate} />}
+                    {view === 'formA' && <FormRubrica onBack={() => setView('landing')} />}
+                    {view === 'formB' && <FormCorreccion onBack={() => setView('landing')} onSuccess={handleCorrectionSuccess} />}
+                    {view === 'result' && <ResultView htmlContent={resultHtml} onReset={handleReset} />}
+                </>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+
+</html>
