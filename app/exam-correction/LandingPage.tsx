@@ -205,7 +205,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
                                     <div className="bg-emerald-100 p-2 rounded-lg text-emerald-600"><CheckCircle size={18} /></div>
                                     <div className="text-left">
                                         <h4 className="font-bold text-slate-800 text-sm">Corrección de Exámenes</h4>
-                                        <p className="text-xs text-slate-400">Evaluación por rúbricas.</p>
+                                        <p className="text-xs text-slate-400">Tu asistente de corrección experta.</p>
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-3 bg-white p-3 rounded-xl border border-slate-100 shadow-sm">
