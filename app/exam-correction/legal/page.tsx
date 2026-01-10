@@ -1,10 +1,10 @@
 'use client';
-import React from 'react';
+import React, { Suspense } from 'react';
 import { ArrowLeft, Shield, Eye, FileText, Lock, Scale, UserCheck } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 
-export default function LegalPage() {
+function LegalContent() {
     const searchParams = useSearchParams();
     const tab = searchParams.get('tab') || 'aviso-legal';
 
@@ -113,5 +113,13 @@ export default function LegalPage() {
                 )}
             </main>
         </div>
+    );
+}
+
+export default function LegalPage() {
+    return (
+        <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-slate-50 text-slate-500">Cargando...</div>}>
+            <LegalContent />
+        </Suspense>
     );
 }
