@@ -517,29 +517,29 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
 
     // --- DASHBOARD VIEW (LOGGED IN) ---
     return (
-        <div className="flex-1 bg-slate-50 flex flex-col items-center justify-center p-6 font-inter overflow-hidden h-screen relative">
+        <div className="flex-1 bg-slate-50 flex flex-col items-center p-6 font-inter overflow-hidden h-screen relative">
 
-            {/* FAQ & Contact Links (Top Left) */}
-            <div className="absolute top-6 left-6 z-20 flex items-center gap-4">
-                <a
-                    href="/exam-correction/preguntas-frecuentes"
-                    className="flex items-center gap-2 px-2 py-2 text-xs font-bold text-slate-400 hover:text-indigo-600 transition-colors uppercase tracking-wider"
-                >
-                    <div className="w-4 h-4 rounded-full border border-current flex items-center justify-center text-[10px] font-serif">?</div>
-                    FAQ
-                </a>
-                <a
-                    href="/exam-correction/contacto"
-                    className="flex items-center gap-2 px-2 py-2 text-xs font-bold text-slate-400 hover:text-violet-600 transition-colors uppercase tracking-wider"
-                >
-                    <Mail size={14} />
-                    Contacto
-                </a>
-            </div>
+            {/* Header Bar */}
+            <header className="w-full max-w-6xl flex justify-between items-center z-20 p-2">
+                {/* FAQ & Contact Links */}
+                <div className="flex items-center gap-4">
+                    <a
+                        href="/exam-correction/preguntas-frecuentes"
+                        className="flex items-center gap-2 px-2 py-2 text-xs font-bold text-slate-400 hover:text-indigo-600 transition-colors uppercase tracking-wider"
+                    >
+                        <div className="w-4 h-4 rounded-full border border-current flex items-center justify-center text-[10px] font-serif">?</div>
+                        FAQ
+                    </a>
+                    <a
+                        href="/exam-correction/contacto"
+                        className="flex items-center gap-2 px-2 py-2 text-xs font-bold text-slate-400 hover:text-violet-600 transition-colors uppercase tracking-wider"
+                    >
+                        <Mail size={14} />
+                        Contacto
+                    </a>
+                </div>
 
-            {/* Logout Button (Top Right) */}
-            <div className="absolute top-6 right-6 z-20 flex items-center gap-3">
-
+                {/* Logout Button */}
                 <button
                     onClick={onLogout}
                     className="flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm border border-slate-200 rounded-xl shadow-sm text-xs font-bold text-slate-500 hover:bg-slate-100 hover:text-slate-700 hover:border-slate-300 transition-all uppercase tracking-wider"
@@ -547,124 +547,126 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
                     <Lock size={14} />
                     Cerrar Sesión
                 </button>
-            </div>
+            </header>
 
-            {/* Branding Central - Hero Style */}
-            <div className="text-center mb-12 animate-fade-in-up space-y-4">
-                <h1 className="text-5xl md:text-6xl font-black text-slate-900 leading-tight tracking-tight">
-                    Centraliza, <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600">Potencia</span> y Simplifica.
-                </h1>
-                <p className="text-slate-500 font-medium text-xl md:text-2xl max-w-2xl mx-auto">
-                    Tu ecosistema integral para la gestión educativa inteligente y la corrección asistida por IA.
-                </p>
-                <div className="pt-4">
-                    <button
-                        onClick={onShowSample}
-                        className="px-6 py-2 bg-emerald-50 text-emerald-700 font-bold rounded-full text-sm hover:bg-emerald-100 transition-colors border border-emerald-100 shadow-sm"
-                    >
-                        ✨ Ver Informe de Ejemplo (Simulación)
-                    </button>
-                </div>
-            </div>
-
-            {/* Layout de Selección */}
-            {viewMode === 'main' ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl animate-fade-in-up md:h-[400px]">
-                    {/* Tarjeta Izquierda (Auditor) */}
-                    <button
-                        onClick={onSelectAuditor}
-                        className="group bg-white rounded-[24px] border border-slate-200 p-8 shadow-soft hover:shadow-xl hover:border-indigo-400 transition-all duration-300 text-left flex flex-col justify-between"
-                    >
-                        <div>
-                            <div className="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-indigo-600 group-hover:text-white transition-all">
-                                <Search className="h-7 w-7 text-indigo-600 group-hover:text-white" />
-                            </div>
-                            <h2 className="text-2xl font-bold text-slate-900 mb-2">MODO AUDITOR</h2>
-                            <p className="text-slate-500 font-medium">
-                                Sube fotos de los exámenes y obtén una corrección rigurosa.
-                            </p>
-                        </div>
-                        <div className="flex items-center gap-2 mt-4 text-indigo-600 font-bold text-sm uppercase tracking-widest group-hover:gap-3 transition-all">
-                            <span>Iniciar Auditoría</span>
-                            <ChevronRight className="h-4 w-4" />
-                        </div>
-                    </button>
-
-                    {/* Tarjeta Derecha (Forge Entry) */}
-                    <button
-                        onClick={() => setViewMode('forge-selection')}
-                        className="group bg-white rounded-[24px] border border-slate-200 p-8 shadow-soft hover:shadow-xl hover:border-violet-400 transition-all duration-300 text-left flex flex-col justify-between"
-                    >
-                        <div>
-                            <div className="w-14 h-14 bg-violet-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-violet-600 group-hover:text-white transition-all">
-                                <Zap className="h-7 w-7 text-violet-600 group-hover:text-white" />
-                            </div>
-                            <h2 className="text-2xl font-bold text-slate-900 mb-2">MODO FORGE</h2>
-                            <p className="text-slate-500 font-medium">
-                                Herramientas de generación de exámenes y recursos.
-                            </p>
-                        </div>
-                        <div className="flex items-center gap-2 mt-4 text-violet-600 font-bold text-sm uppercase tracking-widest group-hover:gap-3 transition-all">
-                            <span>Seleccionar Herramienta</span>
-                            <ChevronRight className="h-4 w-4" />
-                        </div>
-                    </button>
-                </div>
-            ) : (
-                <div className="w-full max-w-4xl animate-in slide-in-from-right duration-300">
-                    <div className="flex items-center gap-2 mb-6 cursor-pointer text-slate-400 hover:text-slate-600 transition-colors w-fit" onClick={() => setViewMode('main')}>
-                        <ChevronRight className="h-4 w-4 rotate-180" />
-                        <span className="text-xs font-bold uppercase tracking-widest">Volver</span>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:h-[350px]">
-                        {/* Forge Universal */}
+            <div className="flex-1 flex flex-col items-center justify-center w-full max-w-6xl overflow-y-auto">
+                {/* Branding Central - Hero Style */}
+                <div className="text-center mb-12 animate-fade-in-up space-y-4 shrink-0">
+                    <h1 className="text-5xl md:text-6xl font-black text-slate-900 leading-tight tracking-tight">
+                        Centraliza, <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600">Potencia</span> y Simplifica.
+                    </h1>
+                    <p className="text-slate-500 font-medium text-xl md:text-2xl max-w-2xl mx-auto">
+                        Tu ecosistema integral para la gestión educativa inteligente y la corrección asistida por IA.
+                    </p>
+                    <div className="pt-4">
                         <button
-                            onClick={onSelectForgeUniversal}
-                            className="group bg-white rounded-[24px] border border-slate-200 p-8 shadow-soft hover:shadow-xl hover:border-violet-400 transition-all duration-300 text-left flex flex-col justify-between relative overflow-hidden"
+                            onClick={onShowSample}
+                            className="px-6 py-2 bg-emerald-50 text-emerald-700 font-bold rounded-full text-sm hover:bg-emerald-100 transition-colors border border-emerald-100 shadow-sm"
                         >
-                            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-violet-400 to-fuchsia-400"></div>
-                            <div>
-                                <div className="w-12 h-12 bg-violet-50 rounded-xl flex items-center justify-center mb-4 group-hover:bg-violet-600 group-hover:text-white transition-all">
-                                    <BarChart3 className="h-6 w-6 text-violet-600 group-hover:text-white" />
-                                </div>
-                                <h2 className="text-xl font-bold text-slate-900 mb-2">Forge Universal</h2>
-                                <p className="text-slate-500 text-sm leading-relaxed">
-                                    Cualquier asignatura. Sube tus apuntes y crea un examen a medida.
-                                </p>
-                            </div>
-                            <div className="flex items-center gap-2 mt-4 text-violet-600 font-bold text-xs uppercase tracking-widest group-hover:gap-3 transition-all">
-                                <span>Crear Genérico</span>
-                                <ChevronRight className="h-3.5 w-3.5" />
-                            </div>
-                        </button>
-
-                        {/* Forge Especialista */}
-                        <button
-                            onClick={onSelectForgeSpecialist}
-                            className="group bg-slate-50 rounded-[24px] border border-slate-200 p-8 shadow-sm hover:shadow-lg hover:border-slate-300 transition-all duration-300 text-left flex flex-col justify-between relative overflow-hidden"
-                        >
-                            <div className="absolute top-0 left-0 w-full h-1 bg-slate-300"></div>
-                            <div>
-                                <div className="w-12 h-12 bg-white border border-slate-200 rounded-xl flex items-center justify-center mb-4 group-hover:border-slate-400 transition-all">
-                                    <Award className="h-6 w-6 text-slate-500" />
-                                </div>
-                                <h2 className="text-xl font-bold text-slate-900 mb-2">Forge Especialista</h2>
-                                <p className="text-slate-500 text-sm leading-relaxed">
-                                    Historia de España (PAU). Basado en estándares oficiales.
-                                </p>
-                            </div>
-                            <div className="flex items-center gap-2 mt-4 text-slate-600 font-bold text-xs uppercase tracking-widest group-hover:gap-3 transition-all">
-                                <span>Crear PAU</span>
-                                <ChevronRight className="h-3.5 w-3.5" />
-                            </div>
+                            ✨ Ver Informe de Ejemplo (Simulación)
                         </button>
                     </div>
                 </div>
-            )}
 
-            <div className="mt-12 text-slate-400 text-[10px] font-bold uppercase tracking-[0.2em]">
-                HIPAT<span className="text-indigo-500">IA</span> Ecosistema v4.0 • More human than human
+                {/* Layout de Selección */}
+                {viewMode === 'main' ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl animate-fade-in-up md:h-[400px]">
+                        {/* Tarjeta Izquierda (Auditor) */}
+                        <button
+                            onClick={onSelectAuditor}
+                            className="group bg-white rounded-[24px] border border-slate-200 p-8 shadow-soft hover:shadow-xl hover:border-indigo-400 transition-all duration-300 text-left flex flex-col justify-between"
+                        >
+                            <div>
+                                <div className="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-indigo-600 group-hover:text-white transition-all">
+                                    <Search className="h-7 w-7 text-indigo-600 group-hover:text-white" />
+                                </div>
+                                <h2 className="text-2xl font-bold text-slate-900 mb-2">MODO AUDITOR</h2>
+                                <p className="text-slate-500 font-medium">
+                                    Sube fotos de los exámenes y obtén una corrección rigurosa.
+                                </p>
+                            </div>
+                            <div className="flex items-center gap-2 mt-4 text-indigo-600 font-bold text-sm uppercase tracking-widest group-hover:gap-3 transition-all">
+                                <span>Iniciar Auditoría</span>
+                                <ChevronRight className="h-4 w-4" />
+                            </div>
+                        </button>
+
+                        {/* Tarjeta Derecha (Forge Entry) */}
+                        <button
+                            onClick={() => setViewMode('forge-selection')}
+                            className="group bg-white rounded-[24px] border border-slate-200 p-8 shadow-soft hover:shadow-xl hover:border-violet-400 transition-all duration-300 text-left flex flex-col justify-between"
+                        >
+                            <div>
+                                <div className="w-14 h-14 bg-violet-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-violet-600 group-hover:text-white transition-all">
+                                    <Zap className="h-7 w-7 text-violet-600 group-hover:text-white" />
+                                </div>
+                                <h2 className="text-2xl font-bold text-slate-900 mb-2">MODO FORGE</h2>
+                                <p className="text-slate-500 font-medium">
+                                    Herramientas de generación de exámenes y recursos.
+                                </p>
+                            </div>
+                            <div className="flex items-center gap-2 mt-4 text-violet-600 font-bold text-sm uppercase tracking-widest group-hover:gap-3 transition-all">
+                                <span>Seleccionar Herramienta</span>
+                                <ChevronRight className="h-4 w-4" />
+                            </div>
+                        </button>
+                    </div>
+                ) : (
+                    <div className="w-full max-w-4xl animate-in slide-in-from-right duration-300">
+                        <div className="flex items-center gap-2 mb-6 cursor-pointer text-slate-400 hover:text-slate-600 transition-colors w-fit" onClick={() => setViewMode('main')}>
+                            <ChevronRight className="h-4 w-4 rotate-180" />
+                            <span className="text-xs font-bold uppercase tracking-widest">Volver</span>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:h-[350px]">
+                            {/* Forge Universal */}
+                            <button
+                                onClick={onSelectForgeUniversal}
+                                className="group bg-white rounded-[24px] border border-slate-200 p-8 shadow-soft hover:shadow-xl hover:border-violet-400 transition-all duration-300 text-left flex flex-col justify-between relative overflow-hidden"
+                            >
+                                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-violet-400 to-fuchsia-400"></div>
+                                <div>
+                                    <div className="w-12 h-12 bg-violet-50 rounded-xl flex items-center justify-center mb-4 group-hover:bg-violet-600 group-hover:text-white transition-all">
+                                        <BarChart3 className="h-6 w-6 text-violet-600 group-hover:text-white" />
+                                    </div>
+                                    <h2 className="text-xl font-bold text-slate-900 mb-2">Forge Universal</h2>
+                                    <p className="text-slate-500 text-sm leading-relaxed">
+                                        Cualquier asignatura. Sube tus apuntes y crea un examen a medida.
+                                    </p>
+                                </div>
+                                <div className="flex items-center gap-2 mt-4 text-violet-600 font-bold text-xs uppercase tracking-widest group-hover:gap-3 transition-all">
+                                    <span>Crear Genérico</span>
+                                    <ChevronRight className="h-3.5 w-3.5" />
+                                </div>
+                            </button>
+
+                            {/* Forge Especialista */}
+                            <button
+                                onClick={onSelectForgeSpecialist}
+                                className="group bg-slate-50 rounded-[24px] border border-slate-200 p-8 shadow-sm hover:shadow-lg hover:border-slate-300 transition-all duration-300 text-left flex flex-col justify-between relative overflow-hidden"
+                            >
+                                <div className="absolute top-0 left-0 w-full h-1 bg-slate-300"></div>
+                                <div>
+                                    <div className="w-12 h-12 bg-white border border-slate-200 rounded-xl flex items-center justify-center mb-4 group-hover:border-slate-400 transition-all">
+                                        <Award className="h-6 w-6 text-slate-500" />
+                                    </div>
+                                    <h2 className="text-xl font-bold text-slate-900 mb-2">Forge Especialista</h2>
+                                    <p className="text-slate-500 text-sm leading-relaxed">
+                                        Historia de España (PAU). Basado en estándares oficiales.
+                                    </p>
+                                </div>
+                                <div className="flex items-center gap-2 mt-4 text-slate-600 font-bold text-xs uppercase tracking-widest group-hover:gap-3 transition-all">
+                                    <span>Crear PAU</span>
+                                    <ChevronRight className="h-3.5 w-3.5" />
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                <div className="mt-12 text-slate-400 text-[10px] font-bold uppercase tracking-[0.2em] shrink-0">
+                    HIPAT<span className="text-indigo-500">IA</span> Ecosistema v4.0 • More human than human
+                </div>
             </div>
         </div>
     );
