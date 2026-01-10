@@ -96,7 +96,7 @@ const ForgeUniversalForm: React.FC<ForgeUniversalFormProps> = ({ onBack, userTok
                 }
             };
 
-            const response = await fetch(process.env.NEXT_PUBLIC_WEBHOOK_FORGE_UNIVERSAL || 'https://n8n-n8n.ehqtcd.easypanel.host/webhook-test/generar-examen_generico', {
+            const response = await fetch(process.env.NEXT_PUBLIC_WEBHOOK_FORGE_UNIVERSAL || 'https://n8n-n8n.ehqtcd.easypanel.host/webhook/generar-examen_generico', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
