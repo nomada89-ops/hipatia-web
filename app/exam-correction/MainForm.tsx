@@ -359,14 +359,14 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                 <div className="flex-1 overflow-auto p-6 lg:p-8 custom-scrollbar">
                     <div className="max-w-7xl mx-auto grid grid-cols-12 gap-6">
                         {/* Filmstrip Overlay */}
-                        <div className="col-span-12 lg:col-span-2 space-y-4">
-                            <h3 className="text-[9px] font-bold text-slate-400 uppercase tracking-widest px-1">Evidencias</h3>
-                            <div className="flex flex-row lg:flex-col gap-2.5 overflow-x-auto lg:overflow-x-visible">
+                        <div className="col-span-12 lg:col-span-3 space-y-4 pr-2">
+                            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest px-1">Evidencias</h3>
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-2 gap-3 overflow-y-auto max-h-[calc(100vh-250px)] pr-2 custom-scrollbar">
                                 {examenArchivos.map((_, idx) => (
-                                    <div key={idx} onClick={() => { setViewerStartingIndex(idx); setIsViewerOpen(true); }} className="relative group cursor-pointer flex-shrink-0">
-                                        <div className="w-16 h-20 lg:w-full lg:h-24 bg-white border border-slate-200 rounded-lg shadow-soft flex flex-col items-center justify-center transition-all group-hover:border-indigo-400 overflow-hidden">
-                                            <FileText className="h-5 w-5 text-slate-300 group-hover:text-indigo-400 transition-colors" />
-                                            <span className="text-[9px] font-bold text-slate-400 mt-1.5">Pág {idx + 1}</span>
+                                    <div key={idx} onClick={() => { setViewerStartingIndex(idx); setIsViewerOpen(true); }} className="relative group cursor-pointer">
+                                        <div className="aspect-[3/4] bg-white border border-slate-200 rounded-lg shadow-soft flex flex-col items-center justify-center transition-all group-hover:border-indigo-400 overflow-hidden relative">
+                                            <FileText className="h-6 w-6 text-slate-300 group-hover:text-indigo-400 transition-colors" />
+                                            <span className="text-[10px] font-bold text-slate-500 mt-1.5">Pág {idx + 1}</span>
                                             <CheckCircle className="absolute top-1 right-1 h-3 w-3 text-indigo-600" />
                                         </div>
                                     </div>
@@ -374,7 +374,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                             </div>
                         </div>
 
-                        <div className="col-span-12 lg:col-span-7 space-y-6">
+                        <div className="col-span-12 lg:col-span-6 space-y-6">
                             {/* Score Card Hero Compact */}
                             <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-soft flex items-center justify-between">
                                 <div className="space-y-2">
@@ -479,10 +479,10 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                         <form onSubmit={handleSubmit} className="space-y-8">
 
                             {/* SECTION 1: CONTEXTO (RÚBRICA & REFERENCIAS) */}
-                            <div className="space-y-3">
+                            <div className="space-y-4">
                                 <div className="flex items-center gap-2 mb-2">
-                                    <div className="bg-indigo-50 p-1.5 rounded-lg text-indigo-600"><Shield size={14} /></div>
-                                    <h3 className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Contexto</h3>
+                                    <div className="bg-indigo-50 p-2 rounded-lg text-indigo-600"><Shield size={16} /></div>
+                                    <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest">Contexto de la Evaluación</h3>
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -548,25 +548,25 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                             <hr className="border-slate-100" />
 
                             {/* SECTION 2: DATOS DEL ALUMNO */}
-                            <div className="space-y-3">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div className="space-y-1.5">
-                                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">ID Alumno (LOPD: No usar nombre real)</label>
+                            <div className="space-y-4">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-bold text-slate-500 uppercase tracking-widest pl-1">ID Alumno (Privacidad: No usar nombre real)</label>
                                         <input
                                             type="text"
                                             value={alumnoId}
                                             onChange={(e) => setAlumnoId(e.target.value)}
-                                            placeholder="Ej: ALU-2024"
-                                            className="w-full p-3 bg-slate-50 border-2 border-transparent rounded-lg focus:border-indigo-500 focus:bg-white outline-none transition-all font-medium text-sm text-slate-700 shadow-sm"
+                                            placeholder="Ej: ALU-2024-X"
+                                            className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-indigo-500 focus:bg-white focus:shadow-md outline-none transition-all font-bold text-base text-slate-700 shadow-sm"
                                             required
                                         />
                                     </div>
-                                    <div className="space-y-1.5">
-                                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Exigencia</label>
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-bold text-slate-500 uppercase tracking-widest pl-1">Criterio de Exigencia</label>
                                         <select
                                             value={nivelExigencia}
                                             onChange={(e) => setNivelExigencia(e.target.value)}
-                                            className="w-full p-3 bg-slate-50 border-2 border-transparent rounded-lg focus:border-indigo-500 focus:bg-white outline-none transition-all font-medium text-sm text-slate-700 shadow-sm appearance-none cursor-pointer"
+                                            className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-indigo-500 focus:bg-white focus:shadow-md outline-none transition-all font-bold text-base text-slate-700 shadow-sm appearance-none cursor-pointer"
                                         >
                                             <option value="estricto">ESTRICTO</option>
                                             <option value="normal">ESTÁNDAR</option>
@@ -577,8 +577,8 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                             </div>
 
                             {/* SECTION 3: EVIDENCIAS */}
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1">Examen</label>
+                            <div className="space-y-3">
+                                <label className="text-xs font-bold text-slate-500 uppercase tracking-widest pl-1">Escanear Examen</label>
                                 <div
                                     onDragOver={handleDragOver}
                                     onDragLeave={handleDragLeave}
@@ -624,7 +624,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                                         className="w-4 h-4 text-indigo-600 rounded bg-white border-slate-300 focus:ring-indigo-500 focus:ring-offset-0 cursor-pointer"
                                     />
                                 </div>
-                                <label htmlFor="legal-consent" className="text-[10px] text-slate-500 font-medium leading-tight cursor-pointer select-none">
+                                <label htmlFor="legal-consent" className="text-xs text-slate-500 font-medium leading-relaxed cursor-pointer select-none">
                                     Certifico que soy el propietario legítimo de los materiales subidos y acepto el tratamiento de datos para fines de evaluación académica según la <a href="/exam-correction/legal?tab=privacidad" target="_blank" className="text-indigo-600 hover:underline font-bold">Política de Privacidad</a> y el <a href="/exam-correction/legal?tab=aviso-legal" target="_blank" className="text-indigo-600 hover:underline font-bold">Aviso Legal</a>, incluyendo la anonimización de datos de menores.
                                 </label>
                             </div>
