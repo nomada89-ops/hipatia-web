@@ -30,6 +30,8 @@ const ForgeUniversalForm: React.FC<ForgeUniversalFormProps> = ({ onBack, userTok
 
     // Resultado
     const [examHtml, setExamHtml] = useState<string | null>(null);
+    const [solucionarioHtml, setSolucionarioHtml] = useState<string | null>(null);
+    const [activeTab, setActiveTab] = useState<'examen' | 'solucionario'>('examen');
     const [guiaData, setGuiaData] = useState<any>(null); // Para persistencia
     const [isDyslexic, setIsDyslexic] = useState(false);
 
@@ -108,7 +110,7 @@ const ForgeUniversalForm: React.FC<ForgeUniversalFormProps> = ({ onBack, userTok
 
             // Procesar respuesta
             const htmlContent = data.examen_html || data.output || '<h3>Error: Sin contenido generado</h3>';
-            setExamHtml(htmlContent);
+            setExamHtml(htmlContent); setSolucionarioHtml(data.solucionario_html || null);
             setGuiaData(data.guia_correccion_data || null);
 
             setStatus('success');
@@ -134,7 +136,7 @@ const ForgeUniversalForm: React.FC<ForgeUniversalFormProps> = ({ onBack, userTok
 
     const handleReset = () => {
         if (confirm('¿Descartar examen y volver al generador?')) {
-            setExamHtml(null);
+            setExamHtml(null); setSolucionarioHtml(null); setActiveTab('examen');
             setGuiaData(null);
             setStatus('idle');
             setMessage('');
@@ -160,7 +162,25 @@ const ForgeUniversalForm: React.FC<ForgeUniversalFormProps> = ({ onBack, userTok
                     </div>
 
                     <div className="flex items-center gap-3">
-                        <div className="flex items-center gap-2 mr-4">
+                        {/* Tabs Selector */}
+                          <div className="flex bg-slate-100 p-1 rounded-lg mr-4 border border-slate-200 print:hidden">
+                                <button 
+                                    onClick={() => setActiveTab('examen')} 
+                                    className={`px-3 py-1 text-xs font-bold rounded-md transition-all ${activeTab === 'examen' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                                >
+                                    Examen
+                                </button>
+                                {solucionarioHtml && (
+                                    <button 
+                                        onClick={() => setActiveTab('solucionario')} 
+                                        className={`px-3 py-1 text-xs font-bold rounded-md transition-all ${activeTab === 'solucionario' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                                    >
+                                        Solucionario
+                                    </button>
+                                )}
+                          </div>
+                          
+                          <div className="flex items-center gap-2 mr-4">
                             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Modo Dislexia</span>
                             <button
                                 onClick={() => setIsDyslexic(!isDyslexic)}
@@ -190,13 +210,36 @@ const ForgeUniversalForm: React.FC<ForgeUniversalFormProps> = ({ onBack, userTok
                 {/* Editor Area */}
                 <div className="flex-1 overflow-y-auto bg-slate-100 p-8 print:p-0 print:bg-white">
                     <div className="max-w-[210mm] mx-auto bg-white shadow-xl min-h-[297mm] p-[20mm] print:shadow-none print:p-0">
-                        <div
-                            ref={editorRef}
-                            className="prose prose-slate max-w-none outline-none"
-                            contentEditable
-                            suppressContentEditableWarning
-                            dangerouslySetInnerHTML={{ __html: examHtml }}
-                        />
+                        
+                        {/* Examen View */}
+                        <div className={`prose prose-slate max-w-none outline-none ${activeTab === 'examen' ? 'block' : 'hidden print:block'}`}>
+                              <div 
+                                  ref={editorRef}
+                                  contentEditable
+                                  suppressContentEditableWarning
+                                  dangerouslySetInnerHTML={{ __html: examHtml }} 
+                              />
+                        </div>
+
+                        {/* Page Break for Print */}
+                        {solucionarioHtml && (
+                             <div className="hidden print:block" style={{ pageBreakBefore: 'always', height: 0, overflow: 'hidden' }}></div>
+                        )}
+
+                        {/* Solucionario View */}
+                        {solucionarioHtml && (
+                            <div className={`prose prose-slate max-w-none outline-none mt-10 print:mt-0 ${activeTab === 'solucionario' ? 'block' : 'hidden print:block'}`}>
+                                  <div className="print:hidden mb-4 p-4 bg-indigo-50 text-indigo-700 font-bold rounded-lg border border-indigo-100 text-center uppercase tracking-widest text-xs">
+                                      --- Solucionario y Criterios de Corrección ---
+                                  </div>
+                                  <div 
+                                      contentEditable
+                                      suppressContentEditableWarning
+                                      dangerouslySetInnerHTML={{ __html: solucionarioHtml }} 
+                                  />
+                            </div>
+                        )}
+    
                     </div>
                 </div>
             </div>
