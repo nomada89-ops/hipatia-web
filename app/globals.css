@@ -73,3 +73,28 @@ body {
 .prose-auditor strong {
   color: #0F172A;
 }
+/* PREMIUM ACADEMIC THEME OVERRIDES */
+:root {
+  --background: #faf9f6; /* Off-white / Cream */
+  --foreground: #1c1917; /* Stone 900 */
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+}
+
+/* Elegant Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #d6d3d1; /* Stone 300 */
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a29e; /* Stone 400 */
+}
