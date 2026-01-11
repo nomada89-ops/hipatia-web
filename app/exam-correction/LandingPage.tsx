@@ -197,7 +197,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
                             </h1>
 
                             <p className="text-lg text-slate-500 font-medium max-w-md mx-auto lg:mx-0 leading-relaxed">
-                                <strong className="text-slate-700">HIPAT<span className="text-indigo-600">IA</span></strong> es el ecosistema definitivo para generar exámenes accesibles y corregir evidencias manuscritas con Inteligencia Artificial.
+                                <strong className="text-slate-700">HIPAT<span className="text-indigo-600">IA</span> <span className="text-[10px] align-top bg-slate-100 text-slate-500 px-1 py-0.5 rounded font-bold ml-0.5 border border-slate-200">BETA</span></strong> es el ecosistema definitivo para generar exámenes accesibles y corregir evidencias manuscritas con Inteligencia Artificial.
                             </p>
 
                             <div className="flex flex-col gap-4 max-w-sm mx-auto lg:mx-0">
