@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Search, Zap, ChevronRight, Lock, CheckCircle, Shield, Award, BarChart3, Mail, BookOpen, LayoutGrid, MessageCircle, X, Send } from "lucide-react";
+import { Search, Zap, ChevronRight, Lock, CheckCircle, Shield, Award, BarChart3, Mail, BookOpen, LayoutGrid, MessageCircle, X, Send, ArrowRight, Play, ExternalLink } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 
 interface LandingPageProps {
@@ -12,7 +12,6 @@ interface LandingPageProps {
     onShowSample: () => void;
 }
 
-// --- SCROLL & REVEAL LOGIC ---
 const useScrollReveal = () => {
     const [isVisible, setIsVisible] = useState(false);
     const ref = useRef<HTMLDivElement>(null);
@@ -22,21 +21,12 @@ const useScrollReveal = () => {
             ([entry]) => {
                 if (entry.isIntersecting) {
                     setIsVisible(true);
-                    observer.disconnect();
                 }
             },
-            { threshold: 0.2 }
+            { threshold: 0.1 }
         );
-
-        if (ref.current) {
-            observer.observe(ref.current);
-        }
-
-        return () => {
-            if (ref.current) {
-                observer.unobserve(ref.current);
-            }
-        };
+        if (ref.current) observer.observe(ref.current);
+        return () => observer.disconnect();
     }, []);
 
     return { ref, isVisible };
@@ -47,7 +37,7 @@ const RevealSection: React.FC<{ children: React.ReactNode, className?: string }>
     return (
         <div
             ref={ref}
-            className={`transition-all duration-1000 transform ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-20"} ${className}`}
+            className={`transition-all duration-1000 transform ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"} ${className}`}
         >
             {children}
         </div>
@@ -60,11 +50,11 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
     const [errorMessage, setErrorMessage] = useState("");
     const [viewMode, setViewMode] = useState<"main" | "forge">("main");
 
-    // --- CHATBOT STATE ---
+    // Chatbot State
     const [showChat, setShowChat] = useState(false);
     const [isChatOpen, setIsChatOpen] = useState(false);
     const [messages, setMessages] = useState<{ role: 'user' | 'assistant', text: string }[]>([
-        { role: 'assistant', text: '¡Hola! Soy el asistente virtual de Hipatia. ¿En qué puedo ayudarte hoy?' }
+        { role: 'assistant', text: '¡Hola! Soy el asistente virtual de **Hipatia**. ¿Cómo puedo ayudarte hoy?' }
     ]);
     const [inputMessage, setInputMessage] = useState('');
     const [isTyping, setIsTyping] = useState(false);
@@ -75,9 +65,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
     };
 
     useEffect(() => {
-        if (isChatOpen) {
-            scrollToBottom();
-        }
+        if (isChatOpen) scrollToBottom();
     }, [messages, isChatOpen]);
 
     const handleSendMessage = async (e: React.FormEvent) => {
@@ -88,7 +76,6 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
         setMessages(prev => [...prev, { role: 'user', text: userMsg }]);
         setInputMessage('');
         setIsTyping(true);
-        // Placeholder loading bubble
         setMessages(prev => [...prev, { role: 'assistant', text: '...' }]);
 
         try {
@@ -98,31 +85,25 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
                 body: JSON.stringify({ message: userMsg })
             });
             const data = await response.json();
-
-            // Replace loading bubble with response
             setMessages(prev => {
                 const newMsgs = [...prev];
-                newMsgs.pop(); // remove '...'
-                return [...newMsgs, { role: 'assistant', text: data.text || 'Lo siento, no he podido procesar tu respuesta.' }];
+                newMsgs.pop();
+                return [...newMsgs, { role: 'assistant', text: data.text || 'No he podido procesar tu solicitud.' }];
             });
         } catch (error) {
-            console.error('Chat error:', error);
             setMessages(prev => {
                 const newMsgs = [...prev];
-                newMsgs.pop(); // remove '...'
-                return [...newMsgs, { role: 'assistant', text: '**Error de conexión:** No he podido conectar con el servidor.' }];
+                newMsgs.pop();
+                return [...newMsgs, { role: 'assistant', text: 'Error de conexión con el servidor.' }];
             });
         } finally {
             setIsTyping(false);
         }
     };
 
-    const handleLoginAttempt = async () => {
-        if (!tokenInput.trim()) {
-            setErrorMessage("Por favor, introduce tu token.");
-            return;
-        }
-
+    const handleLogin = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!tokenInput.trim()) return;
         setIsLoading(true);
         try {
             const response = await fetch("https://n8n-n8n.ehqtcd.easypanel.host/webhook/login-uclm", {
@@ -130,528 +111,316 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ user_token: tokenInput })
             });
-
-            if (!response.ok) throw new Error("Network response was not ok");
-
             const data = await response.json();
-
-            if (data.autorizado) {
-                onLogin(tokenInput);
-            } else {
-                setErrorMessage("Código no válido o usuario inactivo");
-            }
-        } catch (error) {
-            console.error("Login error:", error);
-            setErrorMessage("Error de conexión. Inténtelo de nuevo.");
+            if (data.autorizado) onLogin(tokenInput);
+            else setErrorMessage("Token inválido");
+        } catch {
+            setErrorMessage("Error de conexión");
         } finally {
             setIsLoading(false);
         }
     };
 
-    const handleFormSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        handleLoginAttempt();
-    };
-
     const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
         const scrollTop = e.currentTarget.scrollTop;
-        const windowHeight = window.innerHeight;
-
-        // Show chat button if we scrolled past 20% or if chat is open
-        if (scrollTop > windowHeight * 0.2 || isChatOpen) {
-            setShowChat(true);
-        } else {
-            if (!isChatOpen) setShowChat(false);
-        }
+        setShowChat(scrollTop > 300 || isChatOpen);
     };
 
     if (!isLoggedIn) {
         return (
-            <div
-                className="flex-1 h-screen overflow-y-auto bg-stone-50 scroll-smooth font-sans custom-scrollbar"
-                onScroll={handleScroll}
-            >
-                {/* --- HERO SECTION (100vh) --- */}
-                <section id="top" className="min-h-screen flex flex-col items-center justify-center p-6 relative">
-                    {/* Background Decor */}
-                    <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none opacity-40">
-                        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-emerald-100/30 rounded-full blur-[100px]"></div>
-                        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-teal-100/30 rounded-full blur-[100px]"></div>
+            <div className="flex-1 h-screen overflow-y-auto bg-mesh scroll-smooth selection:bg-indigo-100 selection:text-indigo-900" onScroll={handleScroll}>
+                {/* --- NAVIGATION --- */}
+                <nav className="fixed top-0 w-full z-50 p-6 flex justify-between items-center transition-all">
+                    <div className="flex items-center gap-2 group cursor-pointer">
+                        <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform">
+                            <Shield size={18} />
+                        </div>
+                        <span className="font-bold text-slate-900 tracking-tight text-xl">HIPATIA</span>
                     </div>
+                    <div className="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600">
+                        <a href="/blog" className="hover:text-indigo-600 transition-colors">Blog</a>
+                        <a href="/contacto" className="hover:text-indigo-600 transition-colors">Contacto</a>
+                        <button onClick={() => document.getElementById('login-card')?.scrollIntoView({ behavior: 'smooth' })} className="px-5 py-2 bg-slate-900 text-white rounded-full hover:bg-slate-800 transition-all shadow-md active:scale-95">
+                            Acceder
+                        </button>
+                    </div>
+                </nav>
 
-                    <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-12 items-center z-10">
-                        {/* Left Column: Value Proposition */}
-                        <div className="space-y-8 text-center lg:text-left animate-in fade-in slide-in-from-bottom-8 duration-700">
-                            <div className="flex items-center gap-2 justify-center lg:justify-start">
-                                <Shield size={14} className="text-emerald-700" />
-                                <span className="text-[10px] uppercase font-bold text-emerald-700 tracking-widest">Plataforma Docente Segura</span>
+                {/* --- HERO SECTION --- */}
+                <section className="min-h-screen pt-32 pb-20 px-6 flex flex-col lg:flex-row items-center justify-center gap-16 max-w-7xl mx-auto">
+                    <div className="flex-1 space-y-10 text-center lg:text-left">
+                        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-700 text-xs font-bold animate-pulse-soft">
+                            <span className="flex h-2 w-2 rounded-full bg-indigo-600"></span>
+                            BETA DISPONIBLE PARA DOCENTES
+                        </div>
+                        <h1 className="text-6xl md:text-8xl font-extrabold text-slate-900 leading-[1.05] tracking-tight">
+                            La IA que entiende <br />
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-blue-600 to-indigo-700">la educación.</span>
+                        </h1>
+                        <p className="text-xl text-slate-500 max-w-xl mx-auto lg:mx-0 leading-relaxed font-medium">
+                            HIPATIA es el ecosistema inteligente diseñado para potenciar tu labor docente: desde la corrección de exámenes manuscritos hasta la generación de recursos oficiales.
+                        </p>
+                        <div className="flex flex-wrap justify-center lg:justify-start gap-4 pt-4">
+                            <div className="flex items-center gap-2 text-slate-600 font-bold bg-white/50 px-4 py-2 rounded-lg border border-slate-100 shadow-sm">
+                                <CheckCircle size={18} className="text-emerald-500" />
+                                <span>Corrección OCR</span>
                             </div>
-
-                            <h1 className="text-5xl md:text-7xl font-black font-serif text-stone-900 leading-[0.9] tracking-tight">
-                                Revoluciona tu <br />
-                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-700 to-teal-900">Evaluación</span>
-                            </h1>
-
-                            <p className="text-lg text-stone-500 font-medium max-w-md mx-auto lg:mx-0 leading-relaxed">
-                                <strong className="text-stone-700">HIPAT<span className="text-emerald-600">IA</span> <span className="text-[10px] align-top bg-stone-100 text-stone-500 px-1 py-0.5 rounded font-bold ml-0.5 border border-stone-200">BETA</span></strong> es el ecosistema definitivo para generar exámenes accesibles y corregir evidencias manuscritas con Inteligencia Artificial.
-                            </p>
-
-                            <div className="flex flex-col gap-4 max-w-sm mx-auto lg:mx-0">
-                                <div className="flex items-center gap-3 bg-white p-3 rounded-lg border border-stone-200 shadow-sm">
-                                    <div className="bg-emerald-100 p-2 rounded-md text-emerald-700"><CheckCircle size={18} /></div>
-                                    <div className="text-left">
-                                        <h4 className="font-bold text-stone-800 text-sm">Corrección de Exámenes</h4>
-                                        <p className="text-xs text-stone-400">Tu asistente de corrección experta.</p>
-                                    </div>
-                                </div>
-                                <div className="flex items-center gap-3 bg-white p-3 rounded-lg border border-stone-200 shadow-sm">
-                                    <div className="bg-teal-100 p-2 rounded-md text-teal-700"><Zap size={18} /></div>
-                                    <div className="text-left">
-                                        <h4 className="font-bold text-stone-800 text-sm">Generación de Exámenes</h4>
-                                        <p className="text-xs text-stone-400">Crea exámenes en segundos con IA.</p>
-                                    </div>
-                                </div>
+                            <div className="flex items-center gap-2 text-slate-600 font-bold bg-white/50 px-4 py-2 rounded-lg border border-slate-100 shadow-sm">
+                                <CheckCircle size={18} className="text-emerald-500" />
+                                <span>Generación IA</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-slate-600 font-bold bg-white/50 px-4 py-2 rounded-lg border border-slate-100 shadow-sm">
+                                <CheckCircle size={18} className="text-emerald-500" />
+                                <span>Conformidad LOPD</span>
                             </div>
                         </div>
+                    </div>
 
-                        {/* Right Column: Login Card */}
-                        <div className="flex justify-center lg:justify-end animate-in fade-in slide-in-from-bottom-8 duration-700 delay-100">
-                            <div className="bg-white p-8 md:p-10 rounded-xl shadow-xl border border-stone-200 w-full max-w-md relative overflow-hidden">
-                                <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-emerald-600 to-teal-700"></div>
-
-                                <div className="mb-8 text-center">
-                                    <div className="w-16 h-16 bg-stone-50 rounded-lg flex items-center justify-center mx-auto mb-4 text-stone-400">
-                                        <Lock size={28} />
-                                    </div>
-                                    <h2 className="text-2xl font-black font-serif text-stone-900 mb-2">Acceso Docente</h2>
-                                    <p className="text-stone-400 text-sm font-medium">Introduce tu token corporativo</p>
+                    <div id="login-card" className="w-full max-w-[440px] animate-float">
+                        <div className="glass shadow-stripe rounded-[32px] p-10 relative overflow-hidden">
+                            <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-indigo-500 to-blue-600"></div>
+                            <div className="mb-10 text-center">
+                                <div className="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center mx-auto mb-6 text-indigo-600 border border-indigo-100">
+                                    <Lock size={24} />
                                 </div>
+                                <h2 className="text-2xl font-bold text-slate-900 mb-2">Entrar en la plataforma</h2>
+                                <p className="text-slate-500 text-sm font-medium">Introduce tu código de acceso corporativo</p>
+                            </div>
 
-                                <form onSubmit={handleFormSubmit} className="space-y-4">
-                                    <div>
-                                        <input
-                                            type="text"
-                                            autoFocus
-                                            className={`w-full h-14 px-4 bg-stone-50 border-2 rounded-lg focus:bg-white outline-none transition-all text-center text-lg font-bold text-stone-800 tracking-widest placeholder:text-stone-300 placeholder:font-normal placeholder:tracking-normal
-                                                ${errorMessage ? "border-rose-300 focus:border-rose-500" : "border-stone-200 focus:border-emerald-500"}`}
-                                            placeholder="TOKEN_ID"
-                                            value={tokenInput}
-                                            onChange={(e) => {
-                                                setTokenInput(e.target.value);
-                                                if (errorMessage) setErrorMessage("");
-                                            }}
-                                            disabled={isLoading}
-                                        />
-                                    </div>
-
-                                    {errorMessage && (
-                                        <div className="text-rose-500 text-xs text-center font-bold animate-pulse">
-                                            {errorMessage}
-                                        </div>
+                            <form onSubmit={handleLogin} className="space-y-6">
+                                <div className="space-y-2">
+                                    <input
+                                        type="text"
+                                        autoFocus
+                                        className={`w-full h-16 px-6 bg-slate-50/50 border-2 rounded-2xl outline-none transition-all text-center text-xl font-bold tracking-[0.2em] focus:bg-white
+                                            ${errorMessage ? "border-rose-400 focus:border-rose-500 text-rose-600" : "border-slate-100 focus:border-indigo-500 text-slate-800"}`}
+                                        placeholder="TOKEN_ID"
+                                        value={tokenInput}
+                                        onChange={(e) => { setTokenInput(e.target.value); setErrorMessage(""); }}
+                                    />
+                                    {errorMessage && <p className="text-rose-500 text-xs font-bold text-center animate-bounce">{errorMessage}</p>}
+                                </div>
+                                <button
+                                    type="submit"
+                                    disabled={isLoading}
+                                    className="w-full h-16 bg-indigo-600 text-white rounded-2xl font-bold text-lg hover:bg-indigo-700 transition-all shadow-lg shadow-indigo-200 active:scale-[0.98] flex items-center justify-center group"
+                                >
+                                    {isLoading ? <span className="animate-pulse">Verificando...</span> : (
+                                        <>
+                                            Acceder ahora
+                                            <ArrowRight size={20} className="ml-2 group-hover:translate-x-1 transition-transform" />
+                                        </>
                                     )}
-
-                                    <button
-                                        type="submit"
-                                        disabled={isLoading}
-                                        className="w-full h-12 bg-stone-900 hover:bg-stone-800 text-white rounded-lg font-bold transition-all shadow-lg hover:shadow-xl active:scale-[0.98] flex items-center justify-center gap-2 group"
-                                    >
-                                        {isLoading ? (
-                                            <span className="animate-pulse">Validando...</span>
-                                        ) : (
-                                            <>
-                                                <span>ENTRAR AL SISTEMA</span>
-                                                <ChevronRight size={18} className="group-hover:translate-x-1 transition-transform" />
-                                            </>
-                                        )}
-                                    </button>
-                                </form>
-                                <div className="mt-6 text-center text-stone-400 text-xs font-bold gap-4 flex justify-center">
-                                    <button onClick={onShowSample} className="hover:text-emerald-600 underline transition-colors">
-                                        ✨ Ver Informe de Ejemplo
-                                    </button>
-                                </div>
+                                </button>
+                            </form>
+                            <div className="mt-8 text-center">
+                                <button onClick={onShowSample} className="text-slate-400 text-sm font-semibold hover:text-indigo-600 transition-colors flex items-center justify-center gap-2 mx-auto">
+                                    <Play size={14} className="text-indigo-500" />
+                                    Probar demostración interactiva
+                                </button>
                             </div>
                         </div>
                     </div>
                 </section>
 
-                {/* --- SECCIÓN 1: JUSTICIA ACADÉMICA --- */}
-                <section className="py-24 px-6 bg-white border-t border-stone-200">
-                    <RevealSection className="w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
-                        <div className="space-y-8">
-                            <h2 className="text-4xl md:text-5xl font-black font-serif text-stone-900 leading-tight">
-                                Cero errores con nuestra <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-700 to-teal-900">verificación en 3 capas</span>
-                            </h2>
-                            <p className="text-lg text-stone-500 font-medium leading-relaxed">
-                                Un sistema de auditoría multicapa que garantiza la equidad en cada corrección.
-                            </p>
-
-                            <ul className="space-y-6">
-                                <li className="flex gap-4">
-                                    <div className="w-12 h-12 bg-stone-100 rounded-lg flex items-center justify-center shrink-0">
-                                        <Search className="text-emerald-700" />
-                                    </div>
-                                    <div>
-                                        <h4 className="font-bold text-stone-900 text-lg font-serif">1. El Juez (Análisis)</h4>
-                                        <p className="text-stone-500 text-sm">Lectura OCR y extracción de evidencias crudas.</p>
-                                    </div>
-                                </li>
-                                <li className="flex gap-4">
-                                    <div className="w-12 h-12 bg-emerald-50 rounded-lg flex items-center justify-center shrink-0">
-                                        <CheckCircle className="text-teal-700" />
-                                    </div>
-                                    <div>
-                                        <h4 className="font-bold text-stone-900 text-lg font-serif">2. El Auditor (Rúbrica)</h4>
-                                        <p className="text-stone-500 text-sm">Contraste estricto con los criterios de evaluación.</p>
-                                    </div>
-                                </li>
-                                <li className="flex gap-4">
-                                    <div className="w-12 h-12 bg-stone-100 rounded-lg flex items-center justify-center shrink-0">
-                                        <Award className="text-emerald-700" />
-                                    </div>
-                                    <div>
-                                        <h4 className="font-bold text-stone-900 text-lg font-serif">3. Tribunal Supremo (Informe)</h4>
-                                        <p className="text-stone-500 text-sm">Redacción pedagógica de la justificación final.</p>
-                                    </div>
-                                </li>
-                            </ul>
+                {/* --- FEATURES GRID --- */}
+                <section className="py-32 px-6 bg-white border-t border-slate-100">
+                    <RevealSection className="max-w-7xl mx-auto">
+                        <div className="text-center space-y-4 mb-20">
+                            <h2 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight">Potencia instalada</h2>
+                            <p className="text-slate-500 text-lg max-w-2xl mx-auto font-medium">Todo lo necesario para una gestión pedagógica avanzada.</p>
                         </div>
-                        <div className="relative group w-full max-w-[350px] mx-auto grayscale hover:grayscale-0 transition-all duration-700">
-                            <div className="absolute -inset-4 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-lg opacity-20 blur-xl"></div>
-                            <img
-                                src="/blog-triple-consenso.jpg.png"
-                                alt="Triple Consenso Workflow"
-                                className="relative rounded-lg shadow-xl border-4 border-white transform group-hover:scale-[1.01] transition-transform duration-500 w-full"
-                            />
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                            {[
+                                {
+                                    icon: Search,
+                                    title: "Auditoría en 3 capas",
+                                    desc: "Verificación triple para una precisión absoluta en la corrección de exámenes manuscritos.",
+                                    color: "indigo"
+                                },
+                                {
+                                    icon: Zap,
+                                    title: "Generación Reactiva",
+                                    desc: "Crea exámenes y materiales de apoyo en segundos a partir de tus propios contenidos.",
+                                    color: "blue"
+                                },
+                                {
+                                    icon: Shield,
+                                    title: "Escudo LOPD",
+                                    desc: "Diseñado para cumplir con los estándares más estrictos de privacidad en el aula.",
+                                    color: "purple"
+                                }
+                            ].map((feature, i) => (
+                                <div key={i} className="group p-10 rounded-[32px] bg-slate-50 hover:bg-white border border-transparent hover:border-slate-100 transition-all hover:shadow-2xl hover:shadow-slate-200/50">
+                                    <div className={`w-14 h-14 bg-white rounded-2xl flex items-center justify-center mb-8 shadow-sm group-hover:scale-110 transition-transform`}>
+                                        <feature.icon size={26} className={`text-indigo-600`} />
+                                    </div>
+                                    <h3 className="text-2xl font-bold text-slate-900 mb-4 tracking-tight">{feature.title}</h3>
+                                    <p className="text-slate-500 leading-relaxed font-medium">{feature.desc}</p>
+                                </div>
+                            ))}
                         </div>
                     </RevealSection>
                 </section>
 
-                {/* --- SECCIÓN 2: SEGURIDAD JURÍDICA --- */}
-                <section className="py-24 px-6 bg-stone-50">
-                    <RevealSection className="w-full max-w-4xl mx-auto text-center space-y-12">
-                        <div className="space-y-4">
-                            <h2 className="text-4xl md:text-5xl font-black font-serif text-stone-900 leading-tight">
-                                Informes <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-700 to-teal-900">irrefutables</span>:<br />
-                                Tu escudo ante las reclamaciones
-                            </h2>
-                            <p className="text-xl text-stone-500 font-medium max-w-2xl mx-auto">
-                                Trazabilidad total entre la rúbrica, la evidencia del examen y el feedback final.
-                            </p>
-                        </div>
-
-                        <div className="relative inline-block w-full max-w-[400px] mx-auto">
-                            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-emerald-700/10 rounded-full blur-[100px]"></div>
-                            <img
-                                src="/imagen articulo 5.png"
-                                alt="Hipatia Informes"
-                                className="relative rounded-lg shadow-2xl border border-stone-200 w-full transform hover:-translate-y-2 transition-transform duration-500"
-                            />
-                        </div>
-                    </RevealSection>
-                </section>
-
-                {/* --- SECCIÓN 3: CARACTERÍSTICAS TÉCNICAS --- */}
-                <section className="py-24 px-6 bg-white border-t border-stone-200">
-                    <RevealSection className="w-full max-w-6xl mx-auto">
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-                            {/* Feature 1 */}
-                            <div className="text-center space-y-6 group p-8 rounded-2xl hover:bg-stone-50 transition-colors border border-transparent hover:border-stone-100">
-                                <div className="w-20 h-20 mx-auto mb-6 relative">
-                                    <div className="absolute inset-0 bg-emerald-100/50 rounded-full blur-xl group-hover:bg-emerald-200/50 transition-all"></div>
-                                    <img src="/icon-ocr.png" alt="OCR" className="relative w-full h-full object-contain p-2" />
-                                </div>
-                                <h3 className="text-2xl font-black font-serif text-stone-900">OCR de Precisión</h3>
-                                <p className="text-stone-500 font-medium leading-relaxed text-sm">
-                                    Lectura inteligente de caligrafía manuscrita, incluso en condiciones de baja legibilidad.
-                                </p>
-                            </div>
-
-                            {/* Feature 2 */}
-                            <div className="text-center space-y-6 group p-8 rounded-2xl hover:bg-stone-50 transition-colors border border-transparent hover:border-stone-100">
-                                <div className="w-20 h-20 mx-auto mb-6 relative">
-                                    <div className="absolute inset-0 bg-teal-100/50 rounded-full blur-xl group-hover:bg-teal-200/50 transition-all"></div>
-                                    <img src="/icon-privacy.png" alt="Privacy" className="relative w-full h-full object-contain p-2" />
-                                </div>
-                                <h3 className="text-2xl font-black font-serif text-stone-900">Privacidad Blindada</h3>
-                                <p className="text-stone-500 font-medium leading-relaxed text-sm">
-                                    Anonimización automática de datos sensibles y cumplimiento estricto con la LOPD.
-                                </p>
-                            </div>
-
-                            {/* Feature 3 */}
-                            <div className="text-center space-y-6 group p-8 rounded-2xl hover:bg-stone-50 transition-colors border border-transparent hover:border-stone-100">
-                                <div className="w-20 h-20 mx-auto mb-6 relative">
-                                    <div className="absolute inset-0 bg-emerald-100/50 rounded-full blur-xl group-hover:bg-emerald-200/50 transition-all"></div>
-                                    <img src="/icon-cloud.png" alt="Cloud" className="relative w-full h-full object-contain p-2" />
-                                </div>
-                                <h3 className="text-2xl font-black font-serif text-stone-900">Sincronización Cloud</h3>
-                                <p className="text-stone-500 font-medium leading-relaxed text-sm">
-                                    Acceso multidispositivo a tus informes desde cualquier lugar y en cualquier momento.
-                                </p>
-                            </div>
-                        </div>
-                    </RevealSection>
-                </section>
-
-                {/* --- CHATBOT WIDGET --- */}
+                {/* --- CHATBOT --- */}
                 {showChat && (
-                    <div className="fixed bottom-8 right-8 z-50 animate-in fade-in slide-in-from-bottom-10 flex flex-col items-end gap-4 print:hidden">
-
-                        {/* Chat Interface Window */}
+                    <div className="fixed bottom-8 right-8 z-50 flex flex-col items-end gap-4">
                         {isChatOpen && (
-                            <div className="bg-white w-[350px] md:w-[400px] h-[500px] rounded-xl shadow-2xl border border-stone-200 flex flex-col overflow-hidden animate-in zoom-in-95 origin-bottom-right mb-2">
-                                {/* Chat Header */}
-                                <div className="p-4 bg-stone-900 flex items-center justify-between shrink-0">
+                            <div className="glass shadow-2xl w-[380px] h-[550px] rounded-[24px] flex flex-col overflow-hidden animate-in zoom-in-95 origin-bottom-right">
+                                <div className="p-5 bg-indigo-600 text-white flex items-center justify-between">
                                     <div className="flex items-center gap-3">
-                                        <div className="w-8 h-8 rounded-full bg-gradient-to-r from-emerald-600 to-teal-700 flex items-center justify-center text-white font-black font-serif text-xs">
-                                            H
+                                        <div className="w-10 h-10 rounded-full bg-indigo-500 flex items-center justify-center shadow-inner">
+                                            <Shield size={20} />
                                         </div>
                                         <div>
-                                            <h4 className="font-bold text-white text-sm">Asistente Hipatia</h4>
-                                            <p className="text-[10px] text-stone-300 font-medium">En línea • IA Educativa</p>
+                                            <p className="font-bold text-sm">Asistente Hipatia</p>
+                                            <p className="text-[10px] opacity-80 uppercase tracking-widest font-bold">Online</p>
                                         </div>
                                     </div>
-                                    <button
-                                        onClick={() => setIsChatOpen(false)}
-                                        className="text-stone-400 hover:text-white transition-colors"
-                                    >
-                                        <X size={18} />
-                                    </button>
+                                    <button onClick={() => setIsChatOpen(false)} className="hover:rotate-90 transition-transform"><X size={20} /></button>
                                 </div>
-
-                                {/* Messages Area */}
-                                <div className="flex-1 p-4 overflow-y-auto space-y-4 bg-stone-50">
-                                    {messages.map((msg, idx) => (
-                                        <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                                            <div
-                                                className={`max-w-[85%] rounded-lg p-3 text-sm shadow-sm
-                                                ${msg.role === 'user'
-                                                        ? 'bg-gradient-to-r from-emerald-700 to-teal-900 text-white rounded-tr-sm'
-                                                        : 'bg-white border border-stone-200 text-stone-700 rounded-tl-sm prose prose-sm prose-p:my-1 prose-headings:my-2 prose-ul:my-1 prose-li:my-0'}`}
-                                            >
-                                                {msg.text === '...' ? (
-                                                    <div className="flex gap-1 h-5 items-center px-1">
-                                                        <span className="w-1.5 h-1.5 bg-stone-400 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-                                                        <span className="w-1.5 h-1.5 bg-stone-400 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
-                                                        <span className="w-1.5 h-1.5 bg-stone-400 rounded-full animate-bounce"></span>
-                                                    </div>
-                                                ) : (
-                                                    <ReactMarkdown
-                                                        components={{
-                                                            a: ({ node, ...props }) => <a {...props} className="text-emerald-600 underline font-bold hover:text-emerald-700" target="_blank" rel="noopener noreferrer" />,
-                                                            strong: ({ node, ...props }) => <strong {...props} className="font-black font-serif" />
-                                                        }}
-                                                    >
-                                                        {msg.text}
-                                                    </ReactMarkdown>
-                                                )}
+                                <div className="flex-1 p-5 overflow-y-auto space-y-6 bg-white/40 custom-scrollbar">
+                                    {messages.map((msg, i) => (
+                                        <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                                            <div className={`max-w-[85%] p-4 rounded-2xl text-sm shadow-sm ${msg.role === 'user' ? 'bg-indigo-600 text-white rounded-tr-none' : 'bg-white border border-slate-100 text-slate-800 rounded-tl-none font-medium'}`}>
+                                                <ReactMarkdown className="prose prose-sm prose-slate prose-indigo">{msg.text}</ReactMarkdown>
                                             </div>
                                         </div>
                                     ))}
                                     <div ref={messagesEndRef} />
                                 </div>
-
-                                {/* Input Area */}
-                                <form onSubmit={handleSendMessage} className="p-3 bg-white border-t border-stone-100 flex gap-2">
-                                    <input
-                                        type="text"
-                                        value={inputMessage}
-                                        onChange={(e) => setInputMessage(e.target.value)}
-                                        placeholder="Pregunta sobre Hipatia..."
-                                        className="flex-1 bg-stone-50 border border-stone-200 rounded-lg px-4 py-2 text-sm focus:bg-white focus:border-emerald-500 outline-none text-stone-700 placeholder:text-stone-400 transition-all font-medium"
-                                        disabled={isTyping}
-                                    />
-                                    <button
-                                        type="submit"
-                                        disabled={!inputMessage.trim() || isTyping}
-                                        className="w-10 h-10 bg-stone-900 text-white rounded-lg flex items-center justify-center hover:bg-emerald-600 active:scale-95 transition-all disabled:opacity-50 disabled:active:scale-100 shadow-md"
-                                    >
-                                        <Send size={18} />
-                                    </button>
+                                <form onSubmit={handleSendMessage} className="p-4 bg-white border-t border-slate-100 flex gap-2">
+                                    <input value={inputMessage} onChange={(e) => setInputMessage(e.target.value)} placeholder="¿Cómo funciona el módulo auditor?" className="flex-1 h-12 px-5 bg-slate-50 rounded-xl outline-none focus:bg-white focus:ring-2 ring-indigo-100 border border-slate-100 transition-all" />
+                                    <button disabled={!inputMessage.trim()} className="w-12 h-12 bg-indigo-600 text-white rounded-xl flex items-center justify-center hover:bg-indigo-700 transition-all disabled:opacity-50"><Send size={18} /></button>
                                 </form>
                             </div>
                         )}
-
-                        {/* Toggle Button */}
-                        <div
-                            onClick={() => setIsChatOpen(!isChatOpen)}
-                            className={`bg-white rounded-full shadow-2xl p-4 border border-stone-100 cursor-pointer hover:scale-110 transition-transform relative group
-                            ${isChatOpen ? 'bg-stone-900 border-stone-800 text-white rotate-90' : 'text-emerald-600'}`}
-                        >
-                            {!isChatOpen && (
-                                <span className="absolute -top-1 -right-1 flex h-3 w-3">
-                                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-teal-400 opacity-75"></span>
-                                    <span className="relative inline-flex rounded-full h-3 w-3 bg-teal-500"></span>
-                                </span>
-                            )}
-                            <div className="w-8 h-8 flex items-center justify-center">
-                                {isChatOpen ? (
-                                    <X size={24} />
-                                ) : (
-                                    <MessageCircle size={24} />
-                                )}
-                            </div>
-                        </div>
+                        <button onClick={() => setIsChatOpen(!isChatOpen)} className={`w-16 h-16 rounded-full shadow-2xl flex items-center justify-center transition-all hover:scale-110 active:scale-90 ${isChatOpen ? 'bg-slate-900 text-white rotate-90' : 'bg-indigo-600 text-white'}`}>
+                            {isChatOpen ? <X size={28} /> : <MessageCircle size={28} />}
+                        </button>
                     </div>
                 )}
             </div>
         );
     }
 
-    // --- DASHBOARD VIEW (LOGGED IN) ---
     return (
-        <div className="flex-1 bg-stone-50 flex flex-col items-center p-6 font-sans overflow-hidden h-screen relative">
-
-            {/* Header Bar */}
-            <header className="w-full max-w-6xl flex justify-between items-center z-20 p-2">
-                <div className="flex items-center gap-4">
-                    {/* Branding + BETA */}
-                    <div className="flex items-center gap-2 mr-4 pb-0.5 select-none">
-                        <span className="text-lg font-black font-serif text-stone-700 tracking-tight">HIPAT<span className="text-emerald-600">IA</span></span>
-                        <span className="bg-amber-100 text-amber-700 text-[9px] px-1.5 py-0.5 rounded font-bold border border-amber-200">BETA</span>
+        <div className="flex-1 bg-mesh h-screen overflow-hidden flex flex-col font-sans selection:bg-indigo-100 selection:text-indigo-900">
+            {/* --- DASHBOARD HEADER --- */}
+            <header className="px-8 py-5 flex justify-between items-center glass border-b border-slate-200/50 z-30">
+                <div className="flex items-center gap-8">
+                    <div className="flex items-center gap-2 select-none pointer-events-none">
+                        <div className="w-7 h-7 bg-indigo-600 rounded-md flex items-center justify-center text-white shadow-md">
+                            <Shield size={14} />
+                        </div>
+                        <span className="font-bold text-slate-900 text-lg tracking-tight">HIPATIA</span>
                     </div>
-
-                    {/* Links */}
-                    <a href="/blog" className="flex items-center gap-2 px-2 py-2 text-xs font-bold text-stone-400 hover:text-emerald-600 transition-colors uppercase tracking-wider">
-                        <BookOpen size={14} /> Blog
-                    </a>
-                    <a href="/preguntas-frecuentes" className="flex items-center gap-2 px-2 py-2 text-xs font-bold text-stone-400 hover:text-emerald-600 transition-colors uppercase tracking-wider">
-                        <div className="w-4 h-4 rounded-full border border-current flex items-center justify-center text-[10px] font-serif">?</div>
-                        FAQ
-                    </a>
-                    <a href="/contacto" className="flex items-center gap-2 px-2 py-2 text-xs font-bold text-stone-400 hover:text-emerald-600 transition-colors uppercase tracking-wider">
-                        <Mail size={14} />
-                        Contacto
-                    </a>
+                    <nav className="hidden md:flex items-center gap-6 text-xs font-bold text-slate-500">
+                        <a href="/blog" className="hover:text-indigo-600 transition-colors uppercase tracking-widest flex items-center gap-1.5"><BookOpen size={14} /> Blog</a>
+                        <a href="/contacto" className="hover:text-indigo-600 transition-colors uppercase tracking-widest flex items-center gap-1.5"><Mail size={14} /> Contacto</a>
+                    </nav>
                 </div>
-
-                {/* Navigation Actions */}
-                <div className="flex items-center gap-3">
-                    {viewMode !== "main" && (
-                        <button onClick={() => setViewMode("main")} className="flex items-center gap-2 px-3 py-2 text-xs font-bold text-stone-500 hover:text-emerald-600 hover:bg-stone-100 rounded-lg transition-all uppercase tracking-wider">
-                            <LayoutGrid size={14} /> Apps
+                <div className="flex items-center gap-4">
+                    {viewMode === 'forge' && (
+                        <button onClick={() => setViewMode('main')} className="px-4 py-2 bg-slate-100 text-slate-600 rounded-lg text-xs font-bold hover:bg-slate-200 transition-all uppercase tracking-widest">
+                            <LayoutGrid size={14} className="inline mr-2" /> Menú
                         </button>
                     )}
-                    <button
-                        onClick={onLogout}
-                        className="flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm border border-stone-200 rounded-lg shadow-sm text-xs font-bold text-stone-500 hover:bg-stone-100 hover:text-stone-700 hover:border-stone-300 transition-all uppercase tracking-wider"
-                    >
-                        <Lock size={14} />
-                        Cerrar Sesión
+                    <button onClick={onLogout} className="px-4 py-2 bg-indigo-50 text-indigo-700 rounded-lg text-xs font-bold hover:bg-indigo-100 transition-all flex items-center gap-2 border border-indigo-100 uppercase tracking-widest">
+                        <Lock size={14} /> Salir
                     </button>
                 </div>
             </header>
 
-            <div className="flex-1 flex flex-col items-center justify-start pt-12 w-full max-w-6xl overflow-y-auto custom-scrollbar">
-
-                {viewMode === "main" ? (
-                    <>
-                        {/* Branding Central - Hero Style */}
-                        <div className="text-center mb-12 animate-fade-in-up space-y-4 shrink-0 px-4">
-                            <h1 className="text-5xl md:text-6xl font-black font-serif text-stone-900 leading-[1.15] tracking-tight pb-2">
-                                Centraliza, <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-700 to-teal-900">Potencia</span> y Simplifica
-                            </h1>
-                            <p className="text-stone-500 font-medium text-xl md:text-2xl max-w-2xl mx-auto">
-                                Tu ecosistema integral para la gestión educativa inteligente y la corrección asistida por IA.
-                            </p>
-                        </div>
-
-                        {/* Module Selection Grid */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl px-4 animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-200 mb-12">
-
-                            {/* Auditor Card */}
-                            <button
-                                onClick={onSelectAuditor}
-                                className="group bg-white rounded-lg border border-stone-200 p-8 shadow-sm hover:shadow-xl transition-all duration-300 text-left flex flex-col gap-6 relative overflow-hidden active:scale-[0.99]"
-                            >
-                                <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-50 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
-                                <div className="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center text-emerald-700 shadow-sm z-10">
-                                    <Search size={24} />
-                                </div>
-                                <div className="z-10">
-                                    <h3 className="text-2xl font-bold text-stone-800 mb-2 group-hover:text-emerald-700 transition-colors font-serif">MÓDULO CORRECTOR</h3>
-                                    <p className="text-stone-500 text-sm leading-relaxed">
-                                        Auditoría técnica de evidencias manuscritas y evaluación automática por rúbricas.
-                                    </p>
-                                    <div className="flex items-center gap-2 mt-4 text-emerald-600 font-bold text-xs uppercase tracking-widest group-hover:gap-3 transition-all">
-                                        <span>Iniciar Corrección</span>
-                                        <ChevronRight className="h-3.5 w-3.5" />
-                                    </div>
-                                </div>
-                            </button>
-
-                            {/* Forge Card */}
-                            <button
-                                onClick={() => setViewMode("forge")}
-                                className="group bg-white rounded-lg border border-stone-200 p-8 shadow-sm hover:shadow-xl transition-all duration-300 text-left flex flex-col gap-6 relative overflow-hidden active:scale-[0.99]"
-                            >
-                                <div className="absolute top-0 right-0 w-24 h-24 bg-teal-50 rounded-bl-full -mr-4 -mt-4 transition-transform group-hover:scale-110"></div>
-                                <div className="w-12 h-12 bg-teal-100 rounded-lg flex items-center justify-center text-teal-700 shadow-sm z-10">
-                                    <Zap size={24} />
-                                </div>
-                                <div className="z-10">
-                                    <h3 className="text-2xl font-bold text-stone-800 mb-2 group-hover:text-teal-700 transition-colors font-serif">MÓDULO GENERADOR</h3>
-                                    <p className="text-stone-500 text-sm leading-relaxed">
-                                        Creación de materiales, exámenes y rúbricas con rigor UCLM y accesibilidad.
-                                    </p>
-                                    <div className="flex items-center gap-2 mt-4 text-teal-600 font-bold text-xs uppercase tracking-widest group-hover:gap-3 transition-all">
-                                        <span>Generación de Exámenes</span>
-                                        <ChevronRight className="h-3.5 w-3.5" />
-                                    </div>
-                                </div>
-                            </button>
-                        </div>
-                    </>
-                ) : (
-                    /* FORGE SUB-MENU */
-                    <div className="animate-in fade-in slide-in-from-right-8 duration-500 w-full flex flex-col items-center">
-                        <div className="text-center mb-10 space-y-3">
-                            <div className="w-16 h-16 bg-teal-100 rounded-2xl flex items-center justify-center mx-auto mb-4 text-teal-700 shadow-sm">
-                                <Zap size={32} />
+            <main className="flex-1 overflow-y-auto p-12 custom-scrollbar relative z-10 flex flex-col items-center">
+                <div className="w-full max-w-6xl">
+                    {viewMode === 'main' ? (
+                        <div className="space-y-16 animate-in fade-in slide-in-from-bottom-8 duration-700">
+                            <div className="text-center space-y-6">
+                                <h1 className="text-5xl md:text-7xl font-black text-slate-900 tracking-tight">
+                                    Bienvenid@ al futuro <br />
+                                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-blue-700">del aula inteligente.</span>
+                                </h1>
+                                <p className="text-xl text-slate-500 font-medium max-w-2xl mx-auto">Selecciona la herramienta que deseas utilizar hoy.</p>
                             </div>
-                            <h2 className="text-4xl font-black font-serif text-stone-900 tracking-tight">Elige tu modo de creación</h2>
-                            <p className="text-stone-500 max-w-lg mx-auto">Selecciona la herramienta especializada que mejor se adapte a tu necesidad pedagógica actual.</p>
-                        </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-3xl px-4">
-                            {/* Forge Universal */}
-                            <button
-                                onClick={onSelectForgeUniversal}
-                                className="group bg-white rounded-lg border border-stone-200 p-8 shadow-sm hover:shadow-xl hover:border-teal-200 transition-all text-left flex items-start gap-4 active:scale-[0.99]"
-                            >
-                                <div className="bg-teal-50 p-3 rounded-lg text-teal-700 shrink-0">
-                                    <BookOpen size={24} />
-                                </div>
-                                <div>
-                                    <h3 className="text-lg font-bold text-stone-800 mb-1 font-serif group-hover:text-teal-700">MODO GENERAL</h3>
-                                    <p className="text-xs text-stone-400 mb-3">Para cualquier materia y nivel.</p>
-                                    <span className="text-[10px] font-bold text-teal-600 uppercase tracking-widest border-b border-teal-200 pb-0.5">Acceder al Generador</span>
-                                </div>
-                            </button>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+                                <button onClick={onSelectAuditor} className="group glass-indigo rounded-[32px] p-10 text-left transition-all hover:scale-[1.02] hover:shadow-2xl hover:shadow-indigo-200/50 flex flex-col gap-10">
+                                    <div className="flex justify-between items-start">
+                                        <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-indigo-700 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-indigo-200">
+                                            <Search size={32} />
+                                        </div>
+                                        <div className="bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">Auditoría Pro</div>
+                                    </div>
+                                    <div>
+                                        <h2 className="text-3xl font-bold text-slate-900 mb-3 tracking-tight">MÓDULO CORRECTOR</h2>
+                                        <p className="text-slate-500 font-medium leading-relaxed">Auditoría técnica de evidencias manuscritas y evaluación automática por rúbricas de alta precisión.</p>
+                                    </div>
+                                    <div className="flex items-center gap-2 text-indigo-600 font-bold text-sm uppercase tracking-widest pt-4 group-hover:gap-4 transition-all">
+                                        Acceder al corrector <ArrowRight size={18} />
+                                    </div>
+                                </button>
 
-                            {/* Forge Specialist */}
-                            <button
-                                onClick={onSelectForgeSpecialist}
-                                className="group bg-white rounded-lg border border-stone-200 p-8 shadow-sm hover:shadow-xl hover:border-teal-200 transition-all text-left flex items-start gap-4 active:scale-[0.99]"
-                            >
-                                <div className="bg-emerald-50 p-3 rounded-lg text-emerald-700 shrink-0">
-                                    <Award size={24} />
-                                </div>
-                                <div>
-                                    <h3 className="text-lg font-bold text-stone-800 mb-1 font-serif group-hover:text-emerald-700">MODO ESPECIALISTA</h3>
-                                    <p className="text-xs text-stone-400 mb-3">Historia de España (2º Bach).</p>
-                                    <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest border-b border-emerald-200 pb-0.5">Acceder al Especialista</span>
-                                </div>
-                            </button>
+                                <button onClick={() => setViewMode('forge')} className="group glass rounded-[32px] p-10 text-left transition-all hover:scale-[1.02] hover:shadow-2xl hover:shadow-slate-200/20 flex flex-col gap-10">
+                                    <div className="flex justify-between items-start">
+                                        <div className="w-16 h-16 bg-slate-900 rounded-2xl flex items-center justify-center text-white shadow-lg">
+                                            <Zap size={32} />
+                                        </div>
+                                        <div className="bg-slate-100 text-slate-600 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">Generación IA</div>
+                                    </div>
+                                    <div>
+                                        <h2 className="text-3xl font-bold text-slate-900 mb-3 tracking-tight">MÓDULO GENERADOR</h2>
+                                        <p className="text-slate-500 font-medium leading-relaxed">Creación masiva de materiales complementarios, rúbricas y exámenes oficiales en segundos.</p>
+                                    </div>
+                                    <div className="flex items-center gap-2 text-slate-900 font-bold text-sm uppercase tracking-widest pt-4 group-hover:gap-4 transition-all">
+                                        Elegir modo <ArrowRight size={18} />
+                                    </div>
+                                </button>
+                            </div>
+                            <div className="text-center pt-8">
+                                <button onClick={onShowSample} className="px-8 py-3 bg-white text-slate-500 font-bold rounded-full border border-slate-200 hover:bg-slate-50 transition-all shadow-sm">
+                                    ✨ Ver Simulación de Informe Completo
+                                </button>
+                            </div>
                         </div>
+                    ) : (
+                        <div className="space-y-16 animate-in slide-in-from-right-8 duration-500">
+                            <div className="text-center space-y-4">
+                                <div className="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 mx-auto mb-6">
+                                    <Zap size={32} />
+                                </div>
+                                <h1 className="text-4xl md:text-6xl font-black text-slate-900 tracking-tight">Especialidades</h1>
+                                <p className="text-slate-500 font-medium text-lg">Selecciona tu modo de generación preferido.</p>
+                            </div>
 
-                        <div className="mt-12 text-stone-400 text-[10px] font-bold uppercase tracking-[0.2em] opacity-50">
-                            HIPATIA ACADEMIC SUITE v4.0
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                                <button onClick={onSelectForgeUniversal} className="group glass p-10 rounded-[32px] text-left transition-all hover:-translate-y-2 hover:shadow-xl flex gap-6">
+                                    <div className="bg-indigo-50 p-4 rounded-2xl text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-all shadow-sm"><BookOpen size={32} /></div>
+                                    <div>
+                                        <h3 className="text-2xl font-bold text-slate-900 mb-2">MODO GENERAL</h3>
+                                        <p className="text-slate-500 font-medium mb-6">Cualquier materia y nivel. Sube tus contenidos y genera exámenes.</p>
+                                        <div className="text-indigo-600 font-bold uppercase tracking-widest text-xs flex items-center gap-2">Abrir herramienta <ExternalLink size={14} /></div>
+                                    </div>
+                                </button>
+
+                                <button onClick={onSelectForgeSpecialist} className="group glass p-10 rounded-[32px] text-left transition-all hover:-translate-y-2 hover:shadow-xl flex gap-6">
+                                    <div className="bg-blue-50 p-4 rounded-2xl text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all shadow-sm"><Award size={32} /></div>
+                                    <div>
+                                        <h3 className="text-2xl font-bold text-slate-900 mb-2">MODO ESPECIALISTA</h3>
+                                        <p className="text-slate-500 font-medium mb-6">Historia de España (2 Bach). Protocolo oficial UCLM.</p>
+                                        <div className="text-blue-600 font-bold uppercase tracking-widest text-xs flex items-center gap-2">Abrir herramienta <ExternalLink size={14} /></div>
+                                    </div>
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                )}
-            </div>
+                    )}
+                </div>
+            </main>
+
+            <footer className="px-8 py-6 text-center text-slate-400 text-[10px] font-bold uppercase tracking-[0.3em] font-sans pb-10">
+                HIPATIA ACADEMIC ECOSYSTEM v4.0 • ENGINEERED FOR EDUCATION
+            </footer>
         </div>
     );
 };
