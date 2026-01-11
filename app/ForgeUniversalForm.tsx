@@ -172,7 +172,7 @@ const ForgeUniversalForm: React.FC<ForgeUniversalFormProps> = ({ onBack, userTok
 
                         <div className="text-xs text-amber-400 flex items-center gap-2 mr-4 bg-amber-900/30 px-3 py-1 rounded-full border border-amber-700/50">
                             <AlertCircle size={14} />
-                            <span>Contenido Editable</span>
+                            <span>Modo Dislexia</span>
                         </div>
                         <button
                             onClick={handleReset}
