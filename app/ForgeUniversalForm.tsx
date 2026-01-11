@@ -147,9 +147,23 @@ const ForgeUniversalForm: React.FC<ForgeUniversalFormProps> = ({ onBack, userTok
     if (examHtml) {
         return (
             <div className={`h-screen overflow-hidden flex flex-col font-sans print:bg-white print:h-auto print:overflow-visible ${isDyslexic ? 'font-dyslexic' : ''}`}>
-                <style>{`
-                    .font-dyslexic * { font-family: 'OpenDyslexic', sans-serif !important; }
-                `}</style>
+                
+                  <style>{`
+                      .font-dyslexic * { font-family: 'OpenDyslexic', sans-serif !important; }
+                      @media print {
+                          .print\:block { display: block !important; }
+                          .print\:hidden { display: none !important; }
+                          .print\:overflow-visible { overflow: visible !important; }
+                          body, html { height: auto !important; overflow: visible !important; }
+                      }
+                      @media print {
+                          .print\:block { display: block !important; }
+                          .print\:hidden { display: none !important; }
+                          .print\:overflow-visible { overflow: visible !important; }
+                          body, html, #__next { height: auto !important; overflow: visible !important; }
+                      }
+                  `}</style>
+
 
                 {/* Header - Oculto al imprimir */}
                 <div className="bg-slate-900 text-white px-6 py-4 flex items-center justify-between shadow-md print:hidden z-50">
@@ -208,8 +222,8 @@ const ForgeUniversalForm: React.FC<ForgeUniversalFormProps> = ({ onBack, userTok
                 </div>
 
                 {/* Editor Area */}
-                <div className="flex-1 overflow-y-auto bg-slate-100 p-8 print:p-0 print:bg-white">
-                    <div className="max-w-[210mm] mx-auto bg-white shadow-xl min-h-[297mm] p-[20mm] print:shadow-none print:p-0">
+                <div className="flex-1 overflow-y-auto bg-slate-100 p-8 print:p-0 print:bg-white print:overflow-visible print:overflow-visible print:overflow-visible">
+                    <div className="max-w-[210mm] mx-auto bg-white shadow-xl min-h-[297mm] p-[20mm] print:shadow-none print:p-0 print:max-w-none print:h-auto print:overflow-visible print:max-w-none print:h-auto print:overflow-visible print:max-w-none print:h-auto print:overflow-visible">
                         
                         {/* Examen View */}
                         <div className={`prose prose-slate max-w-none outline-none ${activeTab === 'examen' ? 'block' : 'hidden print:block'}`}>
