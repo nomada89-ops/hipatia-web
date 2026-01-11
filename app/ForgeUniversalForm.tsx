@@ -161,7 +161,7 @@ const ForgeUniversalForm: React.FC<ForgeUniversalFormProps> = ({ onBack, userTok
 
                     <div className="flex items-center gap-3">
                         <div className="flex items-center gap-2 mr-4">
-                            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Modo Lectura</span>
+                            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Modo Dislexia</span>
                             <button
                                 onClick={() => setIsDyslexic(!isDyslexic)}
                                 className={`w-10 h-6 rounded-full flex items-center transition-colors p-1 ${isDyslexic ? 'bg-violet-500 justify-end' : 'bg-slate-700 justify-start'}`}
@@ -170,10 +170,7 @@ const ForgeUniversalForm: React.FC<ForgeUniversalFormProps> = ({ onBack, userTok
                             </button>
                         </div>
 
-                        <div className="text-xs text-amber-400 flex items-center gap-2 mr-4 bg-amber-900/30 px-3 py-1 rounded-full border border-amber-700/50">
-                            <AlertCircle size={14} />
-                            <span>Modo Dislexia</span>
-                        </div>
+                        
                         <button
                             onClick={handleReset}
                             className="px-4 py-2 text-sm font-bold text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-all"
