@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Search, Zap, ChevronRight, Lock, CheckCircle, Shield, Award, BarChart3, Mail, BookOpen, LayoutGrid, MessageCircle, X, Send, ArrowRight, Play, ExternalLink } from "lucide-react";
+import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 
 interface LandingPageProps {
@@ -131,15 +132,15 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
             <div className="flex-1 h-screen overflow-y-auto bg-mesh scroll-smooth selection:bg-indigo-100 selection:text-indigo-900" onScroll={handleScroll}>
                 {/* --- NAVIGATION --- */}
                 <nav className="fixed top-0 w-full z-50 p-6 flex justify-between items-center transition-all">
-                    <div className="flex items-center gap-2 group cursor-pointer">
+                    <Link href="/" className="flex items-center gap-2 group cursor-pointer">
                         <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform">
                             <Shield size={18} />
                         </div>
                         <span className="font-bold text-slate-900 tracking-tight text-xl">HIPATIA</span>
-                    </div>
+                    </Link>
                     <div className="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600">
-                        <a href="/blog" className="hover:text-indigo-600 transition-colors">Blog</a>
-                        <a href="/contacto" className="hover:text-indigo-600 transition-colors">Contacto</a>
+                        <Link href="/blog" className="hover:text-indigo-600 transition-colors">Blog</Link>
+                        <Link href="/contacto" className="hover:text-indigo-600 transition-colors">Contacto</Link>
                         <button onClick={() => document.getElementById('login-card')?.scrollIntoView({ behavior: 'smooth' })} className="px-5 py-2 bg-slate-900 text-white rounded-full hover:bg-slate-800 transition-all shadow-md active:scale-95">
                             Acceder
                         </button>
@@ -180,7 +181,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
                         <div className="glass shadow-stripe rounded-[32px] p-10 relative overflow-hidden">
                             <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-indigo-500 to-blue-600"></div>
                             <div className="mb-10 text-center">
-                                <div className="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center mx-auto mb-6 text-indigo-600 border border-indigo-100">
+                                <div className="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center mx-auto mb-4 text-indigo-600 border border-indigo-100">
                                     <Lock size={24} />
                                 </div>
                                 <h2 className="text-2xl font-bold text-slate-900 mb-2">Entrar en la plataforma</h2>
@@ -310,15 +311,15 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
             {/* --- DASHBOARD HEADER --- */}
             <header className="px-8 py-5 flex justify-between items-center glass border-b border-slate-200/50 z-30">
                 <div className="flex items-center gap-8">
-                    <div className="flex items-center gap-2 select-none pointer-events-none">
+                    <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
                         <div className="w-7 h-7 bg-indigo-600 rounded-md flex items-center justify-center text-white shadow-md">
                             <Shield size={14} />
                         </div>
                         <span className="font-bold text-slate-900 text-lg tracking-tight">HIPATIA</span>
-                    </div>
+                    </Link>
                     <nav className="hidden md:flex items-center gap-6 text-xs font-bold text-slate-500">
-                        <a href="/blog" className="hover:text-indigo-600 transition-colors uppercase tracking-widest flex items-center gap-1.5"><BookOpen size={14} /> Blog</a>
-                        <a href="/contacto" className="hover:text-indigo-600 transition-colors uppercase tracking-widest flex items-center gap-1.5"><Mail size={14} /> Contacto</a>
+                        <Link href="/blog" className="hover:text-indigo-600 transition-colors uppercase tracking-widest flex items-center gap-1.5"><BookOpen size={14} /> Blog</Link>
+                        <Link href="/contacto" className="hover:text-indigo-600 transition-colors uppercase tracking-widest flex items-center gap-1.5"><Mail size={14} /> Contacto</Link>
                     </nav>
                 </div>
                 <div className="flex items-center gap-4">
