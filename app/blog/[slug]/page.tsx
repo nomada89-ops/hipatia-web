@@ -35,7 +35,7 @@ export default async function BlogPostPage({ params }: Props) {
 
             <header className="fixed top-0 left-0 w-full bg-white/80 backdrop-blur-md border-b border-slate-200 z-50">
                 <div className="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">
-                    <Link href="/exam-correction/blog" className="flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors">
+                    <Link href="/blog" className="flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-indigo-600 transition-colors">
                         <ArrowLeft size={16} /> Volver al Blog
                     </Link>
                     <div className="text-sm font-black text-slate-900 tracking-tight">
