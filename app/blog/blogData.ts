@@ -1,4 +1,4 @@
-export interface BlogPost {
+﻿export interface BlogPost {
     slug: string;
     title: string; // Used as H1 and display title
     seoTitle?: string; // Specific SEO Title tag
@@ -16,203 +16,203 @@ export interface BlogPost {
 export const blogPosts: BlogPost[] = [
     {
         slug: "revolucion-calificacion-ia-consenso-pedagogico",
-        title: "Hipatia: Más allá de la IA, una nueva ética en la calificación",
-        seoTitle: "Hipatia: El fin del error humano en la corrección de exámenes",
-        excerpt: "¿Es justa la nota de una IA? Descubre el sistema de Triple Consenso de Hipatia, diseñado por y para docentes para garantizar una evaluación transparente.",
+        title: "Hipatia: MÃ¡s allÃ¡ de la IA, una nueva Ã©tica en la calificaciÃ³n",
+        seoTitle: "Hipatia: El fin del error humano en la correcciÃ³n de exÃ¡menes",
+        excerpt: "Â¿Es justa la nota de una IA? Descubre el sistema de Triple Consenso de Hipatia, diseÃ±ado por y para docentes para garantizar una evaluaciÃ³n transparente.",
         date: "10 Enero, 2026",
         author: "Equipo HIPATIA",
         readTime: "6 min lectura",
-        category: "Innovación Educativa",
-        keywords: "Calificación académica con IA",
-        imageUrl: "/blog-triple-consenso.jpg.png",
-        imageAlt: "Imagen del flujo de trabajo de Hipatia: Triple Consenso Pedagógico",
+        category: "InnovaciÃ³n Educativa",
+        keywords: "CalificaciÃ³n acadÃ©mica con IA",
+        imageUrl: "/blog-ethics.png",
+        imageAlt: "Imagen del flujo de trabajo de Hipatia: Triple Consenso PedagÃ³gico",
         content: `
-            <p class="lead">Si eres docente, conoces ese peso en el estómago al corregir la pila de exámenes número cincuenta de la tarde. El cansancio nubla el juicio, y el "bolígrafo rojo" a veces se vuelve más subjetivo de lo que nos gustaría admitir. Cuando decidimos crear Hipatia, no queríamos simplemente poner una máquina a leer textos; queríamos replicar la sabiduría de un tribunal de expertos que debate, duda y, finalmente, acierta.</p>
+            <p class="lead">Si eres docente, conoces ese peso en el estÃ³mago al corregir la pila de exÃ¡menes nÃºmero cincuenta de la tarde. El cansancio nubla el juicio, y el "bolÃ­grafo rojo" a veces se vuelve mÃ¡s subjetivo de lo que nos gustarÃ­a admitir. Cuando decidimos crear Hipatia, no querÃ­amos simplemente poner una mÃ¡quina a leer textos; querÃ­amos replicar la sabidurÃ­a de un tribunal de expertos que debate, duda y, finalmente, acierta.</p>
 
-            <h2>El problema de la "mente única" en la tecnología</h2>
-            <p>Poner una nota no es un proceso lineal. Requiere entender el contexto, valorar el esfuerzo y seguir una rúbrica a rajatabla. La mayoría de las soluciones de inteligencia artificial fallan porque actúan como una "mente única": lo que dicen es la ley. Pero en educación, la ley debe ser la justicia.</p>
-            <p>En Hipatia, entendimos rápidamente que confiar en un solo algoritmo era un error. Por eso, diseñamos una arquitectura basada en el <strong>Triple Consenso</strong>, un sistema de pesos y contrapesos que garantiza que ningún alumno sea juzgado por un "error de cálculo" digital.</p>
+            <h2>El problema de la "mente Ãºnica" en la tecnologÃ­a</h2>
+            <p>Poner una nota no es un proceso lineal. Requiere entender el contexto, valorar el esfuerzo y seguir una rÃºbrica a rajatabla. La mayorÃ­a de las soluciones de inteligencia artificial fallan porque actÃºan como una "mente Ãºnica": lo que dicen es la ley. Pero en educaciÃ³n, la ley debe ser la justicia.</p>
+            <p>En Hipatia, entendimos rÃ¡pidamente que confiar en un solo algoritmo era un error. Por eso, diseÃ±amos una arquitectura basada en el <strong>Triple Consenso</strong>, un sistema de pesos y contrapesos que garantiza que ningÃºn alumno sea juzgado por un "error de cÃ¡lculo" digital.</p>
 
-            <h2>¿Cómo funciona el corazón de Hipatia?</h2>
-            <p>Imagina un departamento universitario donde tres profesores revisan el mismo examen. Así es como Hipatia procesa cada entrega:</p>
+            <h2>Â¿CÃ³mo funciona el corazÃ³n de Hipatia?</h2>
+            <p>Imagina un departamento universitario donde tres profesores revisan el mismo examen. AsÃ­ es como Hipatia procesa cada entrega:</p>
             
             <ul>
-                <li><strong>La Primera Lectura (El Juez):</strong> Un primer motor de análisis desglosa el examen siguiendo la rúbrica que el profesor ha definido. No se salta ni una coma. Su trabajo es puramente técnico y matemático, asegurando que cada criterio de evaluación sea atendido.</li>
-                <li><strong>La Auditoría Humana (El Revisor):</strong> Aquí entra la empatía digital. Un segundo motor independiente revisa el trabajo del primero. Su misión es "ponérselo difícil" al Juez. Busca errores de interpretación, valora si una palabra mal escrita por el OCR es realmente un error ortográfico o solo un trazo difícil, y ajusta el tono para que el feedback sea constructivo y no punitivo.</li>
-                <li><strong>El Arbitraje Final (El Veredicto):</strong> ¿Qué pasa si los dos anteriores no se ponen de acuerdo? En el mundo real, esto causaría un conflicto. En Hipatia, se activa automáticamente un tercer motor de alta densidad que actúa como árbitro supremo. Analiza los argumentos de ambos y dicta una sentencia basada en la evidencia del texto.</li>
+                <li><strong>La Primera Lectura (El Juez):</strong> Un primer motor de anÃ¡lisis desglosa el examen siguiendo la rÃºbrica que el profesor ha definido. No se salta ni una coma. Su trabajo es puramente tÃ©cnico y matemÃ¡tico, asegurando que cada criterio de evaluaciÃ³n sea atendido.</li>
+                <li><strong>La AuditorÃ­a Humana (El Revisor):</strong> AquÃ­ entra la empatÃ­a digital. Un segundo motor independiente revisa el trabajo del primero. Su misiÃ³n es "ponÃ©rselo difÃ­cil" al Juez. Busca errores de interpretaciÃ³n, valora si una palabra mal escrita por el OCR es realmente un error ortogrÃ¡fico o solo un trazo difÃ­cil, y ajusta el tono para que el feedback sea constructivo y no punitivo.</li>
+                <li><strong>El Arbitraje Final (El Veredicto):</strong> Â¿QuÃ© pasa si los dos anteriores no se ponen de acuerdo? En el mundo real, esto causarÃ­a un conflicto. En Hipatia, se activa automÃ¡ticamente un tercer motor de alta densidad que actÃºa como Ã¡rbitro supremo. Analiza los argumentos de ambos y dicta una sentencia basada en la evidencia del texto.</li>
             </ul>
 
-            <h2>Tecnología invisible para un impacto real</h2>
-            <p>Lo más bonito de este sistema es que, como profesor, no ves la complejidad técnica de los nodos ni el flujo de datos que viaja por detrás. Lo que recibes es un informe honesto. Un documento que le habla al alumno de "tú a tú", que le explica por qué tiene un 7.5 y no un 8, y que le motiva a mejorar en los puntos específicos donde falló.</p>
-            <p>Estamos convencidos de que la tecnología no ha venido a sustituir al profesor, sino a liberarlo de la parte más mecánica para que pueda centrarse en lo que realmente importa: enseñar.</p>
+            <h2>TecnologÃ­a invisible para un impacto real</h2>
+            <p>Lo mÃ¡s bonito de este sistema es que, como profesor, no ves la complejidad tÃ©cnica de los nodos ni el flujo de datos que viaja por detrÃ¡s. Lo que recibes es un informe honesto. Un documento que le habla al alumno de "tÃº a tÃº", que le explica por quÃ© tiene un 7.5 y no un 8, y que le motiva a mejorar en los puntos especÃ­ficos donde fallÃ³.</p>
+            <p>Estamos convencidos de que la tecnologÃ­a no ha venido a sustituir al profesor, sino a liberarlo de la parte mÃ¡s mecÃ¡nica para que pueda centrarse en lo que realmente importa: enseÃ±ar.</p>
         `
     },
     {
         slug: "privacidad-ia-educacion-anonimizacion-datos",
         title: "Seguridad y Privacidad: El Compromiso Innegociable de Hipatia",
-        seoTitle: "Privacidad Blindada: El Protocolo de Ética de Datos en Hipatia",
-        excerpt: "¿Cómo garantiza Hipatia la seguridad de los alumnos? Descubre nuestro protocolo de anonimización automática y el tratamiento ético de datos en la calificación con IA.",
+        seoTitle: "Privacidad Blindada: El Protocolo de Ã‰tica de Datos en Hipatia",
+        excerpt: "Â¿CÃ³mo garantiza Hipatia la seguridad de los alumnos? Descubre nuestro protocolo de anonimizaciÃ³n automÃ¡tica y el tratamiento Ã©tico de datos en la calificaciÃ³n con IA.",
         date: "12 Enero, 2026",
         author: "Equipo HIPATIA",
         readTime: "4 min lectura",
-        category: "Privacidad y Ética",
-        keywords: "Privacidad datos educación, Anonimización IA",
-        imageUrl: "/imagen seguridad lopd.png",
+        category: "Privacidad y Ã‰tica",
+        keywords: "Privacidad datos educaciÃ³n, AnonimizaciÃ³n IA",
+        imageUrl: "/blog-privacy.png",
         imageAlt: "Protocolo de Seguridad y LOPD de Hipatia",
         content: `
-            <p class="lead">En la era de la educación digital, la privacidad no es una opción, es un derecho fundamental. Mientras muchas herramientas de IA procesan información sin filtros, <strong>Hipatia</strong> ha sido diseñada bajo el principio de <strong>Privacidad por Diseño (Privacy by Design)</strong>. Nuestro sistema asegura que la identidad del alumno permanezca protegida durante todo el ciclo de evaluación.</p>
+            <p class="lead">En la era de la educaciÃ³n digital, la privacidad no es una opciÃ³n, es un derecho fundamental. Mientras muchas herramientas de IA procesan informaciÃ³n sin filtros, <strong>Hipatia</strong> ha sido diseÃ±ada bajo el principio de <strong>Privacidad por DiseÃ±o (Privacy by Design)</strong>. Nuestro sistema asegura que la identidad del alumno permanezca protegida durante todo el ciclo de evaluaciÃ³n.</p>
 
-            <h2>El Escudo de Anonimización Automática</h2>
-            <p>Mucho antes de que el examen sea analizado por nuestros motores de evaluación, el sistema activa un <strong>Protocolo de Limpieza de Datos</strong>. Este proceso ocurre a nivel de código interno y es invisible para el usuario, pero crítico para la seguridad.</p>
+            <h2>El Escudo de AnonimizaciÃ³n AutomÃ¡tica</h2>
+            <p>Mucho antes de que el examen sea analizado por nuestros motores de evaluaciÃ³n, el sistema activa un <strong>Protocolo de Limpieza de Datos</strong>. Este proceso ocurre a nivel de cÃ³digo interno y es invisible para el usuario, pero crÃ­tico para la seguridad.</p>
             <ul>
-                <li><strong>Detección de Patrones Sensibles:</strong> El sistema utiliza algoritmos de reconocimiento de patrones para identificar y "borrar" automáticamente correos electrónicos, números de identidad y nombres propios.</li>
-                <li><strong>Sustitución Dinámica:</strong> La información sensible se reemplaza por etiquetas genéricas o IDs internos. Esto permite que el sistema evalúe el contenido académico sin conocer la identidad real de la persona detrás del examen.</li>
+                <li><strong>DetecciÃ³n de Patrones Sensibles:</strong> El sistema utiliza algoritmos de reconocimiento de patrones para identificar y "borrar" automÃ¡ticamente correos electrÃ³nicos, nÃºmeros de identidad y nombres propios.</li>
+                <li><strong>SustituciÃ³n DinÃ¡mica:</strong> La informaciÃ³n sensible se reemplaza por etiquetas genÃ©ricas o IDs internos. Esto permite que el sistema evalÃºe el contenido acadÃ©mico sin conocer la identidad real de la persona detrÃ¡s del examen.</li>
             </ul>
 
-            <h2>Ética en la Evaluación: Eliminando el Sesgo Humano y Digital</h2>
-            <p>La privacidad no solo protege al alumno, también garantiza una <strong>calificación más justa</strong>. Al anonimizar los datos, Hipatia elimina cualquier posibilidad de sesgo consciente o inconsciente.</p>
+            <h2>Ã‰tica en la EvaluaciÃ³n: Eliminando el Sesgo Humano y Digital</h2>
+            <p>La privacidad no solo protege al alumno, tambiÃ©n garantiza una <strong>calificaciÃ³n mÃ¡s justa</strong>. Al anonimizar los datos, Hipatia elimina cualquier posibilidad de sesgo consciente o inconsciente.</p>
             <ol>
-                <li><strong>Evaluación Ciega:</strong> Los agentes encargados de calificar solo reciben el contenido intelectual del examen.</li>
-                <li><strong>Neutralidad de Algoritmos:</strong> Al no tener acceso a metadatos personales, los motores de razonamiento se centran exclusivamente en el cumplimiento de la rúbrica pedagógica.</li>
+                <li><strong>EvaluaciÃ³n Ciega:</strong> Los agentes encargados de calificar solo reciben el contenido intelectual del examen.</li>
+                <li><strong>Neutralidad de Algoritmos:</strong> Al no tener acceso a metadatos personales, los motores de razonamiento se centran exclusivamente en el cumplimiento de la rÃºbrica pedagÃ³gica.</li>
             </ol>
 
             <h2>Trazabilidad sin Compromiso</h2>
-            <p>¿Cómo devolvemos la nota al alumno correcto si todo es anónimo? La respuesta reside en nuestra arquitectura de <strong>Mapeo de Datos</strong>.</p>
-            <p>Utilizamos variables de sistema para "enlazar" el resultado final con el token de usuario original. Este proceso permite que el profesor mantenga el control total del libro de calificaciones en su base de datos privada, sin que la información personal haya salido jamás de su entorno seguro.</p>
+            <p>Â¿CÃ³mo devolvemos la nota al alumno correcto si todo es anÃ³nimo? La respuesta reside en nuestra arquitectura de <strong>Mapeo de Datos</strong>.</p>
+            <p>Utilizamos variables de sistema para "enlazar" el resultado final con el token de usuario original. Este proceso permite que el profesor mantenga el control total del libro de calificaciones en su base de datos privada, sin que la informaciÃ³n personal haya salido jamÃ¡s de su entorno seguro.</p>
 
-            <h2>Cumplimiento de Estándares Internacionales</h2>
-            <p>Hipatia ha sido configurada para alinearse con las normativas de protección de datos más exigentes. Al ejecutar procesos en servidores controlados y utilizar flujos de trabajo cerrados, garantizamos que los exámenes manuscritos y las respuestas digitales se procesen bajo estándares de seguridad de nivel empresarial.</p>
+            <h2>Cumplimiento de EstÃ¡ndares Internacionales</h2>
+            <p>Hipatia ha sido configurada para alinearse con las normativas de protecciÃ³n de datos mÃ¡s exigentes. Al ejecutar procesos en servidores controlados y utilizar flujos de trabajo cerrados, garantizamos que los exÃ¡menes manuscritos y las respuestas digitales se procesen bajo estÃ¡ndares de seguridad de nivel empresarial.</p>
         `
     },
     {
         slug: "tecnologia-ocr-caligrafia-examen",
-        title: "Del papel al informe: La tecnología que da vida a los exámenes manuscritos",
-        seoTitle: "De la tinta al bit: Cómo Hipatia \"entiende\" la caligrafía del alumno",
-        excerpt: "Hipatia no obliga a abandonar el papel. Descubre cómo nuestro Motor de Transcripción Académica convierte exámenes manuscritos en análisis de datos precisos sin perder el contexto.",
+        title: "Del papel al informe: La tecnologÃ­a que da vida a los exÃ¡menes manuscritos",
+        seoTitle: "De la tinta al bit: CÃ³mo Hipatia \"entiende\" la caligrafÃ­a del alumno",
+        excerpt: "Hipatia no obliga a abandonar el papel. Descubre cÃ³mo nuestro Motor de TranscripciÃ³n AcadÃ©mica convierte exÃ¡menes manuscritos en anÃ¡lisis de datos precisos sin perder el contexto.",
         date: "14 Enero, 2026",
         author: "Equipo HIPATIA",
         readTime: "5 min lectura",
-        category: "Tecnología Educativa",
-        keywords: "OCR manuscrito, Digitalización exámenes, Transcripción académica",
-        imageUrl: "/Imagen articulo 2.png",
-        imageAlt: "Transformación de texto manuscrito a datos digitales en Hipatia",
+        category: "TecnologÃ­a Educativa",
+        keywords: "OCR manuscrito, DigitalizaciÃ³n exÃ¡menes, TranscripciÃ³n acadÃ©mica",
+        imageUrl: "/blog-ocr.png",
+        imageAlt: "TransformaciÃ³n de texto manuscrito a datos digitales en Hipatia",
         content: `
-            <p class="lead">Todos hemos estado ahí: una montaña de hojas de papel, caligrafías difíciles de descifrar y la presión de entregar una retroalimentación útil a tiempo. En el desarrollo de Hipatia, sabíamos que no podíamos pedirles a los alumnos que dejaran de usar papel y bolígrafo; escribir a mano es parte fundamental del proceso cognitivo. Por eso, decidimos crear un puente tecnológico que uniera lo mejor del mundo analógico con la precisión del mundo digital.</p>
+            <p class="lead">Todos hemos estado ahÃ­: una montaÃ±a de hojas de papel, caligrafÃ­as difÃ­ciles de descifrar y la presiÃ³n de entregar una retroalimentaciÃ³n Ãºtil a tiempo. En el desarrollo de Hipatia, sabÃ­amos que no podÃ­amos pedirles a los alumnos que dejaran de usar papel y bolÃ­grafo; escribir a mano es parte fundamental del proceso cognitivo. Por eso, decidimos crear un puente tecnolÃ³gico que uniera lo mejor del mundo analÃ³gico con la precisiÃ³n del mundo digital.</p>
 
             <h2>No es solo leer, es comprender el contexto</h2>
-            <p>La mayoría de los sistemas de reconocimiento de texto (OCR) se limitan a convertir imágenes en palabras sueltas. Hipatia va un paso más allá. Cuando un profesor sube la foto de un examen, nuestro sistema no solo identifica letras; activa un <strong>Motor de Transcripción Académica</strong> diseñado para entender el contexto docente.</p>
-            <p>Gracias a este proceso, el sistema es capaz de diferenciar entre un tachón, una nota al margen o una respuesta estructurada. Esta "visión inteligente" es el primer eslabón de una cadena que transforma una simple fotografía en datos procesables para la evaluación.</p>
+            <p>La mayorÃ­a de los sistemas de reconocimiento de texto (OCR) se limitan a convertir imÃ¡genes en palabras sueltas. Hipatia va un paso mÃ¡s allÃ¡. Cuando un profesor sube la foto de un examen, nuestro sistema no solo identifica letras; activa un <strong>Motor de TranscripciÃ³n AcadÃ©mica</strong> diseÃ±ado para entender el contexto docente.</p>
+            <p>Gracias a este proceso, el sistema es capaz de diferenciar entre un tachÃ³n, una nota al margen o una respuesta estructurada. Esta "visiÃ³n inteligente" es el primer eslabÃ³n de una cadena que transforma una simple fotografÃ­a en datos procesables para la evaluaciÃ³n.</p>
 
-            <h2>La "Magia" detrás de la transformación digital</h2>
-            <p>El viaje de un examen en Hipatia es fascinante desde un punto de vista técnico, pero sencillo de entender:</p>
+            <h2>La "Magia" detrÃ¡s de la transformaciÃ³n digital</h2>
+            <p>El viaje de un examen en Hipatia es fascinante desde un punto de vista tÃ©cnico, pero sencillo de entender:</p>
             <ul>
-                <li><strong>Captura Inteligente:</strong> El flujo comienza recibiendo las imágenes a través de un canal seguro. Aquí, la tecnología se encarga de "limpiar" la imagen para que la lectura sea perfecta.</li>
-                <li><strong>Transcripción Fiel:</strong> Antes de poner una nota, Hipatia actúa como un perito calígrafo. Transcribe cada frase respetando la intención del alumno, sin corregir errores todavía, solo capturando la realidad del papel.</li>
-                <li><strong>Conversión a Informe Pedagógico:</strong> Una vez que el texto es digital, la información se procesa y se estructura en un formato visualmente atractivo. El resultado no es un archivo de texto plano, sino un informe HTML dinámico, lleno de gráficos, notas y consejos personalizados.</li>
+                <li><strong>Captura Inteligente:</strong> El flujo comienza recibiendo las imÃ¡genes a travÃ©s de un canal seguro. AquÃ­, la tecnologÃ­a se encarga de "limpiar" la imagen para que la lectura sea perfecta.</li>
+                <li><strong>TranscripciÃ³n Fiel:</strong> Antes de poner una nota, Hipatia actÃºa como un perito calÃ­grafo. Transcribe cada frase respetando la intenciÃ³n del alumno, sin corregir errores todavÃ­a, solo capturando la realidad del papel.</li>
+                <li><strong>ConversiÃ³n a Informe PedagÃ³gico:</strong> Una vez que el texto es digital, la informaciÃ³n se procesa y se estructura en un formato visualmente atractivo. El resultado no es un archivo de texto plano, sino un informe HTML dinÃ¡mico, lleno de grÃ¡ficos, notas y consejos personalizados.</li>
             </ul>
 
             <h2>Reduciendo la brecha entre el aula y el dato</h2>
-            <p>Lo que antes tomaba horas de transcripción y corrección manual, ahora sucede en segundos. Pero lo más importante no es la velocidad, sino la calidad de la información. Al digitalizar el examen, el profesor obtiene una trazabilidad absoluta: puede ver exactamente qué competencia falló el alumno y por qué, basándose en la evidencia directa de su puño y letra.</p>
-            <p>Con Hipatia, el papel ya no es un límite para la analítica educativa. Es el punto de partida para una educación más eficiente, transparente y, sobre todo, justa.</p>
+            <p>Lo que antes tomaba horas de transcripciÃ³n y correcciÃ³n manual, ahora sucede en segundos. Pero lo mÃ¡s importante no es la velocidad, sino la calidad de la informaciÃ³n. Al digitalizar el examen, el profesor obtiene una trazabilidad absoluta: puede ver exactamente quÃ© competencia fallÃ³ el alumno y por quÃ©, basÃ¡ndose en la evidencia directa de su puÃ±o y letra.</p>
+            <p>Con Hipatia, el papel ya no es un lÃ­mite para la analÃ­tica educativa. Es el punto de partida para una educaciÃ³n mÃ¡s eficiente, transparente y, sobre todo, justa.</p>
         `
     },
     {
         slug: "generador-examenes-rubricas-ia-personalizable",
-        title: "Creatividad bajo control: Cómo Hipatia diseña tu próximo examen",
-        seoTitle: "Hipatia: Crea, edita y descarga tus exámenes y rúbricas en segundos",
-        excerpt: "Diseña exámenes y rúbricas para cualquier materia con Hipatia. Control total: edita en pantalla y descarga en PDF con un solo clic.",
+        title: "Creatividad bajo control: CÃ³mo Hipatia diseÃ±a tu prÃ³ximo examen",
+        seoTitle: "Hipatia: Crea, edita y descarga tus exÃ¡menes y rÃºbricas en segundos",
+        excerpt: "DiseÃ±a exÃ¡menes y rÃºbricas para cualquier materia con Hipatia. Control total: edita en pantalla y descarga en PDF con un solo clic.",
         date: "16 Enero, 2026",
         author: "Equipo HIPATIA",
         readTime: "5 min lectura",
         category: "Productividad Docente",
-        keywords: "Generador de exámenes y rúbricas con IA",
-        imageUrl: "/imagen articulo 4.png",
-        imageAlt: "Interfaz de generación de exámenes y rúbricas en Hipatia",
+        keywords: "Generador de exÃ¡menes y rÃºbricas con IA",
+        imageUrl: "/blog-generation.png",
+        imageAlt: "Interfaz de generaciÃ³n de exÃ¡menes y rÃºbricas en Hipatia",
         content: `
-            <p class="lead">La labor docente tiene un componente creativo agotador: diseñar el examen perfecto y la rúbrica que lo mida con justicia. Muchas veces, pasamos horas frente a una hoja en blanco intentando equilibrar la dificultad y los objetivos de aprendizaje. Hipatia ha sido diseñada para ser tu "asistente de taller", permitiéndote generar materiales de alta calidad para cualquier materia, desde física cuántica hasta literatura contemporánea, en cuestión de segundos.</p>
+            <p class="lead">La labor docente tiene un componente creativo agotador: diseÃ±ar el examen perfecto y la rÃºbrica que lo mida con justicia. Muchas veces, pasamos horas frente a una hoja en blanco intentando equilibrar la dificultad y los objetivos de aprendizaje. Hipatia ha sido diseÃ±ada para ser tu "asistente de taller", permitiÃ©ndote generar materiales de alta calidad para cualquier materia, desde fÃ­sica cuÃ¡ntica hasta literatura contemporÃ¡nea, en cuestiÃ³n de segundos.</p>
 
-            <h2>Exámenes y rúbricas a la medida de tu aula</h2>
-            <p>No creemos en las soluciones "enlatadas". Cada grupo de alumnos es un mundo, y Hipatia lo sabe. Nuestro módulo de generación permite:</p>
+            <h2>ExÃ¡menes y rÃºbricas a la medida de tu aula</h2>
+            <p>No creemos en las soluciones "enlatadas". Cada grupo de alumnos es un mundo, y Hipatia lo sabe. Nuestro mÃ³dulo de generaciÃ³n permite:</p>
             <ul>
-                <li><strong>Adaptación Total:</strong> Tú defines el tema, el nivel de dificultad y el tipo de preguntas. El sistema utiliza algoritmos avanzados para proponer una estructura coherente.</li>
-                <li><strong>Rúbricas Semánticas:</strong> Olvídate de pelearte con tablas de Excel. Hipatia genera rúbricas detalladas que vinculan cada pregunta con competencias específicas, asegurando una evaluación transparente.</li>
-                <li><strong>Edición en Tiempo Real:</strong> Nada de lo que genera la IA es definitivo. Todo el contenido aparece en tu pantalla de forma editable. ¿Quieres cambiar una pregunta? ¿Ajustar un porcentaje de la rúbrica? Puedes hacerlo directamente antes de confirmar.</li>
+                <li><strong>AdaptaciÃ³n Total:</strong> TÃº defines el tema, el nivel de dificultad y el tipo de preguntas. El sistema utiliza algoritmos avanzados para proponer una estructura coherente.</li>
+                <li><strong>RÃºbricas SemÃ¡nticas:</strong> OlvÃ­date de pelearte con tablas de Excel. Hipatia genera rÃºbricas detalladas que vinculan cada pregunta con competencias especÃ­ficas, asegurando una evaluaciÃ³n transparente.</li>
+                <li><strong>EdiciÃ³n en Tiempo Real:</strong> Nada de lo que genera la IA es definitivo. Todo el contenido aparece en tu pantalla de forma editable. Â¿Quieres cambiar una pregunta? Â¿Ajustar un porcentaje de la rÃºbrica? Puedes hacerlo directamente antes de confirmar.</li>
             </ul>
 
-            <h2>La soberanía del papel: Edita y descarga con un clic</h2>
-            <p>Sabemos que, al final del día, el aula sigue siendo un espacio físico. Por eso, Hipatia facilita la transición del mundo digital al real. Tanto los exámenes como las rúbricas que generes pueden descargarse instantáneamente. Esto te permite tener una copia física lista para imprimir o compartir en tu plataforma de aprendizaje preferida.</p>
+            <h2>La soberanÃ­a del papel: Edita y descarga con un clic</h2>
+            <p>Sabemos que, al final del dÃ­a, el aula sigue siendo un espacio fÃ­sico. Por eso, Hipatia facilita la transiciÃ³n del mundo digital al real. Tanto los exÃ¡menes como las rÃºbricas que generes pueden descargarse instantÃ¡neamente. Esto te permite tener una copia fÃ­sica lista para imprimir o compartir en tu plataforma de aprendizaje preferida.</p>
 
-            <h2>El Informe de Calificación: Tu nuevo aliado en las tutorías</h2>
-            <p>Una de las joyas de la corona de Hipatia es el Informe de Calificación. Tras el proceso de evaluación, el sistema genera un documento estructurado que es mucho más que una nota.</p>
+            <h2>El Informe de CalificaciÃ³n: Tu nuevo aliado en las tutorÃ­as</h2>
+            <p>Una de las joyas de la corona de Hipatia es el Informe de CalificaciÃ³n. Tras el proceso de evaluaciÃ³n, el sistema genera un documento estructurado que es mucho mÃ¡s que una nota.</p>
             <ul>
-                <li><strong>Interactividad Total:</strong> El informe se presenta en pantalla y es editable. Si como profesor consideras que un matiz merece una nota distinta o quieres personalizar un comentario de retroalimentación, puedes hacerlo allí mismo antes de entregarlo.</li>
-                <li><strong>Profesionalismo en PDF:</strong> Una vez que el informe es perfecto, puedes descargarlo en formato PDF. Es un documento elegante, profesional y detallado, ideal para entregar a alumnos y familias en reuniones de tutoría o para el expediente académico.</li>
+                <li><strong>Interactividad Total:</strong> El informe se presenta en pantalla y es editable. Si como profesor consideras que un matiz merece una nota distinta o quieres personalizar un comentario de retroalimentaciÃ³n, puedes hacerlo allÃ­ mismo antes de entregarlo.</li>
+                <li><strong>Profesionalismo en PDF:</strong> Una vez que el informe es perfecto, puedes descargarlo en formato PDF. Es un documento elegante, profesional y detallado, ideal para entregar a alumnos y familias en reuniones de tutorÃ­a o para el expediente acadÃ©mico.</li>
             </ul>
 
-            <h2>Conclusión: Tú tienes el control, nosotros la tecnología</h2>
-            <p>En Hipatia, la tecnología nunca sustituye tu criterio; lo potencia. Al automatizar la generación de borradores y la estructura de los informes, te devolvemos el tiempo que necesitas para lo más importante: la interacción directa con tus alumnos. Con Hipatia, diseñas, corriges y comunicas con una eficiencia y profesionalismo sin precedentes.</p>
+            <h2>ConclusiÃ³n: TÃº tienes el control, nosotros la tecnologÃ­a</h2>
+            <p>En Hipatia, la tecnologÃ­a nunca sustituye tu criterio; lo potencia. Al automatizar la generaciÃ³n de borradores y la estructura de los informes, te devolvemos el tiempo que necesitas para lo mÃ¡s importante: la interacciÃ³n directa con tus alumnos. Con Hipatia, diseÃ±as, corriges y comunicas con una eficiencia y profesionalismo sin precedentes.</p>
         `
     },
     {
         slug: "justificacion-reclamaciones-notas-ia-objetiva",
-        title: "Informes Blindados: Cómo Hipatia justifica cada décima ante una reclamación",
+        title: "Informes Blindados: CÃ³mo Hipatia justifica cada dÃ©cima ante una reclamaciÃ³n",
         seoTitle: "Hipatia: Informes blindados para justificar notas ante reclamaciones",
-        excerpt: "¿Cansado de justificar notas? Descubre cómo los informes de Hipatia actúan como un escudo ante reclamaciones, basándose en rúbricas objetivas y datos técnicos.",
+        excerpt: "Â¿Cansado de justificar notas? Descubre cÃ³mo los informes de Hipatia actÃºan como un escudo ante reclamaciones, basÃ¡ndose en rÃºbricas objetivas y datos tÃ©cnicos.",
         date: "20 Enero, 2026",
         author: "Equipo HIPATIA",
         readTime: "7 min lectura",
         category: "Derecho Educativo",
-        keywords: "Justificación de notas, reclamaciones exámenes, IA educación",
-        imageUrl: "/imagen articulo 5.png",
-        imageAlt: "Protocolo de generación de informes blindados en Hipatia",
+        keywords: "JustificaciÃ³n de notas, reclamaciones exÃ¡menes, IA educaciÃ³n",
+        imageUrl: "/blog-justification.png",
+        imageAlt: "Protocolo de generaciÃ³n de informes blindados en Hipatia",
         content: `
-            <p>La evaluación es, sin duda, uno de los momentos más estresantes de la labor docente. No solo por la carga de trabajo que supone corregir decenas de exámenes, sino por el "segundo examen" que viene después: <strong>las tutorías con familias y las posibles reclamaciones de notas.</strong></p>
+            <p>La evaluaciÃ³n es, sin duda, uno de los momentos mÃ¡s estresantes de la labor docente. No solo por la carga de trabajo que supone corregir decenas de exÃ¡menes, sino por el "segundo examen" que viene despuÃ©s: <strong>las tutorÃ­as con familias y las posibles reclamaciones de notas.</strong></p>
 
-            <p>¿Cuántas veces has pasado horas redactando una justificación para explicar por qué un alumno tiene un 6.5 y no un 7? Con <strong>Hipatia</strong>, ese tiempo vuelve a ser tuyo.</p>
+            <p>Â¿CuÃ¡ntas veces has pasado horas redactando una justificaciÃ³n para explicar por quÃ© un alumno tiene un 6.5 y no un 7? Con <strong>Hipatia</strong>, ese tiempo vuelve a ser tuyo.</p>
 
             <hr class="my-8" />
 
-            <h2>Más allá del número: Feedback con profundidad pedagógica</h2>
+            <h2>MÃ¡s allÃ¡ del nÃºmero: Feedback con profundidad pedagÃ³gica</h2>
 
-            <p>El gran error de muchas herramientas de IA es entregar resultados fríos. Hipatia ha sido diseñada bajo un principio de <strong>asistente pedagógico</strong>. Cuando el sistema procesa un examen, no se limita a calcular un porcentaje; analiza las evidencias de aprendizaje.</p>
+            <p>El gran error de muchas herramientas de IA es entregar resultados frÃ­os. Hipatia ha sido diseÃ±ada bajo un principio de <strong>asistente pedagÃ³gico</strong>. Cuando el sistema procesa un examen, no se limita a calcular un porcentaje; analiza las evidencias de aprendizaje.</p>
 
             <ul>
-                <li><strong>Feedback Constructivo:</strong> El informe detalla los puntos fuertes y las áreas de mejora con un tono alentador y profesional.</li>
-                <li><strong>Análisis por Competencias:</strong> El alumno entiende exactamente en qué fase del aprendizaje se encuentra.</li>
-                <li><strong>Claridad para las Familias:</strong> Se eliminan las ambigüedades. El padre o madre recibe un documento detallado que habla el lenguaje de la mejora, no solo del castigo del error.</li>
+                <li><strong>Feedback Constructivo:</strong> El informe detalla los puntos fuertes y las Ã¡reas de mejora con un tono alentador y profesional.</li>
+                <li><strong>AnÃ¡lisis por Competencias:</strong> El alumno entiende exactamente en quÃ© fase del aprendizaje se encuentra.</li>
+                <li><strong>Claridad para las Familias:</strong> Se eliminan las ambigÃ¼edades. El padre o madre recibe un documento detallado que habla el lenguaje de la mejora, no solo del castigo del error.</li>
             </ul>
 
             <hr class="my-8" />
 
-            <h2>El "Escudo Jurídico": Conexión total con la Rúbrica</h2>
+            <h2>El "Escudo JurÃ­dico": ConexiÃ³n total con la RÃºbrica</h2>
 
-            <p>La verdadera potencia de Hipatia reside en su <strong>objetividad inquebrantable</strong>. El sistema no emite juicios de valor; aplica las reglas que tú, como docente, has establecido en la rúbrica.</p>
+            <p>La verdadera potencia de Hipatia reside en su <strong>objetividad inquebrantable</strong>. El sistema no emite juicios de valor; aplica las reglas que tÃº, como docente, has establecido en la rÃºbrica.</p>
 
             <blockquote>
-                <strong>El Principio de Trazabilidad:</strong> Cada comentario del informe final está vinculado a un criterio de evaluación específico. Si la rúbrica indica que para alcanzar el "Sobresaliente" se requiere una "argumentación crítica original" y el alumno ha realizado una "descripción literal", Hipatia lo señalará citando la norma.
+                <strong>El Principio de Trazabilidad:</strong> Cada comentario del informe final estÃ¡ vinculado a un criterio de evaluaciÃ³n especÃ­fico. Si la rÃºbrica indica que para alcanzar el "Sobresaliente" se requiere una "argumentaciÃ³n crÃ­tica original" y el alumno ha realizado una "descripciÃ³n literal", Hipatia lo seÃ±alarÃ¡ citando la norma.
             </blockquote>
 
-            <h3>¿Cómo te protege ante una reclamación?</h3>
+            <h3>Â¿CÃ³mo te protege ante una reclamaciÃ³n?</h3>
 
             <table border="1" style="width:100%; border-collapse: collapse; text-align: left; margin-top: 1rem; margin-bottom: 1rem;">
                 <thead>
                     <tr style="background-color: #f2f2f2;">
-                        <th style="padding: 10px;">Situación Común</th>
+                        <th style="padding: 10px;">SituaciÃ³n ComÃºn</th>
                         <th style="padding: 10px;">Respuesta con Hipatia</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td style="padding: 10px;">"¿Por qué mi hijo tiene esta nota?"</td>
-                        <td style="padding: 10px;">El informe desglosa la nota punto por punto según los criterios de la rúbrica oficial.</td>
+                        <td style="padding: 10px;">"Â¿Por quÃ© mi hijo tiene esta nota?"</td>
+                        <td style="padding: 10px;">El informe desglosa la nota punto por punto segÃºn los criterios de la rÃºbrica oficial.</td>
                     </tr>
                     <tr>
-                        <td style="padding: 10px;">"Es que el profesor le tiene manía"</td>
-                        <td style="padding: 10px;">La evaluación ha sido auditada por tres modelos de IA independientes (Triple Consenso) basados en evidencias ciegas.</td>
+                        <td style="padding: 10px;">"Es que el profesor le tiene manÃ­a"</td>
+                        <td style="padding: 10px;">La evaluaciÃ³n ha sido auditada por tres modelos de IA independientes (Triple Consenso) basados en evidencias ciegas.</td>
                     </tr>
                     <tr>
-                        <td style="padding: 10px;">"No entiendo qué tiene que mejorar"</td>
-                        <td style="padding: 10px;">El informe incluye una hoja de ruta específica para que el alumno alcance el siguiente nivel de desempeño.</td>
+                        <td style="padding: 10px;">"No entiendo quÃ© tiene que mejorar"</td>
+                        <td style="padding: 10px;">El informe incluye una hoja de ruta especÃ­fica para que el alumno alcance el siguiente nivel de desempeÃ±o.</td>
                     </tr>
                 </tbody>
             </table>
@@ -221,33 +221,33 @@ export const blogPosts: BlogPost[] = [
 
             <h2>Calidad garantizada por el Triple Consenso</h2>
 
-            <p>Para asegurar que cada informe sea una pieza de "artesanía administrativa", Hipatia utiliza su arquitectura de tres niveles:</p>
+            <p>Para asegurar que cada informe sea una pieza de "artesanÃ­a administrativa", Hipatia utiliza su arquitectura de tres niveles:</p>
 
             <ol>
-                <li><strong>El Juez:</strong> Evalúa el contenido bruto del examen.</li>
-                <li><strong>El Auditor:</strong> Verifica que la evaluación se ajusta estrictamente a la rúbrica proporcionada.</li>
-                <li><strong>El Tribunal Supremo:</strong> Redacta el informe final asegurando que el tono sea pedagógico y que cada décima esté justificada legalmente.</li>
+                <li><strong>El Juez:</strong> EvalÃºa el contenido bruto del examen.</li>
+                <li><strong>El Auditor:</strong> Verifica que la evaluaciÃ³n se ajusta estrictamente a la rÃºbrica proporcionada.</li>
+                <li><strong>El Tribunal Supremo:</strong> Redacta el informe final asegurando que el tono sea pedagÃ³gico y que cada dÃ©cima estÃ© justificada legalmente.</li>
             </ol>
 
-            <p>Con Hipatia, no solo corriges más rápido: corriges mejor, con más seguridad y con la tranquilidad de que tu labor docente está protegida por datos objetivos.</p>
+            <p>Con Hipatia, no solo corriges mÃ¡s rÃ¡pido: corriges mejor, con mÃ¡s seguridad y con la tranquilidad de que tu labor docente estÃ¡ protegida por datos objetivos.</p>
 
             <hr class="my-8" />
 
-            <h2>🎓 Ejemplo de Informe: "El examen de Historia"</h2>
+            <h2>ðŸŽ“ Ejemplo de Informe: "El examen de Historia"</h2>
 
-            <p>Imagina un examen de <strong>Historia de 4º de ESO</strong> sobre la Revolución Industrial. El alumno ha sacado un <strong>6.25</strong>. Así es como Hipatia presenta la información:</p>
+            <p>Imagina un examen de <strong>Historia de 4Âº de ESO</strong> sobre la RevoluciÃ³n Industrial. El alumno ha sacado un <strong>6.25</strong>. AsÃ­ es como Hipatia presenta la informaciÃ³n:</p>
 
             <div style="background-color: #f9f9f9; padding: 20px; border-left: 5px solid #007bff; margin-top: 20px; border-radius: 8px;">
-                <h3 style="margin-top: 0; color: #007bff;">Informe de Evaluación: Hipatia</h3>
-                <p style="font-size: 0.9em; color: #555;"><strong>Asignatura:</strong> Geografía e Historia | <strong>Fecha:</strong> 10/01/2026<br>
-                <strong>Alumno:</strong> [ID_ANON_8842] | <strong>Calificación Final:</strong> 6.25 / 10</p>
+                <h3 style="margin-top: 0; color: #007bff;">Informe de EvaluaciÃ³n: Hipatia</h3>
+                <p style="font-size: 0.9em; color: #555;"><strong>Asignatura:</strong> GeografÃ­a e Historia | <strong>Fecha:</strong> 10/01/2026<br>
+                <strong>Alumno:</strong> [ID_ANON_8842] | <strong>CalificaciÃ³n Final:</strong> 6.25 / 10</p>
 
-                <h4 style="margin-top: 20px; border-bottom: 2px solid #e9ecef; padding-bottom: 5px;">🛡️ Justificación Técnica (Uso Docente/Familias)</h4>
+                <h4 style="margin-top: 20px; border-bottom: 2px solid #e9ecef; padding-bottom: 5px;">ðŸ›¡ï¸ JustificaciÃ³n TÃ©cnica (Uso Docente/Familias)</h4>
                 <div style="overflow-x: auto;">
                     <table border="1" style="width:100%; border-collapse: collapse; text-align: left; background-color: white; font-size: 0.9em;">
                         <thead>
                             <tr style="background-color: #e9ecef;">
-                                <th style="padding: 8px;">Criterio de Evaluación</th>
+                                <th style="padding: 8px;">Criterio de EvaluaciÃ³n</th>
                                 <th style="padding: 8px;">Nivel</th>
                                 <th style="padding: 8px;">Nota</th>
                                 <th style="padding: 8px;">Evidencia Detectada (Cita Textual)</th>
@@ -255,25 +255,25 @@ export const blogPosts: BlogPost[] = [
                         </thead>
                         <tbody>
                             <tr>
-                                <td style="padding: 8px;">1. Precisión Histórica</td>
+                                <td style="padding: 8px;">1. PrecisiÃ³n HistÃ³rica</td>
                                 <td style="padding: 8px; color: #28a745; font-weight: bold;">Avanzado</td>
                                 <td style="padding: 8px; font-weight: bold;">8.5</td>
-                                <td style="padding: 8px; font-style: italic;">"Menciona correctamente la ley de cercamientos y la máquina de Watt."</td>
+                                <td style="padding: 8px; font-style: italic;">"Menciona correctamente la ley de cercamientos y la mÃ¡quina de Watt."</td>
                             </tr>
                             <tr>
-                                <td style="padding: 8px;">2. Relación Causa-Efecto</td>
+                                <td style="padding: 8px;">2. RelaciÃ³n Causa-Efecto</td>
                                 <td style="padding: 8px; color: #fd7e14; font-weight: bold;">Intermedio</td>
                                 <td style="padding: 8px; font-weight: bold;">5.0</td>
-                                <td style="padding: 8px; font-style: italic;">"Relaciona población e industria, pero falta el capital financiero."</td>
+                                <td style="padding: 8px; font-style: italic;">"Relaciona poblaciÃ³n e industria, pero falta el capital financiero."</td>
                             </tr>
                             <tr>
-                                <td style="padding: 8px;">3. Vocabulario Técnico</td>
+                                <td style="padding: 8px;">3. Vocabulario TÃ©cnico</td>
                                 <td style="padding: 8px; color: #dc3545; font-weight: bold;">Inicial</td>
                                 <td style="padding: 8px; font-weight: bold;">4.0</td>
-                                <td style="padding: 8px; font-style: italic;">"Usa 'fábricas grandes' en lugar de 'sistema de producción fabril'."</td>
+                                <td style="padding: 8px; font-style: italic;">"Usa 'fÃ¡bricas grandes' en lugar de 'sistema de producciÃ³n fabril'."</td>
                             </tr>
                             <tr>
-                                <td style="padding: 8px;">4. Ortografía</td>
+                                <td style="padding: 8px;">4. OrtografÃ­a</td>
                                 <td style="padding: 8px; color: #28a745; font-weight: bold;">Excelente</td>
                                 <td style="padding: 8px; font-weight: bold;">10</td>
                                 <td style="padding: 8px; font-style: italic;">"Texto fluido, sin errores detectados por el motor OCR."</td>
@@ -282,19 +282,19 @@ export const blogPosts: BlogPost[] = [
                     </table>
                 </div>
 
-                <h4 style="margin-top: 20px; border-bottom: 2px solid #e9ecef; padding-bottom: 5px;">📝 Análisis del "Tribunal Supremo"</h4>
-                <p style="background-color: white; padding: 10px; border-left: 3px solid #6c757d; font-style: italic;">"La calificación de 6.25 se fundamenta en un dominio sólido de los hechos cronológicos (Criterio 1), pero se observa una falta de profundidad en el análisis multicausal (Criterio 2). Aunque el alumno identifica los inventos, no logra explicar la transición al sistema industrial de forma técnica (Criterio 3), justificando la nota en el bloque de competencias."</p>
+                <h4 style="margin-top: 20px; border-bottom: 2px solid #e9ecef; padding-bottom: 5px;">ðŸ“ AnÃ¡lisis del "Tribunal Supremo"</h4>
+                <p style="background-color: white; padding: 10px; border-left: 3px solid #6c757d; font-style: italic;">"La calificaciÃ³n de 6.25 se fundamenta en un dominio sÃ³lido de los hechos cronolÃ³gicos (Criterio 1), pero se observa una falta de profundidad en el anÃ¡lisis multicausal (Criterio 2). Aunque el alumno identifica los inventos, no logra explicar la transiciÃ³n al sistema industrial de forma tÃ©cnica (Criterio 3), justificando la nota en el bloque de competencias."</p>
 
-                <h4 style="margin-top: 20px; border-bottom: 2px solid #e9ecef; padding-bottom: 5px;">💡 Feedback Pedagógico (Para el Alumno)</h4>
+                <h4 style="margin-top: 20px; border-bottom: 2px solid #e9ecef; padding-bottom: 5px;">ðŸ’¡ Feedback PedagÃ³gico (Para el Alumno)</h4>
                 <ul style="margin-bottom: 0;">
-                    <li><strong>Enriquece tu lenguaje:</strong> En lugar de decir "había más gente", utiliza "crecimiento demográfico sostenido".</li>
-                    <li><strong>Conecta los puntos:</strong> Intenta explicar por qué el dinero del comercio colonial fue clave para las fábricas.</li>
+                    <li><strong>Enriquece tu lenguaje:</strong> En lugar de decir "habÃ­a mÃ¡s gente", utiliza "crecimiento demogrÃ¡fico sostenido".</li>
+                    <li><strong>Conecta los puntos:</strong> Intenta explicar por quÃ© el dinero del comercio colonial fue clave para las fÃ¡bricas.</li>
                 </ul>
             </div>
 
             <hr class="my-8" />
 
-            <h3>🔬 Por qué este informe te ahorra problemas:</h3>
+            <h3>ðŸ”¬ Por quÃ© este informe te ahorra problemas:</h3>
             <ul>
                 <li><strong>Es irrefutable:</strong> Si un padre reclama, le muestras la columna de "Evidencia Detectada".</li>
                 <li><strong>Es constructivo:</strong> El alumno se queda con una hoja de ruta para mejorar.</li>
