@@ -51,57 +51,6 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
     const [errorMessage, setErrorMessage] = useState("");
     const [viewMode, setViewMode] = useState<"main" | "forge">("main");
 
-    // Chatbot State
-    const [showChat, setShowChat] = useState(false);
-    const [isChatOpen, setIsChatOpen] = useState(false);
-    const [messages, setMessages] = useState<{ role: 'user' | 'assistant', text: string }[]>([
-        { role: 'assistant', text: '¡Hola! Soy el asistente virtual de **Hipatia**. ¿Cómo puedo ayudarte hoy?' }
-    ]);
-    const [inputMessage, setInputMessage] = useState('');
-    const [isTyping, setIsTyping] = useState(false);
-    const messagesEndRef = useRef<HTMLDivElement>(null);
-
-    const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    };
-
-    useEffect(() => {
-        if (isChatOpen) scrollToBottom();
-    }, [messages, isChatOpen]);
-
-    const handleSendMessage = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!inputMessage.trim()) return;
-
-        const userMsg = inputMessage;
-        setMessages(prev => [...prev, { role: 'user', text: userMsg }]);
-        setInputMessage('');
-        setIsTyping(true);
-        setMessages(prev => [...prev, { role: 'assistant', text: '...' }]);
-
-        try {
-            const response = await fetch(process.env.NEXT_PUBLIC_WEBHOOK_CHAT || 'https://n8n-n8n.ehqtcd.easypanel.host/webhook/chat-hipatia', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: userMsg })
-            });
-            const data = await response.json();
-            setMessages(prev => {
-                const newMsgs = [...prev];
-                newMsgs.pop();
-                return [...newMsgs, { role: 'assistant', text: data.text || 'No he podido procesar tu solicitud.' }];
-            });
-        } catch (error) {
-            setMessages(prev => {
-                const newMsgs = [...prev];
-                newMsgs.pop();
-                return [...newMsgs, { role: 'assistant', text: 'Error de conexión con el servidor.' }];
-            });
-        } finally {
-            setIsTyping(false);
-        }
-    };
-
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!tokenInput.trim()) return;
@@ -122,14 +71,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
         }
     };
 
-    const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
-        const scrollTop = e.currentTarget.scrollTop;
-        setShowChat(scrollTop > 300 || isChatOpen);
-    };
-
     if (!isLoggedIn) {
         return (
-            <div className="flex-1 h-screen overflow-y-auto bg-mesh scroll-smooth selection:bg-indigo-100 selection:text-indigo-900" onScroll={handleScroll}>
+            <div className="flex-1 h-screen overflow-y-auto bg-mesh scroll-smooth selection:bg-indigo-100 selection:text-indigo-900">
                 {/* --- NAVIGATION --- */}
                 <nav className="fixed top-0 w-full z-50 p-6 flex justify-between items-center transition-all">
                     <Link href="/" className="flex items-center gap-2 group cursor-pointer">
@@ -263,45 +207,6 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
                         </div>
                     </RevealSection>
                 </section>
-
-                {/* --- CHATBOT --- */}
-                {showChat && (
-                    <div className="fixed bottom-8 right-8 z-50 flex flex-col items-end gap-4">
-                        {isChatOpen && (
-                            <div className="glass shadow-2xl w-[380px] h-[550px] rounded-[24px] flex flex-col overflow-hidden animate-in zoom-in-95 origin-bottom-right">
-                                <div className="p-5 bg-indigo-600 text-white flex items-center justify-between">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-full bg-indigo-500 flex items-center justify-center shadow-inner">
-                                            <Shield size={20} />
-                                        </div>
-                                        <div>
-                                            <p className="font-bold text-sm">Asistente Hipatia</p>
-                                            <p className="text-[10px] opacity-80 uppercase tracking-widest font-bold">Online</p>
-                                        </div>
-                                    </div>
-                                    <button onClick={() => setIsChatOpen(false)} className="hover:rotate-90 transition-transform"><X size={20} /></button>
-                                </div>
-                                <div className="flex-1 p-5 overflow-y-auto space-y-6 bg-white/40 custom-scrollbar">
-                                    {messages.map((msg, i) => (
-                                        <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                                            <div className={`max-w-[85%] p-4 rounded-2xl text-sm shadow-sm ${msg.role === 'user' ? 'bg-indigo-600 text-white rounded-tr-none' : 'bg-white border border-slate-100 text-slate-800 rounded-tl-none font-medium'}`}>
-                                                <ReactMarkdown className="prose prose-sm prose-slate prose-indigo">{msg.text}</ReactMarkdown>
-                                            </div>
-                                        </div>
-                                    ))}
-                                    <div ref={messagesEndRef} />
-                                </div>
-                                <form onSubmit={handleSendMessage} className="p-4 bg-white border-t border-slate-100 flex gap-2">
-                                    <input value={inputMessage} onChange={(e) => setInputMessage(e.target.value)} placeholder="¿Cómo funciona el módulo auditor?" className="flex-1 h-12 px-5 bg-slate-50 rounded-xl outline-none focus:bg-white focus:ring-2 ring-indigo-100 border border-slate-100 transition-all" />
-                                    <button disabled={!inputMessage.trim()} className="w-12 h-12 bg-indigo-600 text-white rounded-xl flex items-center justify-center hover:bg-indigo-700 transition-all disabled:opacity-50"><Send size={18} /></button>
-                                </form>
-                            </div>
-                        )}
-                        <button onClick={() => setIsChatOpen(!isChatOpen)} className={`w-16 h-16 rounded-full shadow-2xl flex items-center justify-center transition-all hover:scale-110 active:scale-90 ${isChatOpen ? 'bg-slate-900 text-white rotate-90' : 'bg-indigo-600 text-white'}`}>
-                            {isChatOpen ? <X size={28} /> : <MessageCircle size={28} />}
-                        </button>
-                    </div>
-                )}
             </div>
         );
     }
