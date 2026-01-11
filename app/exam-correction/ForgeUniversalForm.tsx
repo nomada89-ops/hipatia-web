@@ -229,7 +229,7 @@ const ForgeUniversalForm: React.FC<ForgeUniversalFormProps> = ({ onBack, userTok
                     {/* Header Copy */}
                     <div className="text-center space-y-2 mt-2">
                         <h2 className="text-3xl font-black text-slate-900 leading-tight tracking-tight">
-                            Forja exámenes de <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-fuchsia-600">Cualquier Materia</span>.
+                            Forja exámenes de <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-fuchsia-600">Cualquier Materia</span>
                         </h2>
                     </div>
 

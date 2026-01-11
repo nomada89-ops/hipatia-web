@@ -193,7 +193,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
 
                             <h1 className="text-5xl md:text-7xl font-black text-slate-900 leading-[0.9] tracking-tighter">
                                 Revoluciona tu <br />
-                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600">Evaluación.</span>
+                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600">Evaluación</span>
                             </h1>
 
                             <p className="text-lg text-slate-500 font-medium max-w-md mx-auto lg:mx-0 leading-relaxed">
@@ -296,7 +296,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
                     <RevealSection className="w-full max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
                         <div className="space-y-8">
                             <h2 className="text-4xl md:text-5xl font-black text-slate-900 leading-tight">
-                                Justicia académica a través del <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600">Triple Consenso</span>.
+                                Cero errores gracias a nuestra <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600">verificación en 3 capas</span>
                             </h2>
                             <p className="text-lg text-slate-500 font-medium leading-relaxed">
                                 Un sistema de auditoría multicapa que garantiza la equidad en cada corrección.
@@ -349,7 +349,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
                         <div className="space-y-4">
                             <h2 className="text-4xl md:text-5xl font-black text-slate-900 leading-tight">
                                 Informes <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600">irrefutables</span>:<br />
-                                Tu escudo ante las reclamaciones.
+                                Tu escudo ante las reclamaciones
                             </h2>
                             <p className="text-xl text-slate-500 font-medium max-w-2xl mx-auto">
                                 Trazabilidad total entre la rúbrica, la evidencia del examen y el feedback final.
@@ -553,7 +553,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
                 {/* Branding Central - Hero Style */}
                 <div className="text-center mb-12 animate-fade-in-up space-y-4 shrink-0 px-4">
                     <h1 className="text-5xl md:text-6xl font-black text-slate-900 leading-[1.15] tracking-tight pb-2">
-                        Centraliza, <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600">Potencia</span> y Simplifica.
+                        Centraliza, <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600">Potencia</span> y Simplifica
                     </h1>
                     <p className="text-slate-500 font-medium text-xl md:text-2xl max-w-2xl mx-auto">
                         Tu ecosistema integral para la gestión educativa inteligente y la corrección asistida por IA.

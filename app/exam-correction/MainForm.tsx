@@ -468,7 +468,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                     {/* Header Copy */}
                     <div className="text-center space-y-2 mt-2">
                         <h2 className="text-3xl font-black text-slate-900 leading-tight tracking-tight">
-                            Escanea, <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600">Analiza</span> y Califica.
+                            Escanea, <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600">Analiza</span> y Califica
                         </h2>
                     </div>
 

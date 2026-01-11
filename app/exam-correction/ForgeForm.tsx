@@ -221,7 +221,7 @@ export default function ForgeForm({ onBack, userToken }: ForgeFormProps) {
             <main className="flex-1 overflow-y-auto flex flex-col items-center">
                 <div className="w-full max-w-3xl space-y-6 animate-in fade-in zoom-in-95 duration-300 p-4 md:p-6 pb-20">
                     <div className="text-center space-y-2 mt-2">
-                        <h2 className="text-3xl font-black text-slate-900 leading-tight tracking-tight">Diseña, <span className="text-indigo-600">Edita</span> e Imprime.</h2>
+                        <h2 className="text-3xl font-black text-slate-900 leading-tight tracking-tight">Diseña, <span className="text-indigo-600">Edita</span> e Imprime</h2>
                     </div>
 
                     <div className="bg-white p-6 md:p-8 rounded-[24px] shadow-xl shadow-slate-200/50 border border-slate-100">
