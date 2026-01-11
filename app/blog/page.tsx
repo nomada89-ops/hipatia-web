@@ -11,7 +11,7 @@ export default function BlogIndex() {
             <header className="bg-white border-b border-slate-200 sticky top-0 z-30">
                 <div className="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                        <Link href="/exam-correction" className="p-2 -ml-2 hover:bg-slate-100 rounded-lg text-slate-500 transition-colors">
+                        <Link href="/" className="p-2 -ml-2 hover:bg-slate-100 rounded-lg text-slate-500 transition-colors">
                             <ArrowLeft size={20} />
                         </Link>
                         <h1 className="text-xl font-black text-slate-900 tracking-tight flex items-center gap-2">
@@ -36,7 +36,7 @@ export default function BlogIndex() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     {blogPosts.map((post) => (
-                        <Link href={`/exam-correction/blog/${post.slug}`} key={post.slug} className="group">
+                        <Link href={`/blog/${post.slug}`} key={post.slug} className="group">
                             <article className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 h-full flex flex-col hover:shadow-xl hover:border-indigo-300 transition-all duration-300">
                                 <div className="mb-4 flex items-center gap-2 text-xs font-bold text-indigo-600 uppercase tracking-wider">
                                     <BookOpen size={14} />
