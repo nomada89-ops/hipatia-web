@@ -1,4 +1,3 @@
-﻿@
 import React, { useState } from "react";
 import { Search, Zap, ChevronRight, Lock, CheckCircle, Shield, Award, BarChart3, Mail, BookOpen, LayoutGrid } from "lucide-react";
 
@@ -203,25 +202,25 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
                                     </button>
                                 </form>
                                 <div className="mt-6 text-center">
-                                     <button onClick={onShowSample} className="text-xs text-stone-400 hover:text-emerald-600 font-bold underline transition-colors">
-                                         Ver Informe de Ejemplo (Simulación)
+                                    <button onClick={onShowSample} className="text-xs text-stone-400 hover:text-emerald-600 font-bold underline transition-colors">
+                                        ✨ Ver Informe de Ejemplo (Simulación)
                                     </button>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </section>
-             </div>
+            </div>
         );
     }
 
     // --- DASHBOARD VIEW (LOGGED IN) ---
     return (
         <div className="flex-1 bg-stone-50 flex flex-col items-center p-6 font-sans overflow-hidden h-screen relative">
-            
+
             {/* Header Bar */}
             <header className="w-full max-w-6xl flex justify-between items-center z-20 p-2">
-                 <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4">
                     {/* Branding + BETA */}
                     <div className="flex items-center gap-2 mr-4 pb-0.5 select-none">
                         <span className="text-lg font-black font-serif text-stone-700 tracking-tight">HIPAT<span className="text-emerald-600">IA</span></span>
@@ -233,17 +232,17 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
                         <BookOpen size={14} /> Blog
                     </a>
                     <a href="/preguntas-frecuentes" className="flex items-center gap-2 px-2 py-2 text-xs font-bold text-stone-400 hover:text-emerald-600 transition-colors uppercase tracking-wider">
-                         <div className="w-4 h-4 rounded-full border border-current flex items-center justify-center text-[10px] font-serif">?</div>
+                        <div className="w-4 h-4 rounded-full border border-current flex items-center justify-center text-[10px] font-serif">?</div>
                         FAQ
                     </a>
                     <a href="/contacto" className="flex items-center gap-2 px-2 py-2 text-xs font-bold text-stone-400 hover:text-emerald-600 transition-colors uppercase tracking-wider">
                         <Mail size={14} />
                         Contacto
                     </a>
-                 </div>
+                </div>
 
-                 {/* Navigation Actions */}
-                 <div className="flex items-center gap-3">
+                {/* Navigation Actions */}
+                <div className="flex items-center gap-3">
                     {viewMode !== "main" && (
                         <button onClick={() => setViewMode("main")} className="flex items-center gap-2 px-3 py-2 text-xs font-bold text-stone-500 hover:text-emerald-600 hover:bg-stone-100 rounded-lg transition-all uppercase tracking-wider">
                             <LayoutGrid size={14} /> Apps
@@ -256,14 +255,14 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
                         <Lock size={14} />
                         Cerrar Sesión
                     </button>
-                 </div>
+                </div>
             </header>
 
             <div className="flex-1 flex flex-col items-center justify-start pt-12 w-full max-w-6xl overflow-y-auto custom-scrollbar">
-                
+
                 {viewMode === "main" ? (
                     <>
-                         {/* Branding Central - Hero Style */}
+                        {/* Branding Central - Hero Style */}
                         <div className="text-center mb-12 animate-fade-in-up space-y-4 shrink-0 px-4">
                             <h1 className="text-5xl md:text-6xl font-black font-serif text-stone-900 leading-[1.15] tracking-tight pb-2">
                                 Centraliza, <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-700 to-teal-900">Potencia</span> y Simplifica
@@ -275,7 +274,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
 
                         {/* Module Selection Grid */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-4xl px-4 animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-200 mb-12">
-                            
+
                             {/* Auditor Card */}
                             <button
                                 onClick={onSelectAuditor}
@@ -323,7 +322,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
                     /* FORGE SUB-MENU */
                     <div className="animate-in fade-in slide-in-from-right-8 duration-500 w-full flex flex-col items-center">
                         <div className="text-center mb-10 space-y-3">
-                             <div className="w-16 h-16 bg-teal-100 rounded-2xl flex items-center justify-center mx-auto mb-4 text-teal-700 shadow-sm">
+                            <div className="w-16 h-16 bg-teal-100 rounded-2xl flex items-center justify-center mx-auto mb-4 text-teal-700 shadow-sm">
                                 <Zap size={32} />
                             </div>
                             <h2 className="text-4xl font-black font-serif text-stone-900 tracking-tight">Elige tu modo de creación</h2>
@@ -355,13 +354,13 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
                                     <Award size={24} />
                                 </div>
                                 <div>
-                                     <h3 className="text-lg font-bold text-stone-800 mb-1 font-serif group-hover:text-emerald-700">MODO ESPECIALISTA</h3>
+                                    <h3 className="text-lg font-bold text-stone-800 mb-1 font-serif group-hover:text-emerald-700">MODO ESPECIALISTA</h3>
                                     <p className="text-xs text-stone-400 mb-3">Historia de España (2º Bach).</p>
                                     <span className="text-[10px] font-bold text-emerald-600 uppercase tracking-widest border-b border-emerald-200 pb-0.5">Acceder al Especialista</span>
                                 </div>
                             </button>
                         </div>
-                        
+
                         <div className="mt-12 text-stone-400 text-[10px] font-bold uppercase tracking-[0.2em] opacity-50">
                             HIPATIA ACADEMIC SUITE v4.0
                         </div>
@@ -373,4 +372,3 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
 };
 
 export default LandingPage;
-@
