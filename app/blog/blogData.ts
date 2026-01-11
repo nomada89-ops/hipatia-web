@@ -57,7 +57,7 @@ export const blogPosts: BlogPost[] = [
         readTime: "4 min lectura",
         category: "Privacidad y Ética",
         keywords: "Privacidad datos educación, Anonimización IA",
-        imageUrl: "/blog-privacy.png",
+        imageUrl: "/imagen seguridad lopd.webp",
         imageAlt: "Protocolo de Seguridad y LOPD de Hipatia",
         content: `
             <p class="lead">En la era de la educación digital, la privacidad no es una opción, es un derecho fundamental. Mientras muchas herramientas de IA procesan información sin filtros, <strong>Hipatia</strong> ha sido diseñada bajo el principio de <strong>Privacidad por Diseño (Privacy by Design)</strong>. Nuestro sistema asegura que la identidad del alumno permanezca protegida durante todo el ciclo de evaluación.</p>
@@ -94,7 +94,7 @@ export const blogPosts: BlogPost[] = [
         readTime: "5 min lectura",
         category: "Tecnología Educativa",
         keywords: "OCR manuscrito, Digitalización exámenes, Transcripción académica",
-        imageUrl: "/blog-ocr.png",
+        imageUrl: "/Imagen articulo 2.webp",
         imageAlt: "Transformación de texto manuscrito a datos digitales en Hipatia",
         content: `
             <p class="lead">Todos hemos estado ahí: una montaña de hojas de papel, caligrafías difíciles de descifrar y la presión de entregar una retroalimentación útil a tiempo. En el desarrollo de Hipatia, sabíamos que no podíamos pedirles a los alumnos que dejaran de usar papel y bolígrafo; escribir a mano es parte fundamental del proceso cognitivo. Por eso, decidimos crear un puente tecnológico que uniera lo mejor del mundo analógico con la precisión del mundo digital.</p>
@@ -126,7 +126,7 @@ export const blogPosts: BlogPost[] = [
         readTime: "5 min lectura",
         category: "Productividad Docente",
         keywords: "Generador de exámenes y rúbricas con IA",
-        imageUrl: "/blog-generation.png",
+        imageUrl: "/imagen articulo 4.webp",
         imageAlt: "Interfaz de generación de exámenes y rúbricas en Hipatia",
         content: `
             <p class="lead">La labor docente tiene un componente creativo agotador: diseñar el examen perfecto y la rúbrica que lo mida con justicia. Muchas veces, pasamos horas frente a una hoja en blanco intentando equilibrar la dificultad y los objetivos de aprendizaje. Hipatia ha sido diseñada para ser tu "asistente de taller", permitiéndote generar materiales de alta calidad para cualquier materia, desde física cuántica hasta literatura contemporánea, en cuestión de segundos.</p>
@@ -163,7 +163,7 @@ export const blogPosts: BlogPost[] = [
         readTime: "7 min lectura",
         category: "Derecho Educativo",
         keywords: "Justificación de notas, reclamaciones exámenes, IA educación",
-        imageUrl: "/blog-justification.png",
+        imageUrl: "/imagen articulo 5.webp",
         imageAlt: "Protocolo de generación de informes blindados en Hipatia",
         content: `
             <p>La evaluación es, sin duda, uno de los momentos más estresantes de la labor docente. No solo por la carga de trabajo que supone corregir decenas de exámenes, sino por el "segundo examen" que viene después: <strong>las tutorías con familias y las posibles reclamaciones de notas.</strong></p>
@@ -303,4 +303,5 @@ export const blogPosts: BlogPost[] = [
         `
     }
 ];
+
 
