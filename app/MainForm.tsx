@@ -531,7 +531,10 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                                             </div>
                                         ) : (
                                             <div className="text-center">
-                                                <p className="text-xs font-bold text-slate-600 group-hover:text-indigo-600 transition-colors">Subir Rúbrica</p>
+                                                <div className="flex flex-col items-center">
+                                                  <p className="text-xs font-bold text-slate-600 group-hover:text-indigo-600 transition-colors">Subir Rúbrica</p>
+                                                  <p className="text-[10px] text-slate-400 mt-1 font-medium text-center leading-tight max-w-[160px]">Lo más detallada posible para mejores resultados</p>
+                                              </div>
                                             </div>
                                         )}
                                     </div>
@@ -563,7 +566,10 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                                             </div>
                                         ) : (
                                             <div className="text-center">
-                                                <p className="text-xs font-bold text-slate-600 group-hover:text-violet-600 transition-colors">Subir contenidos de referencia</p>
+                                                <div className="flex flex-col items-center">
+                                                  <p className="text-xs font-bold text-slate-600 group-hover:text-violet-600 transition-colors">Subir contenidos de referencia</p>
+                                                  <p className="text-[10px] text-slate-400 mt-1 font-medium text-center leading-tight max-w-[160px]">Para que corrija solo con tus contenidos</p>
+                                              </div>
                                             </div>
                                         )}
                                     </div>
