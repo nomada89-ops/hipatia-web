@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+Ôªøimport type { Metadata } from 'next';
 import { Inter, Merriweather, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 
@@ -30,7 +30,7 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: 'HIPATIA | Ecosistema Educativo Integral con IA',
-  description: 'HIPATIA es la plataforma definitiva de IA para docentes: correcciÛn universal de ex·menes y generaciÛn de recursos especializados.',
+  description: 'HIPATIA es la plataforma definitiva de IA para docentes: correcci√≥n universal de ex√°menes y generaci√≥n de recursos especializados.',
 };
 
 export default function RootLayout({
