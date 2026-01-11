@@ -124,15 +124,26 @@ const ForgeUniversalForm: React.FC<ForgeUniversalFormProps> = ({ onBack, userTok
     };
 
     // --- PERSISTENCIA / IMPRESIÓN ---
-    const handlePrint = () => {
-        // Simular persistencia en segundo plano
-        if (guiaData) {
-            console.log('Guardando guía de corrección en DB (Simulado)...', guiaData);
-            // Aquí iría la llamada a DB real
-            localStorage.setItem('last_generated_multiversal_guia', JSON.stringify(guiaData));
-        }
-        window.print();
-    };
+    const handlePrint = (type: 'examen' | 'solucionario') => {
+          const originalTitle = document.title;
+          
+          if (type === 'examen') {
+              setActiveTab('examen');
+              document.title = `Examen - ${nivel} - ${new Date().toLocaleDateString()}`;
+              // Small timeout to allow state update (tab switch) to render before print
+              setTimeout(() => {
+                  window.print();
+                  document.title = originalTitle;
+              }, 100);
+          } else {
+              setActiveTab('solucionario');
+              document.title = `Solucionario_guía_evaluacion - ${nivel} - ${new Date().toLocaleDateString()}`;
+              setTimeout(() => {
+                  window.print();
+                  document.title = originalTitle;
+              }, 100);
+          }
+      };
 
     const handleReset = () => {
         if (confirm('¿Descartar examen y volver al generador?')) {
@@ -150,18 +161,6 @@ const ForgeUniversalForm: React.FC<ForgeUniversalFormProps> = ({ onBack, userTok
                 
                   <style>{`
                       .font-dyslexic * { font-family: 'OpenDyslexic', sans-serif !important; }
-                      @media print {
-                          .print\:block { display: block !important; }
-                          .print\:hidden { display: none !important; }
-                          .print\:overflow-visible { overflow: visible !important; }
-                          body, html { height: auto !important; overflow: visible !important; }
-                      }
-                      @media print {
-                          .print\:block { display: block !important; }
-                          .print\:hidden { display: none !important; }
-                          .print\:overflow-visible { overflow: visible !important; }
-                          body, html, #__next { height: auto !important; overflow: visible !important; }
-                      }
                   `}</style>
 
 
@@ -211,22 +210,35 @@ const ForgeUniversalForm: React.FC<ForgeUniversalFormProps> = ({ onBack, userTok
                         >
                             Descartar
                         </button>
-                        <button
-                            onClick={handlePrint}
-                            className="px-6 py-2 bg-violet-600 hover:bg-violet-500 text-white font-bold rounded-lg shadow-lg shadow-violet-900/20 flex items-center gap-2 transition-all active:scale-95"
-                        >
-                            <Printer size={18} />
-                            IMPRIMIR / GUARDAR
-                        </button>
+                        
+                          <div className="flex gap-2">
+                            <button
+                                onClick={() => handlePrint('examen')}
+                                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-lg shadow-lg shadow-indigo-900/20 flex items-center gap-2 transition-all active:scale-95 border border-indigo-500"
+                            >
+                                <Printer size={18} />
+                                <span className="hidden xl:inline">Examen</span>
+                            </button>
+                            {solucionarioHtml && (
+                                <button
+                                    onClick={() => handlePrint('solucionario')}
+                                    className="px-4 py-2 bg-violet-600 hover:bg-violet-500 text-white font-bold rounded-lg shadow-lg shadow-violet-900/20 flex items-center gap-2 transition-all active:scale-95 border border-violet-500"
+                                >
+                                    <CheckCircle size={18} />
+                                    <span className="hidden xl:inline">Solucionario</span>
+                                </button>
+                            )}
+                          </div>
+
                     </div>
                 </div>
 
                 {/* Editor Area */}
                 <div className="flex-1 overflow-y-auto bg-slate-100 p-8 print:p-0 print:bg-white print:overflow-visible print:overflow-visible print:overflow-visible">
-                    <div className="max-w-[210mm] mx-auto bg-white shadow-xl min-h-[297mm] p-[20mm] print:shadow-none print:p-0 print:max-w-none print:h-auto print:overflow-visible print:max-w-none print:h-auto print:overflow-visible print:max-w-none print:h-auto print:overflow-visible">
+                    <div className="max-w-[210mm] mx-auto bg-white shadow-xl min-h-[297mm] p-[20mm] print:shadow-none print:p-0   ">
                         
                         {/* Examen View */}
-                        <div className={`prose prose-slate max-w-none outline-none ${activeTab === 'examen' ? 'block' : 'hidden print:block'}`}>
+                        <div className={`prose prose-slate max-w-none outline-none ${activeTab === 'examen' ? 'block' : 'hidden'}`}>
                               <div 
                                   ref={editorRef}
                                   contentEditable
@@ -236,13 +248,11 @@ const ForgeUniversalForm: React.FC<ForgeUniversalFormProps> = ({ onBack, userTok
                         </div>
 
                         {/* Page Break for Print */}
-                        {solucionarioHtml && (
-                             <div className="hidden print:block" style={{ pageBreakBefore: 'always', height: 0, overflow: 'hidden' }}></div>
-                        )}
+                        
 
                         {/* Solucionario View */}
                         {solucionarioHtml && (
-                            <div className={`prose prose-slate max-w-none outline-none mt-10 print:mt-0 ${activeTab === 'solucionario' ? 'block' : 'hidden print:block'}`}>
+                            <div className={`prose prose-slate max-w-none outline-none mt-10 print:mt-0 ${activeTab === 'solucionario' ? 'block' : 'hidden'}`}>
                                   <div className="print:hidden mb-4 p-4 bg-indigo-50 text-indigo-700 font-bold rounded-lg border border-indigo-100 text-center uppercase tracking-widest text-xs">
                                       --- Solucionario y Criterios de Corrección ---
                                   </div>
