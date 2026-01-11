@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import React, { Suspense } from 'react';
 import { ArrowLeft, Shield, Eye, FileText, Lock, Scale, UserCheck } from 'lucide-react';
 import Link from 'next/link';
@@ -12,7 +12,7 @@ function LegalContent() {
         <div className="min-h-screen bg-slate-50 font-sans">
             {/* Header */}
             <header className="bg-white border-b border-slate-200 px-6 py-4 flex items-center gap-4 sticky top-0 z-50">
-                <Link href="/exam-correction" className="p-2 hover:bg-slate-100 rounded-lg text-slate-500 transition-colors">
+                <Link href="/" className="p-2 hover:bg-slate-100 rounded-lg text-slate-500 transition-colors">
                     <ArrowLeft size={20} />
                 </Link>
                 <h1 className="text-xl font-bold text-slate-900 flex items-center gap-2">
@@ -123,3 +123,5 @@ export default function LegalPage() {
         </Suspense>
     );
 }
+
+

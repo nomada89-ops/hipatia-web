@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState } from 'react';
 import { Mail, User, School, MessageSquare, Send, ChevronLeft, CheckCircle2 } from 'lucide-react';
@@ -55,7 +55,7 @@ export default function ContactPage() {
                     Gracias por contactar con HIPATIA. Nuestro equipo revisará tu solicitud y te responderemos en el email institucional proporcionado en breve.
                 </p>
                 <Link
-                    href="/exam-correction"
+                    href="/"
                     className="px-8 py-3 bg-slate-900 text-white font-bold rounded-xl hover:bg-slate-800 transition-all flex items-center gap-2 shadow-lg hover:scale-[1.02]"
                 >
                     <ChevronLeft size={18} />
@@ -70,11 +70,11 @@ export default function ContactPage() {
             {/* Header / Logo */}
             <header className="p-6 border-b border-slate-50 sticky top-0 bg-white/80 backdrop-blur-md z-50">
                 <div className="max-w-7xl mx-auto flex justify-between items-center">
-                    <Link href="/exam-correction" className="inline-flex items-center gap-2 hover:opacity-80 transition-opacity">
+                    <Link href="/" className="inline-flex items-center gap-2 hover:opacity-80 transition-opacity">
                         <div className="bg-indigo-600 text-white p-1 rounded font-bold text-xs">H</div>
                         <span className="font-bold text-slate-900 tracking-tight">HIPATIA</span>
                     </Link>
-                    <Link href="/exam-correction" className="text-xs font-bold text-slate-400 hover:text-indigo-600 transition-colors uppercase tracking-widest flex items-center gap-1">
+                    <Link href="/" className="text-xs font-bold text-slate-400 hover:text-indigo-600 transition-colors uppercase tracking-widest flex items-center gap-1">
                         <ChevronLeft size={14} /> Volver a la plataforma
                     </Link>
                 </div>
@@ -244,3 +244,5 @@ export default function ContactPage() {
         </div>
     );
 }
+
+

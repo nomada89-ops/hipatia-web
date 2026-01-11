@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+﻿import React, { useState, useEffect, useRef } from "react";
 import { Search, Zap, ChevronRight, Lock, CheckCircle, Shield, Award, BarChart3, Mail, BookOpen, LayoutGrid, MessageCircle, X, Send, ArrowRight, Play, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
@@ -65,7 +65,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
             if (data.autorizado) onLogin(tokenInput);
             else setErrorMessage("Token inválido");
         } catch {
-            setErrorMessage("Error de conexión");
+            setErrorMessage("Error de conexié³n");
         } finally {
             setIsLoading(false);
         }
@@ -100,19 +100,19 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
                         </div>
                         <h1 className="text-6xl md:text-8xl font-extrabold text-slate-900 leading-[1.05] tracking-tight">
                             La IA que entiende <br />
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-blue-600 to-indigo-700">la educación.</span>
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-blue-600 to-indigo-700">la educacié³n.</span>
                         </h1>
                         <p className="text-xl text-slate-500 max-w-xl mx-auto lg:mx-0 leading-relaxed font-medium">
-                            HIPATIA es el ecosistema inteligente diseñado para potenciar tu labor docente: desde la corrección de exámenes manuscritos hasta la generación de recursos oficiales.
+                            HIPATIA es el ecosistema inteligente diseé±ado para potenciar tu labor docente: desde la correccié³n de exámenes manuscritos hasta la generacié³n de recursos oficiales.
                         </p>
                         <div className="flex flex-wrap justify-center lg:justify-start gap-4 pt-4">
                             <div className="flex items-center gap-2 text-slate-600 font-bold bg-white/50 px-4 py-2 rounded-lg border border-slate-100 shadow-sm">
                                 <CheckCircle size={18} className="text-emerald-500" />
-                                <span>Corrección OCR</span>
+                                <span>Correccié³n OCR</span>
                             </div>
                             <div className="flex items-center gap-2 text-slate-600 font-bold bg-white/50 px-4 py-2 rounded-lg border border-slate-100 shadow-sm">
                                 <CheckCircle size={18} className="text-emerald-500" />
-                                <span>Generación IA</span>
+                                <span>Generacié³n IA</span>
                             </div>
                             <div className="flex items-center gap-2 text-slate-600 font-bold bg-white/50 px-4 py-2 rounded-lg border border-slate-100 shadow-sm">
                                 <CheckCircle size={18} className="text-emerald-500" />
@@ -129,7 +129,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
                                     <Lock size={24} />
                                 </div>
                                 <h2 className="text-2xl font-bold text-slate-900 mb-2">Entrar en la plataforma</h2>
-                                <p className="text-slate-500 text-sm font-medium">Introduce tu código de acceso corporativo</p>
+                                <p className="text-slate-500 text-sm font-medium">Introduce tu cé³digo de acceso corporativo</p>
                             </div>
 
                             <form onSubmit={handleLogin} className="space-y-6">
@@ -161,7 +161,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
                             <div className="mt-8 text-center">
                                 <button onClick={onShowSample} className="text-slate-400 text-sm font-semibold hover:text-indigo-600 transition-colors flex items-center justify-center gap-2 mx-auto">
                                     <Play size={14} className="text-indigo-500" />
-                                    Probar demostración interactiva
+                                    Probar demostracié³n interactiva
                                 </button>
                             </div>
                         </div>
@@ -173,26 +173,26 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
                     <RevealSection className="max-w-7xl mx-auto">
                         <div className="text-center space-y-4 mb-20">
                             <h2 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight">Potencia instalada</h2>
-                            <p className="text-slate-500 text-lg max-w-2xl mx-auto font-medium">Todo lo necesario para una gestión pedagógica avanzada.</p>
+                            <p className="text-slate-500 text-lg max-w-2xl mx-auto font-medium">Todo lo necesario para una gestié³n pedagé³gica avanzada.</p>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                             {[
                                 { 
                                     icon: Search, 
-                                    title: "Auditoría en 3 capas", 
-                                    desc: "Verificación triple para una precisión absoluta en la corrección de exámenes manuscritos.",
+                                    title: "Auditoré­a en 3 capas", 
+                                    desc: "Verificacié³n triple para una precisié³n absoluta en la correccié³n de exámenes manuscritos.",
                                     color: "indigo"
                                 },
                                 { 
                                     icon: Zap, 
-                                    title: "Generación Reactiva", 
+                                    title: "Generacié³n Reactiva", 
                                     desc: "Crea exámenes y materiales de apoyo en segundos a partir de tus propios contenidos.",
                                     color: "blue"
                                 },
                                 { 
                                     icon: Shield, 
                                     title: "Escudo LOPD", 
-                                    desc: "Diseñado para cumplir con los estándares más estrictos de privacidad en el aula.",
+                                    desc: "Diseé±ado para cumplir con los estándares más estrictos de privacidad en el aula.",
                                     color: "purple"
                                 }
                             ].map((feature, i) => (
@@ -230,7 +230,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
                 <div className="flex items-center gap-4">
                     {viewMode === 'forge' && (
                         <button onClick={() => setViewMode('main')} className="px-4 py-2 bg-slate-100 text-slate-600 rounded-lg text-xs font-bold hover:bg-slate-200 transition-all uppercase tracking-widest">
-                            <LayoutGrid size={14} className="inline mr-2" /> Menú
+                            <LayoutGrid size={14} className="inline mr-2" /> Menéº
                         </button>
                     )}
                     <button onClick={onLogout} className="px-4 py-2 bg-indigo-50 text-indigo-700 rounded-lg text-xs font-bold hover:bg-indigo-100 transition-all flex items-center gap-2 border border-indigo-100 uppercase tracking-widest">
@@ -257,11 +257,11 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
                                         <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-indigo-700 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-indigo-200">
                                             <Search size={32} />
                                         </div>
-                                        <div className="bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">Auditoría Pro</div>
+                                        <div className="bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">Auditoré­a Pro</div>
                                     </div>
                                     <div>
-                                        <h2 className="text-3xl font-bold text-slate-900 mb-3 tracking-tight">MÓDULO CORRECTOR</h2>
-                                        <p className="text-slate-500 font-medium leading-relaxed">Auditoría técnica de evidencias manuscritas y evaluación automática por rúbricas de alta precisión.</p>
+                                        <h2 className="text-3xl font-bold text-slate-900 mb-3 tracking-tight">Mé“DULO CORRECTOR</h2>
+                                        <p className="text-slate-500 font-medium leading-relaxed">Auditoré­a té©cnica de evidencias manuscritas y evaluacié³n automática por réºbricas de alta precisié³n.</p>
                                     </div>
                                     <div className="flex items-center gap-2 text-indigo-600 font-bold text-sm uppercase tracking-widest pt-4 group-hover:gap-4 transition-all">
                                         Acceder al corrector <ArrowRight size={18} />
@@ -273,11 +273,11 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
                                         <div className="w-16 h-16 bg-slate-900 rounded-2xl flex items-center justify-center text-white shadow-lg">
                                             <Zap size={32} />
                                         </div>
-                                        <div className="bg-slate-100 text-slate-600 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">Generación IA</div>
+                                        <div className="bg-slate-100 text-slate-600 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">Generacié³n IA</div>
                                     </div>
                                     <div>
-                                        <h2 className="text-3xl font-bold text-slate-900 mb-3 tracking-tight">MÓDULO GENERADOR</h2>
-                                        <p className="text-slate-500 font-medium leading-relaxed">Creación masiva de materiales complementarios, rúbricas y exámenes oficiales en segundos.</p>
+                                        <h2 className="text-3xl font-bold text-slate-900 mb-3 tracking-tight">Mé“DULO GENERADOR</h2>
+                                        <p className="text-slate-500 font-medium leading-relaxed">Creacié³n masiva de materiales complementarios, réºbricas y exámenes oficiales en segundos.</p>
                                     </div>
                                     <div className="flex items-center gap-2 text-slate-900 font-bold text-sm uppercase tracking-widest pt-4 group-hover:gap-4 transition-all">
                                         Elegir modo <ArrowRight size={18} />
@@ -286,7 +286,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
                             </div>
                             <div className="text-center pt-8">
                                 <button onClick={onShowSample} className="px-8 py-3 bg-white text-slate-500 font-bold rounded-full border border-slate-200 hover:bg-slate-50 transition-all shadow-sm">
-                                     Ver Simulación de Informe Completo
+                                     Ver Simulacié³n de Informe Completo
                                 </button>
                             </div>
                         </div>
@@ -297,7 +297,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
                                     <Zap size={32} />
                                 </div>
                                 <h1 className="text-4xl md:text-6xl font-black text-slate-900 tracking-tight">Especialidades</h1>
-                                <p className="text-slate-500 font-medium text-lg">Selecciona tu modo de generación preferido.</p>
+                                <p className="text-slate-500 font-medium text-lg">Selecciona tu modo de generacié³n preferido.</p>
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
@@ -314,7 +314,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
                                     <div className="bg-blue-50 p-4 rounded-2xl text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all shadow-sm"><Award size={32} /></div>
                                     <div>
                                         <h3 className="text-2xl font-bold text-slate-900 mb-2">MODO ESPECIALISTA</h3>
-                                        <p className="text-slate-500 font-medium mb-6">Historia de España (2 Bach). Protocolo oficial UCLM.</p>
+                                        <p className="text-slate-500 font-medium mb-6">Historia de Espaé±a (2 Bach). Protocolo oficial UCLM.</p>
                                         <div className="text-blue-600 font-bold uppercase tracking-widest text-xs flex items-center gap-2">Abrir herramienta <ExternalLink size={14} /></div>
                                     </div>
                                 </button>
@@ -332,3 +332,4 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
 };
 
 export default LandingPage;
+
