@@ -212,7 +212,7 @@ export default function ForgeForm({ onBack, userToken }: ForgeFormProps) {
                     </button>
                     <div>
                         <h1 className="text-lg font-bold text-slate-900 tracking-tight flex items-center gap-2">
-                            <span>HIPAT<span className="text-violet-600">IA</span></span> <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-indigo-600">Forge</span>
+                            <span>HIPAT<span className="text-violet-600">IA</span></span> <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-indigo-600">Generador</span>
                         </h1>
                     </div>
                 </div>

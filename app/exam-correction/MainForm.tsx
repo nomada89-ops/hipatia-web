@@ -33,9 +33,15 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
     const [isOptimizing, setIsOptimizing] = useState(false);
     const [legalAccepted, setLegalAccepted] = useState(false);
 
-    const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
+    const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>(() => {
+        // HACK: Detect sample load synchronously to prevent UI flash
+        if (typeof window !== 'undefined' && localStorage.getItem('hipatia_load_sample') === 'true') {
+            return 'sending';
+        }
+        return 'idle';
+    });
     const [message, setMessage] = useState('');
-    const [loadingMsg, setLoadingMsg] = useState('');
+    const [loadingMsg, setLoadingMsg] = useState('Iniciando...');
 
     const rubricaInputRef = useRef<HTMLInputElement>(null);
     const refInputRef = useRef<HTMLInputElement>(null);
@@ -141,6 +147,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
         const checkSample = localStorage.getItem('hipatia_load_sample');
         if (checkSample === 'true') {
             localStorage.removeItem('hipatia_load_sample');
+            // If status wasn't set by initializer (due to hydration or SSR), set it now
             setStatus('sending');
             setLoadingMsg("Cargando simulación de Alu prueba 2...");
 
@@ -170,7 +177,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                     <h3>Conclusión</h3>
                     <p>En resumen, demuestras una competencia notable en el análisis histórico. Tu calificación final ajustada es de un <strong>7.7</strong>. ¡Confío plenamente en tu capacidad para seguir mejorando!</p>
                 `);
-            }, 2500); // Fake delay for realism
+            }, 1500); // Slightly faster but still feels like it's working
         }
     }, []);
 
@@ -447,6 +454,24 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
     }
 
     // --- VISTA PRINCIPAL (FORMULARIO UNIFICADO - ESTILO FORGE) ---
+    // Show a clean loading screen if we're in the initial sample loading phase
+    if (status === 'sending' && !alumnoId && !guiaCorreccion && examenArchivos.length === 0) {
+        return (
+            <div className="flex-1 h-full bg-slate-50 flex flex-col items-center justify-center font-sans">
+                <div className="flex flex-col items-center gap-6 animate-in fade-in zoom-in duration-500">
+                    <div className="relative">
+                        <div className="w-16 h-16 border-4 border-indigo-100 border-t-indigo-600 rounded-full animate-spin"></div>
+                        <Shield className="absolute inset-0 m-auto h-6 w-6 text-indigo-600 animate-pulse" />
+                    </div>
+                    <div className="text-center space-y-2">
+                        <h2 className="text-xl font-bold text-slate-900 tracking-tight">Preparando simulación</h2>
+                        <p className="text-sm text-slate-400 font-medium px-8">{loadingMsg}</p>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="flex-1 h-full bg-slate-50 flex flex-col font-sans overflow-hidden">
             {/* Top Navigation */}
@@ -457,7 +482,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                     </button>
                     <div>
                         <h1 className="text-lg font-bold text-slate-900 tracking-tight flex items-center gap-2">
-                            <span>HIPAT<span className="text-indigo-600">IA</span></span> <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600">Corrección</span>
+                            <span>HIPAT<span className="text-indigo-600">IA</span></span> <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600">Corrector</span>
                         </h1>
                     </div>
                 </div>

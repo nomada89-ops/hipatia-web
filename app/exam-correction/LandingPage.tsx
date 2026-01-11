@@ -211,7 +211,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
                                 <div className="flex items-center gap-3 bg-white p-3 rounded-xl border border-slate-100 shadow-sm">
                                     <div className="bg-violet-100 p-2 rounded-lg text-violet-600"><Zap size={18} /></div>
                                     <div className="text-left">
-                                        <h4 className="font-bold text-slate-800 text-sm">Forge Generator</h4>
+                                        <h4 className="font-bold text-slate-800 text-sm">Generación de Exámenes</h4>
                                         <p className="text-xs text-slate-400">Crea exámenes en segundos con IA.</p>
                                     </div>
                                 </div>
@@ -580,13 +580,13 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
                                 <div className="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-indigo-600 group-hover:text-white transition-all">
                                     <Search className="h-7 w-7 text-indigo-600 group-hover:text-white" />
                                 </div>
-                                <h2 className="text-2xl font-bold text-slate-900 mb-2">MODO AUDITOR</h2>
+                                <h2 className="text-2xl font-bold text-slate-900 mb-2 uppercase">MÓDULO CORRECTOR</h2>
                                 <p className="text-slate-500 font-medium">
                                     Sube fotos de los exámenes y obtén una corrección rigurosa.
                                 </p>
                             </div>
                             <div className="flex items-center gap-2 mt-4 text-indigo-600 font-bold text-sm uppercase tracking-widest group-hover:gap-3 transition-all">
-                                <span>Iniciar Auditoría</span>
+                                <span>Iniciar Corrección</span>
                                 <ChevronRight className="h-4 w-4" />
                             </div>
                         </button>
@@ -600,7 +600,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
                                 <div className="w-14 h-14 bg-violet-50 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-violet-600 group-hover:text-white transition-all">
                                     <Zap className="h-7 w-7 text-violet-600 group-hover:text-white" />
                                 </div>
-                                <h2 className="text-2xl font-bold text-slate-900 mb-2">MODO FORGE</h2>
+                                <h2 className="text-2xl font-bold text-slate-900 mb-2 uppercase">MÓDULO GENERADOR</h2>
                                 <p className="text-slate-500 font-medium">
                                     Herramientas de generación de exámenes y recursos.
                                 </p>
@@ -629,8 +629,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
                                     <div className="w-12 h-12 bg-violet-50 rounded-xl flex items-center justify-center mb-4 group-hover:bg-violet-600 group-hover:text-white transition-all">
                                         <BarChart3 className="h-6 w-6 text-violet-600 group-hover:text-white" />
                                     </div>
-                                    <h2 className="text-xl font-bold text-slate-900 mb-2">Forge Universal</h2>
-                                    <p className="text-slate-500 text-sm leading-relaxed">
+                                    <h2 className="text-xl font-bold text-slate-900 mb-1 uppercase tracking-tight">MODO GENERAL</h2>
+                                    <p className="text-xs text-slate-500 font-medium leading-relaxed">
                                         Cualquier asignatura. Sube tus apuntes y crea un examen a medida.
                                     </p>
                                 </div>
