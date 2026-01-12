@@ -324,7 +324,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                 formData.append('material_referencia', materialReferenciaTexto);
             }
             formData.append('alumno_id', alumnoId);
-            formData.append('id_grupo', (idGrupo || 'SIN_GRUPO').trim());
+            formData.append('id_grupo', (isGroupMode && idGrupo ? idGrupo.trim() : 'SIN_GRUPO'));
             formData.append('nivel_exigencia', nivelExigencia);
 
             examenArchivos.forEach((file, index) => {
