@@ -388,11 +388,11 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                 setOriginalReport(reportHtml);
                   
                   const reportWindow = window.open('', 'InformeIndividual');
-                  if (reportWindow) {
-                      reportWindow.document.open();
-                      reportWindow.document.write(reportHtml);
-                      reportWindow.document.close();
-                  }
+                    if (reportWindow) {
+                        reportWindow.document.open();
+                        reportWindow.document.write(reportHtml);
+                        reportWindow.document.close();
+                    }
                   }
                   
                   
