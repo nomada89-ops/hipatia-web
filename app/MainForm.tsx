@@ -303,19 +303,20 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
             };
             
             const url = 'https://n8n.protocolohipatia.com/webhook/generar-informe-grupal';
-
+            
             const response = await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
+                body: JSON.stringify(payload),
             });
 
             if (response.ok) {
                 const reportHtml = await response.text();
                 
-                const targetWindow = 'InformeGrupal';
-                const reportWindow = window.open('', targetWindow);
-                
+                // Determinamos el nombre de la pestaña según el tipo de informe
+                const windowName = 'InformeGrupal';
+                const reportWindow = window.open('', windowName);
+
                 if (reportWindow) {
                     reportWindow.document.open();
                     reportWindow.document.write(reportHtml);
@@ -325,12 +326,12 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                 setStatus('success');
                 setMessage('Informe grupal generado correctamente.');
             } else {
-                throw new Error(`Error del servidor: ${response.status}`);
+                throw new Error(`Error en la respuesta: ${response.status}`);
             }
         } catch (error) {
-            console.error('Error al generar el informe:', error);
+            console.error('Error al procesar el informe:', error);
             setStatus('error');
-            setMessage('No se pudo conectar con Hipatia. Revisa tu conexión.');
+            setMessage('Hubo un problema al conectar con Hipatia.');
         }
     };
 
