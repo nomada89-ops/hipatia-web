@@ -8,6 +8,8 @@ import * as pdfjsLib from 'pdfjs-dist/build/pdf';
 import mammoth from 'mammoth';
 import { optimizeExamImage } from './optimizeImage';
 import { DemoReport } from './components/DemoReport';
+// @ts-ignore
+import html2pdf from 'html2pdf.js';
 
 // Configurar worker de PDF.js
 pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
@@ -27,24 +29,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
     const [extractingRef, setExtractingRef] = useState(false);
 
     const [alumnoId, setAlumnoId] = useState('');
-    const [idGrupo, setIdGrupo] = useState('');
     const [isGroupMode, setIsGroupMode] = useState(false);
-
-    useEffect(() => {
-        const savedGroup = localStorage.getItem('hipatia_id_grupo');
-        if (savedGroup) setIdGrupo(savedGroup);
-        
-        const savedMode = localStorage.getItem('hipatia_group_mode');
-        if (savedMode === 'true') setIsGroupMode(true);
-
-        const messageHandler = (e: MessageEvent) => {
-             if (e.data === 'triggerGroupReport') {
-                 document.getElementById('btn-generate-group')?.click();
-             }
-        };
-        window.addEventListener('message', messageHandler);
-        return () => window.removeEventListener('message', messageHandler);
-    }, []);
 
     const handleGroupModeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const checked = e.target.checked;
@@ -52,38 +37,12 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
         localStorage.setItem('hipatia_group_mode', String(checked));
     };
     
-    // Ensure handleGroupChange is defined too if it was deleted
     const handleGroupChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const newVal = e.target.value;
-        setIdGrupo(newVal);
-        localStorage.setItem('hipatia_id_grupo', newVal);
+        const val = e.target.value;
+        setIdGrupo(val);
+        localStorage.setItem('hipatia_id_grupo', val);
     };
-    
-    const [isGroupMode, setIsGroupMode] = useState(false);
-
-    useEffect(() => {
-        const savedGroup = localStorage.getItem('hipatia_id_grupo');
-        if (savedGroup) setIdGrupo(savedGroup);
-        
-        const savedMode = localStorage.getItem('hipatia_group_mode');
-        if (savedMode === 'true') setIsGroupMode(true);
-
-        const messageHandler = (e: MessageEvent) => {
-             if (e.data === 'triggerGroupReport') {
-                 handleGenerateGroupReport();
-             }
-        };
-        window.addEventListener('message', messageHandler);
-        return () => window.removeEventListener('message', messageHandler);
-    }, []);
-
-    const handleGroupModeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const checked = e.target.checked;
-        setIsGroupMode(checked);
-        localStorage.setItem('hipatia_group_mode', String(checked));
-    };
-
-    
+    const [idGrupo, setIdGrupo] = useState('');
 
     // Persistence for Group ID
     useEffect(() => {
@@ -313,27 +272,30 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                 body: JSON.stringify(payload)
             });
 
-            if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
-            
-            const htmlContent = await response.text();
-            
-            const groupWindow = window.open('', 'InformeGrupal');
-            if (groupWindow) {
-                groupWindow.document.open();
-                groupWindow.document.write(htmlContent);
-                groupWindow.document.close();
+            if (response.ok) {
+                const reportHtml = await response.text();
+                
+                const reportWindow = window.open('', 'InformeGrupal');
+                if (reportWindow) {
+                    reportWindow.document.open();
+                    reportWindow.document.write(reportHtml);
+                    reportWindow.document.close();
+                }
+                
+                setStatus('success');
+                setMessage('Informe grupal generado correctamente.');
+            } else {
+                throw new Error(`Error del servidor: ${response.status}`);
             }
-            
-            setStatus('success');
-            setMessage('Informe grupal generado correctamente.');
-            
         } catch (error) {
-            console.error('Group Report Error:', error);
-            setStatus('error');
-            setMessage('Error al generar el informe grupal.');
-        }
+            console.error('Error al generar el informe:', error);
+            setStatus('error'); // Adapted from user's alert/console
+            setMessage('No se pudo conectar con Hipatia. Revisa tu conexión.');
+        } 
     };
+
     
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -382,16 +344,12 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                 setJsonGrade(numericGrade !== null ? Number(numericGrade) : null);
 
                 setOriginalReport(reportHtml);
-                  
                   const reportWindow = window.open('', 'InformeIndividual');
                   if (reportWindow) {
                       reportWindow.document.open();
                       reportWindow.document.write(reportHtml);
                       reportWindow.document.close();
                   }
-                  }
-                  
-                  
             } else {
                 throw new Error(`Error: ${response.status}`);
             }
@@ -731,22 +689,6 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                                           </div>
                                           
                                           {isGroupMode && (
-                                              
-                                      <div className="space-y-2">
-                                          <div className="flex items-center gap-2 mb-2">
-                                              <input 
-                                                  type="checkbox" 
-                                                  id="group-mode-check"
-                                                  checked={isGroupMode}
-                                                  onChange={handleGroupModeChange}
-                                                  className="w-4 h-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500"
-                                              />
-                                              <label htmlFor="group-mode-check" className="text-sm font-bold text-slate-600 cursor-pointer select-none">
-                                                  Corregir como parte de un grupo
-                                              </label>
-                                          </div>
-                                          
-                                          {isGroupMode && (
                                               <div className="animate-in fade-in slide-in-from-top-1 duration-200">
                                                   <label className="text-xs font-bold text-slate-500 uppercase tracking-widest pl-1 block mb-1">
                                                       Identificador de Grupo
@@ -759,8 +701,6 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                                                       placeholder="Ej: MAT-4A"
                                                   />
                                               </div>
-                                          )}
-                                      </div>
                                           )}
                                       </div>
                                       <div className="space-y-2">
@@ -852,7 +792,6 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                                     </>
                                 )}
                             </button>
-                              
                               <button
                                   id="btn-generate-group"
                                   type="button"
@@ -876,7 +815,6 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                                       </>
                                   )}
                               </button>
-                              
     
 
                             {status === 'error' && (
