@@ -4,7 +4,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useExamContext } from './ExamContext';
 import { 
     Upload, Send, CheckCircle, AlertCircle, Loader2, FileDown, 
-    Bold, Italic, List, ListOrdered, ArrowLeft, BookOpen, Book, AlertTriangle, FileText
+    Bold, Italic, List, ListOrdered, ArrowLeft, BookOpen, Book, 
+    AlertTriangle, FileText, Zap, Users
 } from 'lucide-react';
 
 interface MainFormProps {
