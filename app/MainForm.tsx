@@ -27,6 +27,20 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
     const [extractingRef, setExtractingRef] = useState(false);
 
     const [alumnoId, setAlumnoId] = useState('');
+    const [idGrupo, setIdGrupo] = useState('');
+
+    // Persistence for Group ID
+    useEffect(() => {
+        const savedGroup = localStorage.getItem('hipatia_id_grupo');
+        if (savedGroup) setIdGrupo(savedGroup);
+    }, []);
+
+    const handleGroupChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const val = e.target.value;
+        setIdGrupo(val);
+        if (val) localStorage.setItem('hipatia_id_grupo', val);
+        else localStorage.removeItem('hipatia_id_grupo');
+    };
     const [nivelExigencia, setNivelExigencia] = useState('normal');
     const [examenArchivos, setExamenArchivos] = useState<File[]>([]);
     const [isDragOver, setIsDragOver] = useState(false);
@@ -223,6 +237,41 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
         setExamenArchivos(prev => prev.filter((_, index) => index !== indexToRemove));
     };
 
+    
+    const handleGenerateGroupReport = async () => {
+        if (!idGrupo) return;
+        setStatus('sending');
+        setMessage('Solicitando informe grupal...');
+        
+        try {
+            const response = await fetch(process.env.NEXT_PUBLIC_WEBHOOK_AUDITOR || 'https://n8n-n8n.ehqtcd.easypanel.host/webhook/evaluacion-examen', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'generate_group_report',
+                    id_grupo: idGrupo.trim(),
+                    user_token: userToken // Assuming userToken is available in scope
+                })
+            });
+
+            if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
+            
+            // Assuming response might be a file download or just a success message?
+            // User said "Geneerar Informe", implies a download or view.
+            // For now, let's assume it returns JSON with a message or url.
+            const data = await response.json();
+            console.log("Group Report Response:", data);
+            
+            setStatus('success');
+            setMessage('Informe grupal solicitado correctamente. Revisa tu correo o la carpeta de salida.'); // Generic success
+            
+        } catch (error) {
+            console.error('Group Report Error:', error);
+            setStatus('error');
+            setMessage('Error al generar el informe grupal.');
+        }
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -249,6 +298,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                 formData.append('material_referencia', materialReferenciaTexto);
             }
             formData.append('alumno_id', alumnoId);
+            formData.append('id_grupo', (idGrupo || 'SIN_GRUPO').trim());
             formData.append('nivel_exigencia', nivelExigencia);
 
             examenArchivos.forEach((file, index) => {
@@ -592,7 +642,20 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                                             required
                                         />
                                     </div>
-                                    <div className="space-y-2">
+                                    
+                                      <div className="space-y-2">
+                                          <label className="text-xs font-bold text-slate-500 uppercase tracking-widest pl-1">
+                                              Identificador de Grupo
+                                          </label>
+                                          <input
+                                              type="text"
+                                              value={idGrupo}
+                                              onChange={handleGroupChange}
+                                              className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-indigo-500 focus:bg-white focus:shadow-md outline-none transition-all font-bold text-base text-slate-700 shadow-sm placeholder:font-normal placeholder:text-slate-300"
+                                              placeholder="Ej: MAT-4A (Opcional)"
+                                          />
+                                      </div>
+                                      <div className="space-y-2">
                                         <label className="text-xs font-bold text-slate-500 uppercase tracking-widest pl-1">Criterio de Exigencia</label>
                                         <select
                                             value={nivelExigencia}
@@ -681,6 +744,20 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                                     </>
                                 )}
                             </button>
+                              <button
+                                  type="button"
+                                  onClick={handleGenerateGroupReport}
+                                  disabled={!idGrupo || status === 'sending'}
+                                  className={`w-full mt-4 p-4 rounded-xl border-2 transition-all font-bold flex items-center justify-center gap-2 ${
+                                      !idGrupo
+                                          ? 'bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed opacity-50 hidden' 
+                                          : 'bg-white border-indigo-200 text-indigo-600 hover:bg-indigo-50 hover:border-indigo-300 shadow-sm'
+                                  }`}
+                              >
+                                  <BookOpen size={20} />
+                                  <span>GENERAR INFORME GRUPAL</span>
+                              </button>
+    
 
                             {status === 'error' && (
                                 <div className="p-4 bg-rose-50 border border-rose-100 rounded-xl flex items-center gap-3 animate-in shake">
