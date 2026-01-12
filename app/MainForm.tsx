@@ -241,29 +241,65 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
     const handleGenerateGroupReport = async () => {
         if (!idGrupo) return;
         setStatus('sending');
-        setMessage('Solicitando informe grupal...');
+        setMessage('Hipatia está analizando el grupo...');
         
         try {
-            const response = await fetch(process.env.NEXT_PUBLIC_WEBHOOK_AUDITOR || 'https://n8n-n8n.ehqtcd.easypanel.host/webhook/evaluacion-examen', {
+            const payload = {
+                user_token: userToken,
+                id_grupo: idGrupo.trim()
+            };
+            
+            const response = await fetch('https://n8n.protocolohipatia.com/webhook/generar-informe-grupal', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    action: 'generate_group_report',
-                    id_grupo: idGrupo.trim(),
-                    user_token: userToken // Assuming userToken is available in scope
-                })
+                body: JSON.stringify(payload)
             });
 
             if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
             
-            // Assuming response might be a file download or just a success message?
-            // User said "Geneerar Informe", implies a download or view.
-            // For now, let's assume it returns JSON with a message or url.
-            const data = await response.json();
-            console.log("Group Report Response:", data);
+            const htmlContent = await response.text();
+            
+            const groupWindow = window.open('', 'InformeGrupal');
+            if (groupWindow) {
+                groupWindow.document.write(htmlContent);
+                groupWindow.document.close();
+            }
             
             setStatus('success');
-            setMessage('Informe grupal solicitado correctamente. Revisa tu correo o la carpeta de salida.'); // Generic success
+            setMessage('Informe grupal generado correctamente.');
+            
+        } catch (error) {
+            console.error('Group Report Error:', error);
+            setStatus('error');
+            setMessage('Error al generar el informe grupal.');
+        }
+    };
+    
+    const payload = {
+                user_token: userToken,
+                id_grupo: idGrupo.trim()
+            };
+            
+            const response = await fetch('https://n8n.protocolohipatia.com/webhook/generar-informe-grupal', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
+            
+            // Capture raw HTML response
+            const htmlContent = await response.text();
+            
+            // Open Group Report in new window
+            const groupWindow = window.open('', 'InformeGrupal');
+            if (groupWindow) {
+                groupWindow.document.write(htmlContent);
+                groupWindow.document.close();
+            }
+            
+            setStatus('success');
+            setMessage('Informe grupal generado correctamente.');
             
         } catch (error) {
             console.error('Group Report Error:', error);
@@ -320,6 +356,19 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                 setJsonGrade(numericGrade !== null ? Number(numericGrade) : null);
 
                 setOriginalReport(reportHtml);
+                  
+                  const reportWindow = window.open('', 'InformeIndividual');
+                  if (reportWindow) {
+                      reportWindow.document.write(reportHtml);
+                      reportWindow.document.close();
+                  }
+                  
+                  // Open Individual Report in new window
+                  const reportWindow = window.open('', 'InformeIndividual');
+                  if (reportWindow) {
+                      reportWindow.document.write(reportHtml);
+                      reportWindow.document.close();
+                  }
             } else {
                 throw new Error(`Error: ${response.status}`);
             }
@@ -754,9 +803,27 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                                           : 'bg-white border-indigo-200 text-indigo-600 hover:bg-indigo-50 hover:border-indigo-300 shadow-sm'
                                   }`}
                               >
-                                  <BookOpen size={20} />
-                                  <span>GENERAR INFORME GRUPAL</span>
-                              </button>
+                                  {status === 'sending' && message.includes('grupo') ? (
+                                      <>
+                                          <Loader2 className="animate-spin" size={20} />
+                                          <span>Hipatia está analizando el grupo...</span>
+                                      </>
+                                  ) : (
+                                      <>
+                                          {status === 'sending' && message.includes('grupo') ? (
+                                      <>
+                                          <Loader2 className="animate-spin" size={20} />
+                                          <span>Hipatia está analizando el grupo...</span>
+                                      </>
+                                  ) : (
+                                      <>
+                                          <BookOpen size={20} />
+                                          <span>GENERAR INFORME GRUPAL</span>
+                                      </>
+                                  )}
+                                      </>
+                                  )}
+        </button>
     
 
                             {status === 'error' && (
