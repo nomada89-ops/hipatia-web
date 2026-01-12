@@ -275,39 +275,6 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
         }
     };
     
-    const payload = {
-                user_token: userToken,
-                id_grupo: idGrupo.trim()
-            };
-            
-            const response = await fetch('https://n8n.protocolohipatia.com/webhook/generar-informe-grupal', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-
-            if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
-            
-            // Capture raw HTML response
-            const htmlContent = await response.text();
-            
-            // Open Group Report in new window
-            const groupWindow = window.open('', 'InformeGrupal');
-            if (groupWindow) {
-                groupWindow.document.write(htmlContent);
-                groupWindow.document.close();
-            }
-            
-            setStatus('success');
-            setMessage('Informe grupal generado correctamente.');
-            
-        } catch (error) {
-            console.error('Group Report Error:', error);
-            setStatus('error');
-            setMessage('Error al generar el informe grupal.');
-        }
-    };
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -810,20 +777,12 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                                       </>
                                   ) : (
                                       <>
-                                          {status === 'sending' && message.includes('grupo') ? (
-                                      <>
-                                          <Loader2 className="animate-spin" size={20} />
-                                          <span>Hipatia está analizando el grupo...</span>
-                                      </>
-                                  ) : (
-                                      <>
                                           <BookOpen size={20} />
                                           <span>GENERAR INFORME GRUPAL</span>
                                       </>
                                   )}
-                                      </>
-                                  )}
-        </button>
+                              </button>
+                              
     
 
                             {status === 'error' && (
