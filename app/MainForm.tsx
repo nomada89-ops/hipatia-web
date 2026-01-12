@@ -298,11 +298,12 @@ export default function MainForm() {
 
         {/* 5. SUBIDA DEL EXAMEN (Contexto) */}
         <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center bg-gray-50">
-           <Upload className="w-10 h-10 text-gray-400 mx-auto mb-3" />
-           <p className="text-gray-600 font-medium">Arrastra las fotos del examen aquí</p>
            <input 
-             type="file" multiple accept="image/*,application/pdf"
-             className="hidden" // Aquí deberías integrar tu componente de Dropzone si lo usabas
+             type="file" 
+             id="exam-file-input"
+             multiple 
+             accept="image/*,application/pdf"
+             className="hidden"
              onChange={async (e) => {
                if (e.target.files) {
                  const rawFiles = Array.from(e.target.files);
@@ -314,6 +315,30 @@ export default function MainForm() {
                }
              }}
            />
+           
+           <label 
+             htmlFor="exam-file-input" 
+             className="cursor-pointer block"
+             onDragOver={(e) => e.preventDefault()}
+             onDrop={async (e) => {
+               e.preventDefault();
+               if (e.dataTransfer.files) {
+                 const rawFiles = Array.from(e.dataTransfer.files);
+                 const processedFiles = await Promise.all(
+                   rawFiles.map(file => compressImage(file))
+                 );
+                 setExamFiles(processedFiles);
+               }
+             }}
+           >
+             <Upload className="w-10 h-10 text-gray-400 mx-auto mb-3" />
+             <p className="text-gray-600 font-medium mb-2">Arrastra las fotos del examen aquí</p>
+             <p className="text-sm text-gray-400 mb-4">o haz clic para seleccionar archivos</p>
+             <div className="inline-block px-6 py-2 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition-colors">
+               Seleccionar Archivos
+             </div>
+           </label>
+           
            {/* Visualización simple de archivos seleccionados */}
            {examFiles.length > 0 && (
              <div className="mt-4 flex flex-wrap gap-2 justify-center">
