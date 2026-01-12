@@ -388,7 +388,6 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                         reportWindow.document.write(reportHtml);
                         reportWindow.document.close();
                     }
-                  }
                   
                   
             } else {
