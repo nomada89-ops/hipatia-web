@@ -308,29 +308,41 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
             };
             
             const response = await fetch('https://n8n.protocolohipatia.com/webhook/generar-informe-grupal', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
+                 method: 'POST',
+                 headers: { 'Content-Type': 'application/json' },
+                 body: JSON.stringify(payload)
             });
 
-            if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
-            
-            const htmlContent = await response.text();
-            
-            const groupWindow = window.open('', 'InformeGrupal');
-            if (groupWindow) {
-                groupWindow.document.open();
-                groupWindow.document.write(htmlContent);
-                groupWindow.document.close();
+            if (response.ok) {
+                 const reportHtml = await response.text();
+                 
+                 // Lógica de apertura de ventana según el tipo
+                 const targetWindow = 'InformeGrupal';
+                 const reportWindow = window.open('', targetWindow);
+                 
+                 if (reportWindow) {
+                     reportWindow.document.open();
+                     reportWindow.document.write(reportHtml);
+                     reportWindow.document.close();
+                 }
+                 
+                 setStatus('success');
+                 setMessage('Informe grupal generado correctamente.');
+            } else {
+                 throw new Error(`Error del servidor: ${response.status}`);
             }
-            
-            setStatus('success');
-            setMessage('Informe grupal generado correctamente.');
-            
         } catch (error) {
-            console.error('Group Report Error:', error);
+            console.error('Error al generar el informe:', error);
             setStatus('error');
-            setMessage('Error al generar el informe grupal.');
+            setMessage('No se pudo conectar con Hipatia. Revisa tu conexión.');
+        } finally {
+            // we don't have setIsLoading, we use setStatus('idle') or similar?
+            // User provided "setIsLoading(false)".
+            // Our code uses setStatus.
+            // If success, we stay success. If error, error.
+            // If we just want to stop loading spinner: checking status is enough.
+            // But let's leave it as is, or remove strictly if variable doesn't exist.
+            // We use 'status' state.
         }
     };
     
@@ -852,7 +864,6 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                                     </>
                                 )}
                             </button>
-                              
                               <button
                                   id="btn-generate-group"
                                   type="button"
@@ -876,6 +887,8 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                                       </>
                                   )}
                               </button>
+                              
+                              
                               
     
 
