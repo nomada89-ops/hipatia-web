@@ -289,17 +289,19 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
     };
 
     
-    const handleGenerateGroupReport = async () => {
-        // Enforce validations
-        if (!isGroupMode || !idGrupo) return;
-
+    
+    const executeGraderRequest = async (isGroup: boolean) => {
         setStatus('sending');
-        setMessage('Hipatia está analizando el grupo...');
+        setMessage(isGroup ? 'Hipatia está analizando el grupo...' : 'Hipatia está corrigiendo el examen...');
+        
+        const url = isGroup 
+            ? 'https://n8n.protocolohipatia.com/webhook/generar-informe-grupal' 
+            : process.env.NEXT_PUBLIC_WEBHOOK_AUDITOR || 'https://n8n-n8n.ehqtcd.easypanel.host/webhook/evaluacion-examen';
 
-        const url = 'https://n8n.protocolohipatia.com/webhook/generar-informe-grupal';
         const payload = {
             user_token: userToken,
-            id_grupo: idGrupo.trim()
+            id_grupo: isGroupMode && idGrupo ? idGrupo.trim() : "SIN_GRUPO",
+            alumno_id: alumnoId,
         };
 
         try {
@@ -311,9 +313,8 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
 
             if (response.ok) {
                 const reportHtml = await response.text();
-                const windowName = 'InformeGrupal';
+                const windowName = isGroup ? 'InformeGrupal' : 'InformeIndividual';
                 const reportWindow = window.open('', windowName);
-
                 if (reportWindow) {
                     reportWindow.document.open();
                     reportWindow.document.write(reportHtml);
@@ -321,17 +322,16 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                 }
                 
                 setStatus('success');
-                setMessage('Informe grupal generado correctamente.');
+                setMessage(isGroup ? 'Informe grupal generado correctamente.' : 'Examen corregido correctamente.');
             } else {
-                throw new Error(`Error del servidor: ${response.status}`);
+                throw new Error('Error en la respuesta de Hipatia: ' + response.status);
             }
         } catch (error) {
-            console.error('Error al generar informe:', error);
+            console.error('Error de red:', error);
             setStatus('error');
-            setMessage('Error al conectar con Hipatia.');
+            setMessage('Error de conexión con el servidor.');
         }
     };
-
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -855,7 +855,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                               <button
                                   id="btn-generate-group"
                                   type="button"
-                                  onClick={handleGenerateGroupReport}
+                                  onClick={() => executeGraderRequest(true)}
                                   disabled={!isGroupMode || !idGrupo || status === 'sending'}
                                   className={`w-full mt-4 p-4 rounded-xl border-2 transition-all font-bold flex items-center justify-center gap-2 ${
                                       (!isGroupMode || !idGrupo)
