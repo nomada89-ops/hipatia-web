@@ -1,14 +1,14 @@
 'use client';
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 interface ExamContextType {
     guiaCorreccion: string;
-    setGuiaCorreccion: (value: string) => void;
+    setGuiaCorreccion: (val: string) => void;
     materialReferenciaFiles: File[];
     setMaterialReferenciaFiles: (files: File[]) => void;
     materialReferenciaTexto: string;
-    setMaterialReferenciaTexto: (value: string) => void;
+    setMaterialReferenciaTexto: (val: string) => void;
 }
 
 const ExamContext = createContext<ExamContextType | undefined>(undefined);
@@ -18,30 +18,22 @@ export const ExamProvider = ({ children }: { children: ReactNode }) => {
     const [materialReferenciaFiles, setMaterialReferenciaFiles] = useState<File[]>([]);
     const [materialReferenciaTexto, setMaterialReferenciaTexto] = useState<string>('');
 
-    // Cargar desde localStorage al inicio
-    React.useEffect(() => {
-        const savedGuia = localStorage.getItem('guiaCorreccion');
-        if (savedGuia) {
-            setGuiaCorreccion(savedGuia);
-        }
+    // Persistencia básica si fuera necesaria
+    useEffect(() => {
+        const savedGuia = localStorage.getItem('hipatia_guia_correccion');
+        if (savedGuia) setGuiaCorreccion(savedGuia);
     }, []);
 
-    // Guardar en localStorage cada vez que cambia
-    React.useEffect(() => {
-        localStorage.setItem('guiaCorreccion', guiaCorreccion);
+    useEffect(() => {
+        localStorage.setItem('hipatia_guia_correccion', guiaCorreccion);
     }, [guiaCorreccion]);
 
     return (
-        <ExamContext.Provider
-            value={{
-                guiaCorreccion,
-                setGuiaCorreccion,
-                materialReferenciaFiles,
-                setMaterialReferenciaFiles,
-                materialReferenciaTexto,
-                setMaterialReferenciaTexto,
-            }}
-        >
+        <ExamContext.Provider value={{
+            guiaCorreccion, setGuiaCorreccion,
+            materialReferenciaFiles, setMaterialReferenciaFiles,
+            materialReferenciaTexto, setMaterialReferenciaTexto
+        }}>
             {children}
         </ExamContext.Provider>
     );
@@ -49,8 +41,6 @@ export const ExamProvider = ({ children }: { children: ReactNode }) => {
 
 export const useExamContext = () => {
     const context = useContext(ExamContext);
-    if (!context) {
-        throw new Error('useExamContext must be used within an ExamProvider');
-    }
+    if (!context) throw new Error('useExamContext debe usarse dentro de ExamProvider');
     return context;
 };
