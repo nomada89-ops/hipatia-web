@@ -28,6 +28,62 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
 
     const [alumnoId, setAlumnoId] = useState('');
     const [idGrupo, setIdGrupo] = useState('');
+    const [isGroupMode, setIsGroupMode] = useState(false);
+
+    useEffect(() => {
+        const savedGroup = localStorage.getItem('hipatia_id_grupo');
+        if (savedGroup) setIdGrupo(savedGroup);
+        
+        const savedMode = localStorage.getItem('hipatia_group_mode');
+        if (savedMode === 'true') setIsGroupMode(true);
+
+        const messageHandler = (e: MessageEvent) => {
+             if (e.data === 'triggerGroupReport') {
+                 document.getElementById('btn-generate-group')?.click();
+             }
+        };
+        window.addEventListener('message', messageHandler);
+        return () => window.removeEventListener('message', messageHandler);
+    }, []);
+
+    const handleGroupModeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const checked = e.target.checked;
+        setIsGroupMode(checked);
+        localStorage.setItem('hipatia_group_mode', String(checked));
+    };
+    
+    // Ensure handleGroupChange is defined too if it was deleted
+    const handleGroupChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const newVal = e.target.value;
+        setIdGrupo(newVal);
+        localStorage.setItem('hipatia_id_grupo', newVal);
+    };
+    
+    const [isGroupMode, setIsGroupMode] = useState(false);
+
+    useEffect(() => {
+        const savedGroup = localStorage.getItem('hipatia_id_grupo');
+        if (savedGroup) setIdGrupo(savedGroup);
+        
+        const savedMode = localStorage.getItem('hipatia_group_mode');
+        if (savedMode === 'true') setIsGroupMode(true);
+
+        const messageHandler = (e: MessageEvent) => {
+             if (e.data === 'triggerGroupReport') {
+                 handleGenerateGroupReport();
+             }
+        };
+        window.addEventListener('message', messageHandler);
+        return () => window.removeEventListener('message', messageHandler);
+    }, []);
+
+    const handleGroupModeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const checked = e.target.checked;
+        setIsGroupMode(checked);
+        localStorage.setItem('hipatia_group_mode', String(checked));
+    };
+
+    
 
     // Persistence for Group ID
     useEffect(() => {
@@ -239,7 +295,9 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
 
     
     const handleGenerateGroupReport = async () => {
-        if (!idGrupo) return;
+        // Enforce validations
+        if (!isGroupMode || !idGrupo) return;
+        
         setStatus('sending');
         setMessage('Hipatia está analizando el grupo...');
         
@@ -261,6 +319,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
             
             const groupWindow = window.open('', 'InformeGrupal');
             if (groupWindow) {
+                groupWindow.document.open();
                 groupWindow.document.write(htmlContent);
                 groupWindow.document.close();
             }
@@ -326,8 +385,10 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                   
                   const reportWindow = window.open('', 'InformeIndividual');
                   if (reportWindow) {
+                      reportWindow.document.open();
                       reportWindow.document.write(reportHtml);
                       reportWindow.document.close();
+                  }
                   }
                   
                   
@@ -654,17 +715,53 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                                         />
                                     </div>
                                     
+                                      
                                       <div className="space-y-2">
-                                          <label className="text-xs font-bold text-slate-500 uppercase tracking-widest pl-1">
-                                              Identificador de Grupo
-                                          </label>
-                                          <input
-                                              type="text"
-                                              value={idGrupo}
-                                              onChange={handleGroupChange}
-                                              className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-indigo-500 focus:bg-white focus:shadow-md outline-none transition-all font-bold text-base text-slate-700 shadow-sm placeholder:font-normal placeholder:text-slate-300"
-                                              placeholder="Ej: MAT-4A (Opcional)"
-                                          />
+                                          <div className="flex items-center gap-2 mb-2">
+                                              <input 
+                                                  type="checkbox" 
+                                                  id="group-mode-check"
+                                                  checked={isGroupMode}
+                                                  onChange={handleGroupModeChange}
+                                                  className="w-4 h-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500"
+                                              />
+                                              <label htmlFor="group-mode-check" className="text-sm font-bold text-slate-600 cursor-pointer select-none">
+                                                  Corregir como parte de un grupo
+                                              </label>
+                                          </div>
+                                          
+                                          {isGroupMode && (
+                                              
+                                      <div className="space-y-2">
+                                          <div className="flex items-center gap-2 mb-2">
+                                              <input 
+                                                  type="checkbox" 
+                                                  id="group-mode-check"
+                                                  checked={isGroupMode}
+                                                  onChange={handleGroupModeChange}
+                                                  className="w-4 h-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500"
+                                              />
+                                              <label htmlFor="group-mode-check" className="text-sm font-bold text-slate-600 cursor-pointer select-none">
+                                                  Corregir como parte de un grupo
+                                              </label>
+                                          </div>
+                                          
+                                          {isGroupMode && (
+                                              <div className="animate-in fade-in slide-in-from-top-1 duration-200">
+                                                  <label className="text-xs font-bold text-slate-500 uppercase tracking-widest pl-1 block mb-1">
+                                                      Identificador de Grupo
+                                                  </label>
+                                                  <input
+                                                      type="text"
+                                                      value={idGrupo}
+                                                      onChange={handleGroupChange}
+                                                      className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-indigo-500 focus:bg-white focus:shadow-md outline-none transition-all font-bold text-base text-slate-700 shadow-sm placeholder:font-normal placeholder:text-slate-300"
+                                                      placeholder="Ej: MAT-4A"
+                                                  />
+                                              </div>
+                                          )}
+                                      </div>
+                                          )}
                                       </div>
                                       <div className="space-y-2">
                                         <label className="text-xs font-bold text-slate-500 uppercase tracking-widest pl-1">Criterio de Exigencia</label>
@@ -755,12 +852,14 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                                     </>
                                 )}
                             </button>
+                              
                               <button
+                                  id="btn-generate-group"
                                   type="button"
                                   onClick={handleGenerateGroupReport}
-                                  disabled={!idGrupo || status === 'sending'}
+                                  disabled={!isGroupMode || !idGrupo || status === 'sending'}
                                   className={`w-full mt-4 p-4 rounded-xl border-2 transition-all font-bold flex items-center justify-center gap-2 ${
-                                      !idGrupo
+                                      (!isGroupMode || !idGrupo)
                                           ? 'bg-slate-100 border-slate-200 text-slate-400 cursor-not-allowed opacity-50 hidden' 
                                           : 'bg-white border-indigo-200 text-indigo-600 hover:bg-indigo-50 hover:border-indigo-300 shadow-sm'
                                   }`}
@@ -768,7 +867,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                                   {status === 'sending' && message.includes('grupo') ? (
                                       <>
                                           <Loader2 className="animate-spin" size={20} />
-                                          <span>Hipatia está analizando el grupo...</span>
+                                          <span>Procesando...</span>
                                       </>
                                   ) : (
                                       <>
