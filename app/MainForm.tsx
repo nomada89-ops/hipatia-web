@@ -160,18 +160,7 @@ export default function MainForm() {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* 1. TOKEN DE PROFESOR */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Token de Profesor</label>
-          <input
-            type="password"
-            value={userToken}
-            onChange={(e) => setUserToken(e.target.value)}
-            className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 outline-none transition-all"
-            placeholder="Introduce tu clave de acceso..."
-            required
-          />
-        </div>
+        
 
         {/* 2. ZONA DE CONFIGURACIÓN GRUPAL (NUEVO) */}
         <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
