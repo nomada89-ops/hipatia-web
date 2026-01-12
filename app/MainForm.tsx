@@ -12,6 +12,55 @@ import {
 // Asegúrate de que la ruta a tu contexto sea correcta
 import { useExamContext } from './ExamContext'; 
 
+
+// Función auxiliar para comprimir imágenes (Máx 1200px y calidad 0.7)
+const compressImage = (file: File): Promise<File> => {
+  return new Promise((resolve) => {
+    // Si no es imagen (ej: PDF), devolver original
+    if (!file.type.startsWith('image/')) {
+      resolve(file);
+      return;
+    }
+
+    const img = new Image();
+    img.src = URL.createObjectURL(file);
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const MAX_WIDTH = 1200; // Reducir tamaño excesivo
+      const scaleSize = MAX_WIDTH / img.width;
+      
+      // Si es más pequeña, no redimensionar
+      if (scaleSize >= 1) {
+        canvas.width = img.width;
+        canvas.height = img.height;
+      } else {
+        canvas.width = MAX_WIDTH;
+        canvas.height = img.height * scaleSize;
+      }
+
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        // Convertir a JPEG con calidad 0.7 (70%)
+        canvas.toBlob((blob) => {
+          if (blob) {
+            const compressedFile = new File([blob], file.name, {
+              type: 'image/jpeg',
+              lastModified: Date.now(),
+            });
+            resolve(compressedFile);
+          } else {
+            resolve(file); // Fallback
+          }
+        }, 'image/jpeg', 0.7); 
+      } else {
+        resolve(file);
+      }
+    };
+    img.onerror = () => resolve(file);
+  });
+};
+
 export default function MainForm() {
   // --- ESTADOS ---
   const { 
@@ -254,7 +303,16 @@ export default function MainForm() {
            <input 
              type="file" multiple accept="image/*,application/pdf"
              className="hidden" // Aquí deberías integrar tu componente de Dropzone si lo usabas
-             onChange={(e) => e.target.files && setExamFiles(Array.from(e.target.files))}
+             onChange={async (e) => {
+               if (e.target.files) {
+                 const rawFiles = Array.from(e.target.files);
+                 // Procesar compresión
+                 const processedFiles = await Promise.all(
+                   rawFiles.map(file => compressImage(file))
+                 );
+                 setExamFiles(processedFiles);
+               }
+             }}
            />
            {/* Visualización simple de archivos seleccionados */}
            {examFiles.length > 0 && (
