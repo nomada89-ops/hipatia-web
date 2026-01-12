@@ -76,11 +76,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
         return () => window.removeEventListener('message', messageHandler);
     }, []);
 
-    const handleGroupModeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const checked = e.target.checked;
-        setIsGroupMode(checked);
-        localStorage.setItem('hipatia_group_mode', String(checked));
-    };
+    
 
     
 
