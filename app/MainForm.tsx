@@ -254,19 +254,20 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
 
     
     const handleGenerateGroupReport = async () => {
-        // Enforce validations
         if (!isGroupMode || !idGrupo) return;
-        
+
         setStatus('sending');
         setMessage('Hipatia está analizando el grupo...');
-        
+
         try {
             const payload = {
                 user_token: userToken,
                 id_grupo: idGrupo.trim()
             };
             
-            const response = await fetch('https://n8n.protocolohipatia.com/webhook/generar-informe-grupal', {
+            const url = 'https://n8n.protocolohipatia.com/webhook/generar-informe-grupal';
+
+            const response = await fetch(url, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
@@ -275,7 +276,10 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
             if (response.ok) {
                 const reportHtml = await response.text();
                 
-                const reportWindow = window.open('', 'InformeGrupal');
+                // Lógica de apertura de ventana según el tipo
+                const targetWindow = 'InformeGrupal';
+                const reportWindow = window.open('', targetWindow);
+                
                 if (reportWindow) {
                     reportWindow.document.open();
                     reportWindow.document.write(reportHtml);
@@ -289,12 +293,10 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
             }
         } catch (error) {
             console.error('Error al generar el informe:', error);
-            setStatus('error'); // Adapted from user's alert/console
+            setStatus('error');
             setMessage('No se pudo conectar con Hipatia. Revisa tu conexión.');
-        } 
+        }
     };
-
-    
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
