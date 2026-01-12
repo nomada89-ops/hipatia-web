@@ -330,12 +330,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                       reportWindow.document.close();
                   }
                   
-                  // Open Individual Report in new window
-                  const reportWindow = window.open('', 'InformeIndividual');
-                  if (reportWindow) {
-                      reportWindow.document.write(reportHtml);
-                      reportWindow.document.close();
-                  }
+                  
             } else {
                 throw new Error(`Error: ${response.status}`);
             }
