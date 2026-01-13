@@ -155,7 +155,7 @@ export default function GroupReportPage() {
                     onClick={() => router.push('/')} 
                     className="absolute top-6 right-6 flex items-center gap-2 text-slate-500 hover:text-indigo-600 transition-colors text-sm font-bold"
                 >
-                    <ArrowLeft size={16} /> Volver al Corrector Individual
+                    <ArrowLeft size={16} /> Volver al Panel Principal
                  </button>
 
                  <div className="w-full max-w-md space-y-8 animate-in fade-in zoom-in-95 duration-500">

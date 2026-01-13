@@ -12,6 +12,14 @@ import { HelpFab } from './components/HelpFab';
 export default function ExamCorrectionPage() {
     const [activeModule, setActiveModule] = useState<'landing' | 'auditor' | 'forge-universal' | 'forge-specialist'>('landing');
     const [userToken, setUserToken] = useState<string>('');
+
+    // RESTAURACIÓN DE SESIÓN GLOBAL
+    React.useEffect(() => {
+        const savedToken = localStorage.getItem('user_token') || localStorage.getItem('token');
+        if (savedToken) {
+            setUserToken(savedToken);
+        }
+    }, []);
     const [showOnboarding, setShowOnboarding] = useState(false);
 
     // Check for first-time visit
@@ -38,6 +46,8 @@ export default function ExamCorrectionPage() {
 
     const handleLogout = () => {
         setUserToken('');
+        localStorage.removeItem('user_token');
+        localStorage.removeItem('token');
         localStorage.removeItem('hipatia_load_sample');
         setActiveModule('landing');
     };
