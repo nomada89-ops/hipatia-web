@@ -306,21 +306,31 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
             const html2pdf = (await import('html2pdf.js')).default;
             const options = {
                 margin: 10,
-                filename: `Informe_Hipatia_${new Date().toLocaleDateString()}.pdf`,
+                filename: `Informe_Hipatia_${new Date().toISOString().split('T')[0]}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true },
+                html2canvas: {
+                    scale: 2,
+                    useCORS: true,
+                    logging: false,
+                    windowHeight: element.scrollHeight
+                },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
                 pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
             };
 
-            // Estilos temporales para la impresión
+            // Estilos temporales para la impresión y captura
             const style = document.createElement('style');
             style.innerHTML = `
+                #reporte-final-hipatia {
+                    height: auto !important;
+                    overflow: visible !important;
+                    display: block !important;
+                    background: white !important;
+                }
                 @media print {
                     #reporte-final-hipatia {
-                        width: 210mm; /* Ancho A4 */
+                        width: 210mm;
                         padding: 0;
-                        background: white !important;
                     }
                     .no-print-section { display: none !important; }
                     .section-avoid-break {
