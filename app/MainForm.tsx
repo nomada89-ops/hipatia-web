@@ -148,7 +148,25 @@ export default function MainForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (examFiles.length === 0) { alert("Sube al menos una imagen del examen."); return; }
+    // 1. INTENTO DE RECUPERACIÓN FORZOSA (Priority: State -> LocalStorage -> URL)
+    const tokenStorage = typeof window !== 'undefined' ? (localStorage.getItem('user_token') || localStorage.getItem('token')) : null;
+    const params = new URLSearchParams(window.location.search);
+    const tokenUrl = params.get('user_token') || params.get('token');
+
+    // EL TOKEN FINAL: Si no está en el estado, búscalo en el disco o en la URL
+    const finalToken = userToken || tokenStorage || tokenUrl;
+
+    // 2. DEBUG (Para ver en consola qué está pasando)
+    console.log("🔍 Estado:", userToken, "| Storage:", tokenStorage, "| Final:", finalToken);
+
+    // 3. VALIDACIÓN
+    if (!finalToken) {
+      alert("ERROR CRÍTICO: No hay sesión iniciada. El sistema no detecta el token en el navegador.");
+      setIsLoading(false);
+      return;
+    }
+
+    if (examFiles.length === 0 { alert("Sube al menos una imagen del examen."); return; }
 
     setIsLoading(true);
     setStatusMessage("Analizando examen...");
@@ -170,22 +188,8 @@ export default function MainForm() {
       // -----------------------------------
 
       // Datos obligatorios
-      // Blindaje del token: último intento si el estado está vacío
-      let tokenParaEnviar = userToken;
-      
-      // Si el estado está vacío, intento desesperado de leer del disco
-      if (!tokenParaEnviar) {
-        tokenParaEnviar = localStorage.getItem('user_token') || localStorage.getItem('token') || "";
-      }
-      
-      if (!tokenParaEnviar) {
-        alert("Error de Sesión: No se encuentra el token. Por favor, realiza el Login de nuevo.");
-        setIsLoading(false);
-        return;
-      }
-      
-      // Usar tokenParaEnviar en el append
-      formData.append('user_token', tokenParaEnviar);
+      // Usar el token recuperado forzosamente
+      formData.append('user_token', finalToken);
       formData.append('id_grupo', isGroupMode ? idGrupo : "SIN_GRUPO");
       formData.append('alumno', nombreAlumno || "Alumno");
       formData.append('nivel_exigencia', exigencyLevel);
