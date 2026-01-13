@@ -141,7 +141,7 @@ export default function GroupReportPage() {
             {/* Main Content */}
             <div className="flex-1 flex flex-col p-6 md:p-12 items-center justify-center relative">
                 <button
-                    onClick={() => router.push('/exam-correction')}
+                    onClick={() => router.push('/')}
                     className="absolute top-6 right-6 flex items-center gap-2 text-slate-500 hover:text-indigo-600 transition-colors text-sm font-bold"
                 >
                     <ArrowLeft size={16} /> Volver al Corrector Individual
