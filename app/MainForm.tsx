@@ -181,8 +181,10 @@ export default function MainForm() {
         formData.append('material_referencia_texto', textoMateriales);
       }
 
-      // URL del Webhook Individual (Usa tu variable de entorno o la URL directa)
-      const url = process.env.NEXT_PUBLIC_WEBHOOK_AUDITOR || 'PON_AQUI_TU_URL_DE_PRODUCCION_SI_FALLA_ENV';
+      // URL DE PRODUCCIÓN (Confirmada por usuario)
+      const url = 'https://n8n.protocolohipatia.com/webhook/evaluacion-examen';
+      
+      console.log("🚀 Iniciando envío a:", url);
 
       const response = await fetch(url, {
         method: 'POST',
