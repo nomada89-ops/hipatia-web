@@ -1,5 +1,5 @@
 ﻿import React, { useState, useEffect, useRef } from "react";
-import { Search, Zap, ChevronRight, Lock, CheckCircle, Shield, Award, BarChart3, Mail, BookOpen, LayoutGrid, MessageCircle, X, Send, ArrowRight, Play, ExternalLink } from "lucide-react";
+import { Search, Zap, Users, ChevronRight, Lock, CheckCircle, Shield, Award, BarChart3, Mail, BookOpen, LayoutGrid, MessageCircle, X, Send, ArrowRight, Play, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 
@@ -251,7 +251,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
                                 <p className="text-xl text-slate-500 font-medium max-w-2xl mx-auto">Selecciona la herramienta que deseas utilizar hoy.</p>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto">
                                 <button onClick={onSelectAuditor} className="group glass-indigo rounded-[32px] p-10 text-left transition-all hover:scale-[1.02] hover:shadow-2xl hover:shadow-indigo-200/50 flex flex-col gap-10">
                                     <div className="flex justify-between items-start">
                                         <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-indigo-700 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-indigo-200">
@@ -267,6 +267,23 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
                                         Acceder al corrector <ArrowRight size={18} />
                                     </div>
                                 </button>
+
+                                
+                                <Link href="/informe-grupal" className="group glass-emerald rounded-[32px] p-10 text-left transition-all hover:scale-[1.02] hover:shadow-2xl hover:shadow-emerald-200/50 flex flex-col gap-10">
+                                    <div className="flex justify-between items-start">
+                                        <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-emerald-200">
+                                            <Users size={32} />
+                                        </div>
+                                        <div className="bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">NUEVO</div>
+                                    </div>
+                                    <div>
+                                        <h2 className="text-3xl font-bold text-slate-900 mb-3 tracking-tight">INFORMES DE GRUPO</h2>
+                                        <p className="text-slate-500 font-medium leading-relaxed">Genera estadísticas comparativas y detecta patrones de aprendizaje por clase.</p>
+                                    </div>
+                                    <div className="flex items-center gap-2 text-emerald-600 font-bold text-sm uppercase tracking-widest pt-4 group-hover:gap-4 transition-all">
+                                        Crear informe <ArrowRight size={18} />
+                                    </div>
+                                </Link>
 
                                 <button onClick={() => setViewMode('forge')} className="group glass rounded-[32px] p-10 text-left transition-all hover:scale-[1.02] hover:shadow-2xl hover:shadow-slate-200/20 flex flex-col gap-10">
                                     <div className="flex justify-between items-start">
