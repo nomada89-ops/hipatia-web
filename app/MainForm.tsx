@@ -7,8 +7,7 @@ import {
   Loader2, 
   Zap, 
   Users, 
-  Download 
-} from 'lucide-react';
+  Download, ChevronRight } from 'lucide-react';
 // Asegúrate de que la ruta a tu contexto sea correcta
 import { useExamContext } from './ExamContext'; 
 
@@ -26,7 +25,7 @@ const compressImage = (file: File): Promise<File> => {
     img.src = URL.createObjectURL(file);
     img.onload = () => {
       const canvas = document.createElement('canvas');
-      const MAX_WIDTH = 1200; // Reducir tamaño excesivo
+      const MAX_WIDTH = 1600; // Reducir tamaño excesivo
       const scaleSize = MAX_WIDTH / img.width;
       
       // Si es más pequeña, no redimensionar
@@ -52,7 +51,7 @@ const compressImage = (file: File): Promise<File> => {
           } else {
             resolve(file); // Fallback
           }
-        }, 'image/jpeg', 0.7); 
+        }, 'image/jpeg', 0.85); 
       } else {
         resolve(file);
       }
@@ -197,14 +196,15 @@ export default function MainForm() {
 
   // --- RENDERIZADO (JSX) ---
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white rounded-xl shadow-sm border border-gray-100">
+    <div className="max-w-4xl mx-auto p-6 md:p-8 bg-white rounded-[24px] shadow-xl shadow-indigo-900/5 border border-slate-100 relative overflow-hidden">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-violet-500"></div>
       <div className="flex items-center gap-3 mb-8 border-b pb-4">
-        <div className="p-3 bg-purple-100 rounded-lg">
-          <Zap className="w-6 h-6 text-purple-600" />
+        <div className="p-3 bg-indigo-50 rounded-lg">
+          <Zap size={18} className="text-indigo-600" />
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Hipatia Grader AI</h1>
-          <p className="text-gray-500 text-sm">Sistema de Corrección Avanzada</p>
+          <h1 className="text-lg font-bold text-slate-900 tracking-tight flex items-center gap-2"><span>HIPAT<span className="text-indigo-600">IA</span></span> <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600">Corrector</span></h1>
+          <p className="text-gray-500 text-sm">Escanea, Analiza y Califica</p>
         </div>
       </div>
 
@@ -218,7 +218,7 @@ export default function MainForm() {
               type="checkbox" 
               checked={isGroupMode}
               onChange={(e) => setIsGroupMode(e.target.checked)}
-              className="w-5 h-5 text-purple-600 rounded focus:ring-purple-500"
+              className="w-5 h-5 text-indigo-600 rounded focus:ring-purple-500"
             />
             <span className="font-semibold text-gray-700">Corregir como parte de un grupo</span>
           </label>
@@ -355,10 +355,19 @@ export default function MainForm() {
             type="submit"
             disabled={isLoading}
             className={`w-full py-4 rounded-xl font-bold text-white shadow-lg transform transition-all hover:scale-[1.01] flex items-center justify-center gap-2
-              ${isLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:shadow-purple-200'}`}
+              ${isLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-gradient-to-br from-indigo-600 via-indigo-700 to-violet-700 shadow-indigo-200'}`}
           >
-            {isLoading ? <Loader2 className="animate-spin" /> : <Check />}
-            {isLoading ? statusMessage : 'CORREGIR EXAMEN'}
+            {isLoading ? (
+              <>
+                <Loader2 className="animate-spin" size={20} />
+                <span className="animate-pulse text-sm">{statusMessage || "PROCESANDO..."}</span>
+              </>
+            ) : (
+              <>
+                <span>INICIAR CORRECCIÓN</span>
+                <ChevronRight size={20} className="opacity-60" />
+              </>
+            )}
           </button>
 
           {/* Botón de Informe Grupal (Solo visible en modo grupo) */}
