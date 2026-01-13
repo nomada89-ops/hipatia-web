@@ -304,9 +304,9 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
 
             // @ts-ignore
             const html2pdf = (await import('html2pdf.js')).default;
-            const opt = {
+            const options = {
                 margin: [10, 10],
-                filename: `Correccion_${alumnoId || 'Examen'}.pdf`,
+                filename: `Informe_Hipatia_${new Date().getTime()}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: {
                     scale: 2,
@@ -322,15 +322,21 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
             const style = document.createElement('style');
             style.innerHTML = `
                 @media print {
-                    .page-break-avoid { page-break-inside: avoid; }
-                    #full-report-container { background: white !important; }
+                    #full-report-container {
+                        width: 210mm; /* Ancho A4 */
+                        padding: 0;
+                        background: white !important;
+                    }
                     .no-print-section { display: none !important; }
+                    .section-avoid-break {
+                        page-break-inside: avoid;
+                    }
                 }
             `;
             document.head.appendChild(style);
 
             try {
-                await html2pdf().set(opt).from(element).save();
+                await html2pdf().from(element).set(options).save();
             } finally {
                 document.head.removeChild(style);
             }
@@ -407,7 +413,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
 
                         <div className="col-span-12 lg:col-span-6 space-y-6">
                             {/* Score Card Hero Compact */}
-                            <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-soft flex items-center justify-between">
+                            <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-soft flex items-center justify-between section-avoid-break">
                                 <div className="space-y-2">
                                     <h3 className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Calificación Final</h3>
                                     <div className="flex items-baseline gap-1.5">
@@ -429,7 +435,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                                 </div>
                             </div>
 
-                            <div className="space-y-2.5">
+                            <div className="space-y-2.5 section-avoid-break">
                                 <div className="flex items-center justify-between">
                                     <h3 className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Informe Pedagógico</h3>
                                     <div className="flex gap-1.5">
@@ -452,7 +458,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                         </div>
 
                         <div className="col-span-12 lg:col-span-3 space-y-6">
-                            <div className="bg-slate-900 rounded-xl p-5 shadow-lg text-white">
+                            <div className="bg-slate-900 rounded-xl p-5 shadow-lg text-white section-avoid-break">
                                 <h3 className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-3">Análisis Técnico</h3>
                                 <div className="font-mono bg-slate-800/40 rounded-lg p-4 border border-slate-800">
                                     <div className="text-indigo-400 text-[8px] mb-2 font-bold tracking-widest">$ PRECISION_LOG</div>
