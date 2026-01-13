@@ -62,7 +62,13 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
                 body: JSON.stringify({ user_token: tokenInput })
             });
             const data = await response.json();
-            if (data.autorizado) onLogin(tokenInput);
+            if (data.autorizado) {
+                // GUARDADO FORZOSO PARA COMPATIBILIDAD
+                if (typeof window !== 'undefined') {
+                    localStorage.setItem('user_token', tokenInput);
+                }
+                onLogin(tokenInput);
+            }
             else setErrorMessage("Token inválido");
         } catch {
             setErrorMessage("Error de conexión");

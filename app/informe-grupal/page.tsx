@@ -7,23 +7,34 @@ import { useRouter } from 'next/navigation';
 export default function GroupReportPage() {
     const router = useRouter();
     const [idGrupo, setIdGrupo] = useState('');
-    const [status, setStatus] = useState < 'idle' | 'sending' | 'success' | 'error' > ('idle');
-    const [htmlReport, setHtmlReport] = useState < string | null > (null);
+    const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
+    const [htmlReport, setHtmlReport] = useState<string | null>(null);
     const [loadingMsg, setLoadingMsg] = useState('Procesando datos grupales...');
     const [errorMsg, setErrorMsg] = useState('');
 
-    // --- SEGURIDAD: CHECK TOKEN ---
+    // --- SEGURIDAD: CHECK TOKEN (RELAJADA) ---
     useEffect(() => {
-        const token = localStorage.getItem('user_token') || localStorage.getItem('token');
-        if (!token) {
-            router.push('/');
+        // Intentar recuperar de storage O de parámetros URL
+        if (typeof window !== 'undefined') {
+             const params = new URLSearchParams(window.location.search);
+             const token = localStorage.getItem('user_token') || localStorage.getItem('token') || params.get('token');
+
+            if (!token) {
+                 console.warn("No se detectó token en carga inicial. Redirigiendo en breve...");
+                 const timer = setTimeout(() => {
+                     const reCheck = localStorage.getItem('user_token') || localStorage.getItem('token');
+                     if (!reCheck) router.push('/');
+                 }, 1500);
+                 return () => clearTimeout(timer);
+            }
         }
     }, [router]);
 
     const handleGenerate = async (e: React.FormEvent) => {
         e.preventDefault();
-        const token = localStorage.getItem('user_token') || localStorage.getItem('token');
-
+        const params = new URLSearchParams(window.location.search);
+        const token = localStorage.getItem('user_token') || localStorage.getItem('token') || params.get('token');
+        
         if (!token) {
             alert('Sesión expirada. Por favor, reinicia sesión.');
             router.push('/');
@@ -86,7 +97,7 @@ export default function GroupReportPage() {
                         </div>
                     </div>
                     <div className="flex gap-2">
-                        <button onClick={() => window.print()} className="px-4 py-2 bg-slate-900 text-white rounded-lg text-xs font-bold hover:bg-slate-800 transition-all flex items-center gap-2">
+                         <button onClick={() => window.print()} className="px-4 py-2 bg-slate-900 text-white rounded-lg text-xs font-bold hover:bg-slate-800 transition-all flex items-center gap-2">
                             IMPRIMIR PDF
                         </button>
                     </div>
@@ -95,7 +106,7 @@ export default function GroupReportPage() {
                 {/* Contenido HTML Seguro */}
                 <div className="flex-1 overflow-auto p-8 custom-scrollbar">
                     <div className="max-w-5xl mx-auto bg-white p-10 rounded-xl shadow-sm border border-slate-100 min-h-[500px]">
-                        <div
+                        <div 
                             className="prose prose-slate max-w-none"
                             dangerouslySetInnerHTML={{ __html: htmlReport }}
                         />
@@ -111,25 +122,25 @@ export default function GroupReportPage() {
             {/* Sidebar Visual */}
             <div className="w-full md:w-1/3 lg:w-1/4 bg-slate-900 text-white p-8 flex flex-col justify-between relative overflow-hidden">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500 rounded-full blur-[80px] opacity-20 -translate-y-1/2 translate-x-1/2"></div>
-
+                
                 <div className="relative z-10">
-                    <div className="flex items-center gap-2 mb-8 text-indigo-400">
+                   <div className="flex items-center gap-2 mb-8 text-indigo-400">
                         <Users size={24} />
                         <span className="font-bold tracking-widest text-xs uppercase">Módulo Grupal</span>
-                    </div>
-                    <h1 className="text-3xl font-black leading-tight mb-4">
-                        Visión Global de tu Clase
-                    </h1>
-                    <p className="text-slate-400 text-sm leading-relaxed">
-                        Genera informes agregados para detectar patrones, dificultades comunes y estadísticas de rendimiento por grupo.
-                    </p>
+                   </div>
+                   <h1 className="text-3xl font-black leading-tight mb-4">
+                       Visión Global de tu Clase
+                   </h1>
+                   <p className="text-slate-400 text-sm leading-relaxed">
+                       Genera informes agregados para detectar patrones, dificultades comunes y estadísticas de rendimiento por grupo.
+                   </p>
                 </div>
 
                 <div className="relative z-10 mt-12 md:mt-0">
                     <div className="p-4 bg-slate-800 rounded-xl border border-slate-700/50">
                         <div className="flex items-center gap-3 mb-2">
-                            <Shield className="text-emerald-400" size={16} />
-                            <span className="text-xs font-bold text-slate-300">Zona Segura</span>
+                           <Shield className="text-emerald-400" size={16} />
+                           <span className="text-xs font-bold text-slate-300">Zona Segura</span>
                         </div>
                         <p className="text-[10px] text-slate-500">
                             Solo se procesan datos de exámenes previamente corregidos y etiquetados con el ID de grupo correspondiente.
@@ -140,14 +151,14 @@ export default function GroupReportPage() {
 
             {/* Main Content */}
             <div className="flex-1 flex flex-col p-6 md:p-12 items-center justify-center relative">
-                <button
-                    onClick={() => router.push('/')}
+                 <button 
+                    onClick={() => router.push('/')} 
                     className="absolute top-6 right-6 flex items-center gap-2 text-slate-500 hover:text-indigo-600 transition-colors text-sm font-bold"
                 >
                     <ArrowLeft size={16} /> Volver al Corrector Individual
-                </button>
+                 </button>
 
-                <div className="w-full max-w-md space-y-8 animate-in fade-in zoom-in-95 duration-500">
+                 <div className="w-full max-w-md space-y-8 animate-in fade-in zoom-in-95 duration-500">
                     <div className="text-center">
                         <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-indigo-50 text-indigo-600 mb-4 shadow-sm">
                             <FileText size={32} />
@@ -174,29 +185,29 @@ export default function GroupReportPage() {
                             disabled={status === 'sending' || !idGrupo.trim()}
                             className={`w-full py-4 text-lg font-black text-white rounded-xl shadow-xl transition-all transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2
                                 ${status === 'sending' || !idGrupo.trim()
-                                    ? 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none'
+                                    ? 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none' 
                                     : 'bg-gradient-to-r from-indigo-600 to-violet-600 shadow-indigo-200'}`}
                         >
-                            {status === 'sending' ? (
+                             {status === 'sending' ? (
                                 <>
                                     <Loader2 className="animate-spin" size={20} />
                                     <span className="text-sm font-bold animate-pulse">GENERANDO...</span>
                                 </>
-                            ) : (
+                             ) : (
                                 <>
                                     <Zap size={20} className="fill-white/20" />
                                     <span>GENERAR ANÁLISIS</span>
                                 </>
-                            )}
+                             )}
                         </button>
 
                         {status === 'error' && (
-                            <div className="p-3 bg-rose-50 border border-rose-100 rounded-lg text-center">
-                                <p className="text-xs font-bold text-rose-600">{errorMsg}</p>
-                            </div>
+                             <div className="p-3 bg-rose-50 border border-rose-100 rounded-lg text-center">
+                                 <p className="text-xs font-bold text-rose-600">{errorMsg}</p>
+                             </div>
                         )}
                     </form>
-                </div>
+                 </div>
             </div>
         </div>
     );
