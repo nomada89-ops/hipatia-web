@@ -299,21 +299,16 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
 
     const handleDownloadPdf = async () => {
         if (typeof window !== 'undefined') {
-            const element = document.getElementById('full-report-container');
+            const element = document.getElementById('reporte-final-hipatia');
             if (!element) return;
 
             // @ts-ignore
             const html2pdf = (await import('html2pdf.js')).default;
             const options = {
-                margin: [10, 10],
-                filename: `Informe_Hipatia_${new Date().getTime()}.pdf`,
+                margin: 10,
+                filename: `Informe_Hipatia_${new Date().toLocaleDateString()}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: {
-                    scale: 2,
-                    useCORS: true,
-                    logging: false,
-                    letterRendering: true
-                },
+                html2canvas: { scale: 2, useCORS: true },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
                 pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
             };
@@ -322,7 +317,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
             const style = document.createElement('style');
             style.innerHTML = `
                 @media print {
-                    #full-report-container {
+                    #reporte-final-hipatia {
                         width: 210mm; /* Ancho A4 */
                         padding: 0;
                         background: white !important;
@@ -357,124 +352,137 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
 
         return (
             <div className="flex-1 bg-slate-50 flex flex-col h-full overflow-hidden animate-fade-in font-inter">
-                {/* Header Superior Compact */}
-                <div className="bg-white border-b border-slate-200 px-8 py-3.5 flex items-center justify-between shadow-sm z-10">
-                    <div className="flex items-center gap-4">
-                        <button onClick={onBack} className="p-2 hover:bg-slate-100 rounded-lg transition-colors text-slate-500">
-                            <ArrowLeft className="h-5 w-5" />
-                        </button>
-                        <div className="flex flex-col">
-                            <span className="text-[9px] text-slate-500 font-bold uppercase tracking-widest mb-0.5">Expediente</span>
-                            <h2 className="text-sm font-bold text-slate-900">{alumnoId || 'ID-ALUMNO'}</h2>
+                <div id="reporte-final-hipatia" className="flex flex-col h-full">
+                    {/* Header Superior Compact */}
+                    <div className="bg-white border-b border-slate-200 px-8 py-3.5 flex items-center justify-between shadow-sm z-10">
+                        <div className="flex items-center gap-4">
+                            <button onClick={onBack} className="p-2 hover:bg-slate-100 rounded-lg transition-colors text-slate-500 no-print-section">
+                                <ArrowLeft className="h-5 w-5" />
+                            </button>
+                            <div className="flex flex-col">
+                                <span className="text-[9px] text-slate-500 font-bold uppercase tracking-widest mb-0.5">Expediente</span>
+                                <h2 className="text-sm font-bold text-slate-900">{alumnoId || 'ID-ALUMNO'}</h2>
+                            </div>
+                            <div className="h-6 w-px bg-slate-200 ml-2"></div>
+                            <div className="flex items-center gap-2 px-3 py-1 bg-emerald-50 border border-emerald-100 rounded-full ml-2">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                <span className="text-[10px] font-bold text-emerald-700">AUDITADO</span>
+                            </div>
                         </div>
-                        <div className="h-6 w-px bg-slate-200 ml-2"></div>
-                        <div className="flex items-center gap-2 px-3 py-1 bg-emerald-50 border border-emerald-100 rounded-full ml-2">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                            <span className="text-[10px] font-bold text-emerald-700">AUDITADO</span>
+
+                        <div className="flex items-center gap-3 no-print-section">
+                            <button onClick={handleDownloadPdf} className="flex items-center gap-1.5 px-3 py-1.5 border border-slate-200 rounded-lg text-[10px] font-bold text-slate-600 hover:bg-slate-50 transition-all">
+                                <FileDown className="h-3.5 w-3.5" /> PDF
+                            </button>
+                            <button onClick={() => setOriginalReport(null)} className="px-4 py-1.5 bg-slate-900 text-white rounded-lg text-[10px] font-bold hover:bg-slate-800 transition-all">
+                                NUEVA
+                            </button>
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-3">
-                        <button onClick={handleDownloadPdf} className="flex items-center gap-1.5 px-3 py-1.5 border border-slate-200 rounded-lg text-[10px] font-bold text-slate-600 hover:bg-slate-50 transition-all">
-                            <FileDown className="h-3.5 w-3.5" /> PDF
-                        </button>
-                        <button onClick={() => setOriginalReport(null)} className="px-4 py-1.5 bg-slate-900 text-white rounded-lg text-[10px] font-bold hover:bg-slate-800 transition-all">
-                            NUEVA
-                        </button>
+                    {/* Disclaimer Banner */}
+                    <div className="bg-indigo-50/50 border-b border-indigo-100/50 px-8 py-2 flex items-center justify-center gap-2 no-print-section">
+                        <AlertCircle size={14} className="text-indigo-400" />
+                        <p className="text-[10px] font-medium text-slate-500 italic">
+                            Hipatia es muy segura, pero recuerde revisar personalmente el ejercicio por si hubiera algún error.
+                        </p>
                     </div>
-                </div>
 
-                {/* Disclaimer Banner */}
-                <div className="bg-indigo-50/50 border-b border-indigo-100/50 px-8 py-2 flex items-center justify-center gap-2 no-print-section">
-                    <AlertCircle size={14} className="text-indigo-400" />
-                    <p className="text-[10px] font-medium text-slate-500 italic">
-                        Hipatia es muy segura, pero recuerde revisar personalmente el ejercicio por si hubiera algún error.
-                    </p>
-                </div>
+                    {/* Dashboard Compact Workspace */}
+                    <div className="flex-1 overflow-auto p-6 lg:p-8 custom-scrollbar">
+                        <div className="max-w-7xl mx-auto grid grid-cols-12 gap-6 bg-slate-50 p-4 rounded-2xl relative">
+                            {/* Filmstrip Overlay */}
+                            <div className="col-span-12 lg:col-span-3 space-y-4 pr-2 no-print-section">
+                                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest px-1">Evidencias</h3>
+                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-2 gap-3 overflow-y-auto max-h-[calc(100vh-250px)] pr-2 custom-scrollbar">
+                                    {examenArchivos.map((_, idx) => (
+                                        <div key={idx} onClick={() => { setViewerStartingIndex(idx); setIsViewerOpen(true); }} className="relative group cursor-pointer">
+                                            <div className="aspect-[3/4] bg-white border border-slate-200 rounded-lg shadow-soft flex flex-col items-center justify-center transition-all group-hover:border-indigo-400 overflow-hidden relative">
+                                                <FileText className="h-6 w-6 text-slate-300 group-hover:text-indigo-400 transition-colors" />
+                                                <span className="text-[10px] font-bold text-slate-500 mt-1.5">Pág {idx + 1}</span>
+                                                <CheckCircle className="absolute top-1 right-1 h-3 w-3 text-indigo-600" />
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
 
-                {/* Dashboard Compact Workspace */}
-                <div className="flex-1 overflow-auto p-6 lg:p-8 custom-scrollbar">
-                    <div id="full-report-container" className="max-w-7xl mx-auto grid grid-cols-12 gap-6 bg-slate-50 p-4 rounded-2xl">
-                        {/* Filmstrip Overlay */}
-                        <div className="col-span-12 lg:col-span-3 space-y-4 pr-2 no-print-section">
-                            <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest px-1">Evidencias</h3>
-                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-2 gap-3 overflow-y-auto max-h-[calc(100vh-250px)] pr-2 custom-scrollbar">
-                                {examenArchivos.map((_, idx) => (
-                                    <div key={idx} onClick={() => { setViewerStartingIndex(idx); setIsViewerOpen(true); }} className="relative group cursor-pointer">
-                                        <div className="aspect-[3/4] bg-white border border-slate-200 rounded-lg shadow-soft flex flex-col items-center justify-center transition-all group-hover:border-indigo-400 overflow-hidden relative">
-                                            <FileText className="h-6 w-6 text-slate-300 group-hover:text-indigo-400 transition-colors" />
-                                            <span className="text-[10px] font-bold text-slate-500 mt-1.5">Pág {idx + 1}</span>
-                                            <CheckCircle className="absolute top-1 right-1 h-3 w-3 text-indigo-600" />
+                            <div className="col-span-12 lg:col-span-6 space-y-6">
+                                {/* Score Card Hero Compact */}
+                                <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-soft flex items-center justify-between section-avoid-break">
+                                    <div className="space-y-2">
+                                        <h3 className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Calificación Final</h3>
+                                        <div className="flex items-baseline gap-1.5">
+                                            <span className={`text-5xl font-black ${isPass ? 'text-indigo-600' : 'text-rose-600'}`}>
+                                                {extractedGrade.toFixed(2)}
+                                            </span>
+                                            <span className="text-xl font-bold text-slate-300">/ 10</span>
+                                        </div>
+                                        <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg font-bold text-[10px] uppercase tracking-wider ${isPass ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}`}>
+                                            {isPass ? 'Promoción apta' : 'Refuerzo necesario'}
                                         </div>
                                     </div>
-                                ))}
+                                    <div className="relative w-24 h-24 flex items-center justify-center">
+                                        <svg className="w-full h-full transform -rotate-90">
+                                            <circle cx="48" cy="48" r="42" stroke="currentColor" strokeWidth="8" fill="transparent" className="text-slate-100" />
+                                            <circle cx="48" cy="48" r="42" stroke="currentColor" strokeWidth="8" fill="transparent" strokeDasharray={263.8} strokeDashoffset={263.8 - (263.8 * extractedGrade) / 10} className={`${isPass ? 'text-indigo-600' : 'text-rose-500'} transition-all duration-1000`} />
+                                        </svg>
+                                        <span className="absolute text-[11px] font-bold text-slate-500">{(extractedGrade * 10).toFixed(0)}%</span>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-2.5 section-avoid-break">
+                                    <div className="flex items-center justify-between">
+                                        <h3 className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Informe Pedagógico</h3>
+                                        <div className="flex gap-1.5">
+                                            <button onClick={() => execCmd('bold')} className="p-1 hover:bg-slate-100 rounded text-slate-400 transition-colors"><Bold className="h-3.5 w-3.5" /></button>
+                                            <button onClick={() => execCmd('italic')} className="p-1 hover:bg-slate-100 rounded text-slate-400 transition-colors"><Italic className="h-3.5 w-3.5" /></button>
+                                            <div className="w-px h-5 bg-slate-200 mx-1"></div>
+                                            <button onClick={handleReset} className="text-[9px] font-bold text-rose-500 uppercase hover:underline">Reset</button>
+                                        </div>
+                                    </div>
+                                    <div className="bg-white rounded-xl border border-slate-200 shadow-soft min-h-[450px] p-8 overflow-hidden">
+                                        <div
+                                            className="outline-none prose prose-auditor prose-sm"
+                                            contentEditable={true}
+                                            suppressContentEditableWarning={true}
+                                            onBlur={(e) => setEditedReport(e.currentTarget.innerHTML)}
+                                            dangerouslySetInnerHTML={{ __html: originalReport }}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="col-span-12 lg:col-span-3 space-y-6">
+                                <div className="bg-slate-900 rounded-xl p-5 shadow-lg text-white section-avoid-break">
+                                    <h3 className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-3">Análisis Técnico</h3>
+                                    <div className="font-mono bg-slate-800/40 rounded-lg p-4 border border-slate-800">
+                                        <div className="text-indigo-400 text-[8px] mb-2 font-bold tracking-widest">$ PRECISION_LOG</div>
+                                        <div className="space-y-1.5 text-[11px] text-slate-400">
+                                            <p>P1: <span className="text-white">+2.00</span></p>
+                                            <p>P2: <span className="text-white">+1.50</span></p>
+                                            <p>P3: <span className="text-white">+1.34</span></p>
+                                            <div className="h-px bg-slate-700 my-3"></div>
+                                            <p className="text-sm font-bold text-white tracking-tight">
+                                                $ ╬ú = <span className="text-indigo-400">{extractedGrade.toFixed(2)}</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <GradeBreakdown htmlContent={editedReport} />
                             </div>
                         </div>
+                    </div>
 
-                        <div className="col-span-12 lg:col-span-6 space-y-6">
-                            {/* Score Card Hero Compact */}
-                            <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-soft flex items-center justify-between section-avoid-break">
-                                <div className="space-y-2">
-                                    <h3 className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Calificación Final</h3>
-                                    <div className="flex items-baseline gap-1.5">
-                                        <span className={`text-5xl font-black ${isPass ? 'text-indigo-600' : 'text-rose-600'}`}>
-                                            {extractedGrade.toFixed(2)}
-                                        </span>
-                                        <span className="text-xl font-bold text-slate-300">/ 10</span>
-                                    </div>
-                                    <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg font-bold text-[10px] uppercase tracking-wider ${isPass ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}`}>
-                                        {isPass ? 'Promoción apta' : 'Refuerzo necesario'}
-                                    </div>
-                                </div>
-                                <div className="relative w-24 h-24 flex items-center justify-center">
-                                    <svg className="w-full h-full transform -rotate-90">
-                                        <circle cx="48" cy="48" r="42" stroke="currentColor" strokeWidth="8" fill="transparent" className="text-slate-100" />
-                                        <circle cx="48" cy="48" r="42" stroke="currentColor" strokeWidth="8" fill="transparent" strokeDasharray={263.8} strokeDashoffset={263.8 - (263.8 * extractedGrade) / 10} className={`${isPass ? 'text-indigo-600' : 'text-rose-500'} transition-all duration-1000`} />
-                                    </svg>
-                                    <span className="absolute text-[11px] font-bold text-slate-500">{(extractedGrade * 10).toFixed(0)}%</span>
-                                </div>
-                            </div>
-
-                            <div className="space-y-2.5 section-avoid-break">
-                                <div className="flex items-center justify-between">
-                                    <h3 className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Informe Pedagógico</h3>
-                                    <div className="flex gap-1.5">
-                                        <button onClick={() => execCmd('bold')} className="p-1 hover:bg-slate-100 rounded text-slate-400 transition-colors"><Bold className="h-3.5 w-3.5" /></button>
-                                        <button onClick={() => execCmd('italic')} className="p-1 hover:bg-slate-100 rounded text-slate-400 transition-colors"><Italic className="h-3.5 w-3.5" /></button>
-                                        <div className="w-px h-5 bg-slate-200 mx-1"></div>
-                                        <button onClick={handleReset} className="text-[9px] font-bold text-rose-500 uppercase hover:underline">Reset</button>
-                                    </div>
-                                </div>
-                                <div className="bg-white rounded-xl border border-slate-200 shadow-soft min-h-[450px] p-8 overflow-hidden">
-                                    <div
-                                        className="outline-none prose prose-auditor prose-sm"
-                                        contentEditable={true}
-                                        suppressContentEditableWarning={true}
-                                        onBlur={(e) => setEditedReport(e.currentTarget.innerHTML)}
-                                        dangerouslySetInnerHTML={{ __html: originalReport }}
-                                    />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="col-span-12 lg:col-span-3 space-y-6">
-                            <div className="bg-slate-900 rounded-xl p-5 shadow-lg text-white section-avoid-break">
-                                <h3 className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-3">Análisis Técnico</h3>
-                                <div className="font-mono bg-slate-800/40 rounded-lg p-4 border border-slate-800">
-                                    <div className="text-indigo-400 text-[8px] mb-2 font-bold tracking-widest">$ PRECISION_LOG</div>
-                                    <div className="space-y-1.5 text-[11px] text-slate-400">
-                                        <p>P1: <span className="text-white">+2.00</span></p>
-                                        <p>P2: <span className="text-white">+1.50</span></p>
-                                        <p>P3: <span className="text-white">+1.34</span></p>
-                                        <div className="h-px bg-slate-700 my-3"></div>
-                                        <p className="text-sm font-bold text-white tracking-tight">
-                                            $ ╬ú = <span className="text-indigo-400">{extractedGrade.toFixed(2)}</span>
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                            <GradeBreakdown htmlContent={editedReport} />
-                        </div>
+                    {/* Botón Inferior de Descarga */}
+                    <div className="flex justify-center pb-12 no-print-section">
+                        <button
+                            onClick={handleDownloadPdf}
+                            className="flex items-center gap-2 px-8 py-4 bg-indigo-600 text-white rounded-2xl font-black shadow-xl shadow-indigo-200 hover:bg-indigo-700 transition-all transform hover:scale-[1.02] active:scale-[0.98]"
+                        >
+                            <FileDown size={20} />
+                            DESCARGAR INFORME PDF
+                        </button>
                     </div>
                 </div>
 
