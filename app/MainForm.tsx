@@ -53,10 +53,12 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
         "Analizando rúbrica...",
         "Generando veredicto...",
         "Consensuando (Juez)...",
-        "Validando (Auditor)..."
+        "Validando (Auditor)...",
+        "Nos tomamos muy en serio la corrección...",
+        "Podemos tardar entre dos y tres minutos por examen..."
     ];
 
-    // --- LOGICA DE EXTRACCI├ôN (Traída de Sidebar.tsx) ---
+    // --- LOGICA DE EXTRACCION (Traída de Sidebar.tsx) ---
     const processFileText = async (file: File): Promise<string> => {
         let text = '';
         if (file.type === 'application/pdf') {
@@ -374,6 +376,14 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                             NUEVA
                         </button>
                     </div>
+                </div>
+
+                {/* Disclaimer Banner */}
+                <div className="bg-indigo-50/50 border-b border-indigo-100/50 px-8 py-2 flex items-center justify-center gap-2 no-print-section">
+                    <AlertCircle size={14} className="text-indigo-400" />
+                    <p className="text-[10px] font-medium text-slate-500 italic">
+                        Hipatia es muy segura, pero recuerde revisar personalmente el ejercicio por si hubiera algún error.
+                    </p>
                 </div>
 
                 {/* Dashboard Compact Workspace */}
@@ -707,7 +717,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                                     </>
                                 ) : (
                                     <>
-                                        <span>INICIAR CORRECCI├ôN</span>
+                                        <span>INICIAR CORRECCIÓN</span>
                                         <ChevronRight size={20} className="opacity-60" />
                                     </>
                                 )}
