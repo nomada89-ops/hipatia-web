@@ -114,15 +114,24 @@ export default function MainForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
 
-  // Recuperar token de localStorage si se pierde al recargar
+  // Recuperar token automáticamente al cargar (URL o localStorage)
   useEffect(() => {
-    if (!userToken) {
-      const storedToken = localStorage.getItem('user_token') || localStorage.getItem('token');
-      if (storedToken && setUserToken) {
-        setUserToken(storedToken);
-      }
+    // 1. Buscar en URL (Prioridad máxima por si viene de redirección)
+    const params = new URLSearchParams(window.location.search);
+    const tokenUrl = params.get('token') || params.get('user_token');
+
+    // 2. Buscar en LocalStorage (Persistencia)
+    const tokenStorage = localStorage.getItem('user_token') || localStorage.getItem('token');
+
+    const finalToken = tokenUrl || tokenStorage;
+
+    if (finalToken && setUserToken) {
+      console.log("✅ Sesión restaurada correctamente.");
+      setUserToken(finalToken);
+      // Guardar para futuras recargas
+      localStorage.setItem('user_token', finalToken);
     }
-  }, [userToken, setUserToken]);
+  }, [setUserToken]);
 
   // --- ESCUCHA DE SEÑAL DESDE INFORME INDIVIDUAL ---
   useEffect(() => {
@@ -161,18 +170,22 @@ export default function MainForm() {
       // -----------------------------------
 
       // Datos obligatorios
-      // 1. Intentamos obtener el token del estado o del almacenamiento local
-      const tokenReal = userToken || localStorage.getItem('user_token') || localStorage.getItem('token');
-
-      // 2. Validación BLOQUEANTE DE SEGURIDAD (Si no hay token, no se puede enviar)
-      if (!tokenReal) {
-        alert("Error de sesión: No se detecta el token de profesor. Por favor, vuelve a iniciar sesión.");
-        setIsLoading(false);
-        return; // Detenemos el envío para no romper el backend
+      // Blindaje del token: último intento si el estado está vacío
+      let tokenParaEnviar = userToken;
+      
+      // Si el estado está vacío, intento desesperado de leer del disco
+      if (!tokenParaEnviar) {
+        tokenParaEnviar = localStorage.getItem('user_token') || localStorage.getItem('token') || "";
       }
-
-      // 3. Enviamos el token real
-      formData.append('user_token', tokenReal);
+      
+      if (!tokenParaEnviar) {
+        alert("Error de Sesión: No se encuentra el token. Por favor, realiza el Login de nuevo.");
+        setIsLoading(false);
+        return;
+      }
+      
+      // Usar tokenParaEnviar en el append
+      formData.append('user_token', tokenParaEnviar);
       formData.append('id_grupo', isGroupMode ? idGrupo : "SIN_GRUPO");
       formData.append('alumno', nombreAlumno || "Alumno");
       formData.append('nivel_exigencia', exigencyLevel);
