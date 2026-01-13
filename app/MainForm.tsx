@@ -32,6 +32,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
     const [isDragOver, setIsDragOver] = useState(false);
     const [isOptimizing, setIsOptimizing] = useState(false);
     const [legalAccepted, setLegalAccepted] = useState(false);
+    const [idGrupo, setIdGrupo] = useState('');
 
     const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>(() => {
         // HACK: Detect sample load synchronously to prevent UI flash
@@ -250,6 +251,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
             }
             formData.append('alumno_id', alumnoId);
             formData.append('nivel_exigencia', nivelExigencia);
+            if (idGrupo) formData.append('id_grupo', idGrupo);
 
             examenArchivos.forEach((file, index) => {
                 formData.append(`hoja_${index}`, file);
@@ -642,6 +644,23 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                                         ))}
                                     </div>
                                 )}
+                            </div>
+
+                            {/* GROUP ID OPTIONAL */}
+                            <div className="space-y-4 pt-2 pb-4">
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-slate-500 uppercase tracking-widest pl-1">ID de Grupo (Opcional)</label>
+                                    <input
+                                        type="text"
+                                        value={idGrupo}
+                                        onChange={(e) => setIdGrupo(e.target.value)}
+                                        placeholder="Ej: 2BACH-A"
+                                        className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-indigo-500 focus:bg-white focus:shadow-md outline-none transition-all font-bold text-base text-slate-700 shadow-sm"
+                                    />
+                                    <p className="text-[10px] text-slate-400 pl-1 font-medium">
+                                        Etiqueta este examen para generar luego un informe conjunto.
+                                    </p>
+                                </div>
                             </div>
 
                             {/* Legal Checkbox */}
