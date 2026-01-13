@@ -1,4 +1,10 @@
 ﻿import React, { useState, useEffect, useRef } from 'react';
+import * as pdfjsLib from 'pdfjs-dist';
+import mammoth from 'mammoth';
+
+// Configuración del Worker vía CDN para evitar romper el build de Next.js
+pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+
 import { 
   Upload, 
   FileText, 
@@ -13,6 +19,32 @@ import { useExamContext } from './ExamContext';
 
 
 // Función auxiliar para comprimir imágenes (Máx 1200px y calidad 0.7)
+
+const extractText = async (file: File): Promise<string> => {
+  try {
+    if (file.type === 'application/pdf') {
+      const arrayBuffer = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      let fullText = '';
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const textContent = await page.getTextContent();
+        const pageText = textContent.items.map((item: any) => item.str).join(' ');
+        fullText += pageText + '\n';
+      }
+      return fullText;
+    } else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+      const arrayBuffer = await file.arrayBuffer();
+      const result = await mammoth.extractRawText({ arrayBuffer });
+      return result.value;
+    }
+    return ""; // Si no es PDF/DOCX no extraemos texto
+  } catch (error) {
+    console.error("Error extrayendo texto:", error);
+    return "Error al leer el archivo.";
+  }
+};
+
 const compressImage = (file: File): Promise<File> => {
   return new Promise((resolve) => {
     // Si no es imagen (ej: PDF), devolver original
@@ -103,6 +135,20 @@ export default function MainForm() {
 
     try {
       const formData = new FormData();
+
+      // --- EXTRACCIÓN DE TEXTO (NUEVO) ---
+      let textoRubrica = "";
+      if (rubricFile) {
+        textoRubrica = await extractText(rubricFile);
+      }
+
+      let textoMateriales = "";
+      if (referenceFiles.length > 0) {
+        const extractedTexts = await Promise.all(referenceFiles.map(f => extractText(f)));
+        textoMateriales = extractedTexts.join('\n\n--- SIGUIENTE ARCHIVO ---\n\n');
+      }
+      // -----------------------------------
+
       // Datos obligatorios
       formData.append('user_token', userToken);
       formData.append('id_grupo', isGroupMode ? idGrupo : "SIN_GRUPO");
@@ -116,13 +162,13 @@ export default function MainForm() {
 
       // Archivo de Rúbrica (Opcional)
       if (rubricFile) {
-        formData.append('rubrica', rubricFile);
+        formData.append('rubrica_texto', textoRubrica);
       }
 
       // Materiales de Referencia (Opcional)
-      referenceFiles.forEach((file) => {
-        formData.append('material_referencia', file);
-      });
+      if (textoMateriales) {
+        formData.append('material_referencia_texto', textoMateriales);
+      }
 
       // URL del Webhook Individual (Usa tu variable de entorno o la URL directa)
       const url = process.env.NEXT_PUBLIC_WEBHOOK_AUDITOR || 'PON_AQUI_TU_URL_DE_PRODUCCION_SI_FALLA_ENV';
