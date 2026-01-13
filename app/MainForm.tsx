@@ -114,25 +114,6 @@ export default function MainForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
 
-  // Recuperar token automáticamente al cargar (URL o localStorage)
-  useEffect(() => {
-    // 1. Buscar en URL (Prioridad máxima por si viene de redirección)
-    const params = new URLSearchParams(window.location.search);
-    const tokenUrl = params.get('token') || params.get('user_token');
-
-    // 2. Buscar en LocalStorage (Persistencia)
-    const tokenStorage = localStorage.getItem('user_token') || localStorage.getItem('token');
-
-    const finalToken = tokenUrl || tokenStorage;
-
-    if (finalToken && setUserToken) {
-      console.log("✅ Sesión restaurada correctamente.");
-      setUserToken(finalToken);
-      // Guardar para futuras recargas
-      localStorage.setItem('user_token', finalToken);
-    }
-  }, [setUserToken]);
-
   // --- ESCUCHA DE SEÑAL DESDE INFORME INDIVIDUAL ---
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
@@ -147,32 +128,46 @@ export default function MainForm() {
   // --- FUNCIÓN 1: CORRECCIÓN INDIVIDUAL (FormData) ---
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // 1. INTENTO DE RECUPERACIÓN FORZOSA (Priority: State -> LocalStorage -> URL)
-    const tokenStorage = typeof window !== 'undefined' ? (localStorage.getItem('user_token') || localStorage.getItem('token')) : null;
+
+    // 1. RECUPERACIÓN DE SESIÓN (Basado en auditoría real del navegador)
+    const storage = typeof window !== 'undefined' ? window.localStorage : null;
+
+    // Buscamos el token en las claves estándar
+    const tokenFinal = userToken || storage?.getItem('user_token') || storage?.getItem('token');
+
+    // 2. RECUPERACIÓN DE GRUPO (Clave confirmada en captura: 'hipatia_id_grupo')
     const params = new URLSearchParams(window.location.search);
-    const tokenUrl = params.get('user_token') || params.get('token');
+    // Prioridad: URL -> LocalStorage (clave exacta vista en imagen) -> Estado
+    const idGrupoFinal = params.get('id_grupo') || storage?.getItem('hipatia_id_grupo') || idGrupo;
 
-    // EL TOKEN FINAL: Si no está en el estado, búscalo en el disco o en la URL
-    const finalToken = userToken || tokenStorage || tokenUrl;
-
-    // 2. DEBUG (Para ver en consola qué está pasando)
-    console.log("🔍 Estado:", userToken, "| Storage:", tokenStorage, "| Final:", finalToken);
-
-    // 3. VALIDACIÓN
-    if (!finalToken) {
-      alert("ERROR CRÍTICO: No hay sesión iniciada. El sistema no detecta el token en el navegador.");
-      setIsLoading(false);
+    // 3. VALIDACIÓN DE SEGURIDAD (REDIRECCIÓN)
+    if (!tokenFinal) {
+      // Si no hay token, NO mostramos alerta de error. Redirigimos al Login.
+      const confirmar = confirm("⚠️ Tu sesión ha caducado o no se encuentra.\n\n¿Quieres ir a la página de inicio para identificarte de nuevo?");
+      if (confirmar) {
+        window.location.href = '/'; // Redirección al Login
+      }
       return;
     }
 
-    if (examFiles.length === 0 { alert("Sube al menos una imagen del examen."); return; }
+    if (examFiles.length === 0) {
+      alert("Sube al menos una imagen del examen.");
+      return;
+    }
 
     setIsLoading(true);
     setStatusMessage("Analizando examen...");
 
     try {
+      // 4. PREPARACIÓN DEL ENVÍO
       const formData = new FormData();
+      formData.append('user_token', tokenFinal);
+
+      // Añadimos el grupo si existe (usando la clave correcta)
+      if (idGrupoFinal) {
+        console.log("👥 Grupo detectado:", idGrupoFinal);
+        formData.append('id_grupo', idGrupoFinal);
+      }
 
       // --- EXTRACCIÓN DE TEXTO (NUEVO) ---
       let textoRubrica = "";
@@ -188,9 +183,6 @@ export default function MainForm() {
       // -----------------------------------
 
       // Datos obligatorios
-      // Usar el token recuperado forzosamente
-      formData.append('user_token', finalToken);
-      formData.append('id_grupo', isGroupMode ? idGrupo : "SIN_GRUPO");
       formData.append('alumno', nombreAlumno || "Alumno");
       formData.append('nivel_exigencia', exigencyLevel);
 
@@ -209,10 +201,13 @@ export default function MainForm() {
         formData.append('material_referencia_texto', textoMateriales);
       }
 
-      // URL DE PRODUCCIÓN (Confirmada por usuario)
+      // VERIFICAR PAYLOAD
+      console.log("📦 Enviando FormData con archivos...");
+
+      // URL CONFIRMADA
       const url = 'https://n8n.protocolohipatia.com/webhook/evaluacion-examen';
-      
-      console.log("🚀 Iniciando envío a:", url);
+      console.log("🌐 URL de destino:", url);
+      console.groupEnd();
 
       const response = await fetch(url, {
         method: 'POST',
@@ -354,16 +349,6 @@ export default function MainForm() {
                 onChange={(e) => e.target.files && setReferenceFiles(Array.from(e.target.files))}
               />
             </label>
-
-            {referenceFiles.length > 0 && (
-              <div className="mt-4 max-h-24 overflow-y-auto p-2 border border-gray-100 rounded bg-white shadow-inner">
-                <div className="flex flex-wrap gap-2 justify-center">
-                  {referenceFiles.map((f, i) => (
-                    <span key={i} className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full text-[10px] border border-blue-100">{f.name}</span>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
         </div>
 
@@ -438,12 +423,10 @@ export default function MainForm() {
 
           {/* Visualización simple de archivos seleccionados */}
           {examFiles.length > 0 && (
-            <div className="mt-4 max-h-40 overflow-y-auto p-2 border border-gray-100 rounded bg-white shadow-inner">
-              <div className="flex flex-wrap gap-2 justify-center">
-                {examFiles.map((f, i) => (
-                  <span key={i} className="px-3 py-1 bg-gray-200 rounded-full text-xs text-gray-700">{f.name}</span>
-                ))}
-              </div>
+            <div className="mt-4 flex flex-wrap gap-2 justify-center">
+              {examFiles.map((f, i) => (
+                <span key={i} className="px-3 py-1 bg-gray-200 rounded-full text-xs text-gray-700">{f.name}</span>
+              ))}
             </div>
           )}
         </div>
