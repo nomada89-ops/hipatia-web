@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { useExamContext } from './ExamContext';
 import { Upload, Send, CheckCircle, AlertCircle, Loader2, FileDown, Bold, Italic, List, FileText, X, Eye, ChevronRight, Zap, ArrowLeft, Shield } from 'lucide-react';
 import { SheetViewer } from './SheetViewer';
@@ -18,7 +18,7 @@ interface MainFormProps {
 }
 
 const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
-    // Contexto para datos globales (opcional, pero útil si se quiere persistir al cambiar de pestaña)
+    // Contexto para datos globales (opcional, pero ├║til si se quiere persistir al cambiar de pesta├▒a)
     const { guiaCorreccion, setGuiaCorreccion, materialReferenciaFiles, setMaterialReferenciaFiles, setMaterialReferenciaTexto, materialReferenciaTexto } = useExamContext();
 
     // Estados Locales de UI
@@ -50,13 +50,13 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
     const loadingMessages = [
         "Escaneando evidencias...",
         "Aplicando OCR...",
-        "Analizando rúbrica...",
+        "Analizando r├║brica...",
         "Generando veredicto...",
         "Consensuando (Juez)...",
         "Validando (Auditor)..."
     ];
 
-    // --- LOGICA DE EXTRACCIÓN (Traída de Sidebar.tsx) ---
+    // --- LOGICA DE EXTRACCI├ôN (Tra├¡da de Sidebar.tsx) ---
     const processFileText = async (file: File): Promise<string> => {
         let text = '';
         if (file.type === 'application/pdf') {
@@ -88,7 +88,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
             setGuiaCorreccion(text);
             setRubricaFile(file);
         } catch (error) {
-            console.error('Error extrayendo rúbrica:', error);
+            console.error('Error extrayendo r├║brica:', error);
             alert('Error leyendo el archivo.');
         } finally {
             setExtractingRubrica(false);
@@ -101,7 +101,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
             const newFiles = [...materialReferenciaFiles, ...files];
             setMaterialReferenciaFiles(newFiles);
 
-            // Re-procesar TODO el texto combinado (o añadir, pero re-procesar todo es más seguro para consistencia)
+            // Re-procesar TODO el texto combinado (o a├▒adir, pero re-procesar todo es m├ís seguro para consistencia)
             let combinedText = '';
             for (const file of newFiles) {
                 const text = await processFileText(file);
@@ -150,7 +150,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
             localStorage.removeItem('hipatia_load_sample');
             // If status wasn't set by initializer (due to hydration or SSR), set it now
             setStatus('sending');
-            setLoadingMsg("Cargando simulación de Alu prueba 2...");
+            setLoadingMsg("Cargando simulaci├│n de Alu prueba 2...");
 
             setTimeout(() => {
                 setStatus('success');
@@ -158,25 +158,25 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                 setNivelExigencia('acnee');
                 setJsonGrade(7.7);
                 setOriginalReport(`
-                    <h2>Informe de Corrección (Simulado)</h2>
+                    <h2>Informe de Correcci├│n (Simulado)</h2>
                     <p><strong>Alumno:</strong> ALU-PRUEBA-02 | <strong>Nivel:</strong> ACNEE</p>
-                    <p>He realizado una lectura detenida de tu examen sobre el siglo XIX español y quiero felicitarte por el esfuerzo. Se nota que has comprendido las dinámicas políticas fundamentales entre liberales y absolutistas.</p>
-                    <p>A continuación, desglosamos la corrección:</p>
+                    <p>He realizado una lectura detenida de tu examen sobre el siglo XIX espa├▒ol y quiero felicitarte por el esfuerzo. Se nota que has comprendido las din├ímicas pol├¡ticas fundamentales entre liberales y absolutistas.</p>
+                    <p>A continuaci├│n, desglosamos la correcci├│n:</p>
                     
-                    <h3>1. La Constitución de 1812</h3>
+                    <h3>1. La Constituci├│n de 1812</h3>
                     <ul>
-                        <li><strong>Clasificación y Naturaleza:</strong> Has identificado correctamente que se trata de un texto jurídico y constitucional. (Puntuación: Alta)</li>
-                        <li><strong>Ideas Principales:</strong> Explicas bien la Soberanía Nacional y la División de Poderes. Te ha faltado profundizar un poco más en el contexto de guerra, pero la idea central está clara.</li>
+                        <li><strong>Clasificaci├│n y Naturaleza:</strong> Has identificado correctamente que se trata de un texto jur├¡dico y constitucional. (Puntuaci├│n: Alta)</li>
+                        <li><strong>Ideas Principales:</strong> Explicas bien la Soberan├¡a Nacional y la Divisi├│n de Poderes. Te ha faltado profundizar un poco m├ís en el contexto de guerra, pero la idea central est├í clara.</li>
                     </ul>
 
                     <h3>2. Reinado de Isabel II</h3>
                     <ul>
-                        <li><strong>Problema Sucesorio (Carlismo):</strong> Muy buen análisis del conflicto dinástico. Entiendes las causas profundas.</li>
-                        <li><strong>Evolución Política:</strong> Describe correctamente la alternancia de partidos, aunque la parte de la Desamortización podría ser más detallada en cuanto a sus consecuencias sociales.</li>
+                        <li><strong>Problema Sucesorio (Carlismo):</strong> Muy buen an├ílisis del conflicto din├ístico. Entiendes las causas profundas.</li>
+                        <li><strong>Evoluci├│n Pol├¡tica:</strong> Describe correctamente la alternancia de partidos, aunque la parte de la Desamortizaci├│n podr├¡a ser m├ís detallada en cuanto a sus consecuencias sociales.</li>
                     </ul>
 
-                    <h3>Conclusión</h3>
-                    <p>En resumen, demuestras una competencia notable en el análisis histórico. Tu calificación final ajustada es de un <strong>7.7</strong>. ¡Confío plenamente en tu capacidad para seguir mejorando!</p>
+                    <h3>Conclusi├│n</h3>
+                    <p>En resumen, demuestras una competencia notable en el an├ílisis hist├│rico. Tu calificaci├│n final ajustada es de un <strong>7.7</strong>. ┬íConf├¡o plenamente en tu capacidad para seguir mejorando!</p>
                 `);
             }, 1500); // Slightly faster but still feels like it's working
         }
@@ -204,7 +204,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
         setIsOptimizing(true);
         try {
             const optimizedFiles = await Promise.all(files.map(async (file) => {
-                // Solo optimizar imágenes (no PDFs)
+                // Solo optimizar im├ígenes (no PDFs)
                 if (file.type.startsWith('image/')) {
                     return await optimizeExamImage(file);
                 }
@@ -213,7 +213,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
             setExamenArchivos(prev => [...prev, ...optimizedFiles]);
         } catch (error) {
             console.error("Error optimizing files:", error);
-            alert("Error optimizando algunas imágenes. Se intentarán subir originales.");
+            alert("Error optimizando algunas im├ígenes. Se intentar├ín subir originales.");
             setExamenArchivos(prev => [...prev, ...files]);
         } finally {
             setIsOptimizing(false);
@@ -229,7 +229,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
 
         if (!guiaCorreccion && materialReferenciaFiles.length === 0) {
             setStatus('error');
-            setMessage('Configura la rúbrica o referencia primero.');
+            setMessage('Configura la r├║brica o referencia primero.');
             return;
         }
         if (examenArchivos.length === 0) {
@@ -282,7 +282,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
     };
 
     const handleReset = () => {
-        if (confirm('¿Restablecer el informe?')) {
+        if (confirm('┬┐Restablecer el informe?')) {
             setEditedReport(originalReport || '');
         }
     };
@@ -297,29 +297,41 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
 
     const handleDownloadPdf = async () => {
         if (typeof window !== 'undefined') {
-            const element = document.createElement('div');
-            element.innerHTML = `
-                <div style="padding: 40px; font-family: sans-serif;">
-                    <h1 style="color: #333; border-bottom: 2px solid #ccc; padding-bottom: 10px;">Informe de Corrección</h1>
-                    <p style="color: #666; font-size: 12px; margin-bottom: 20px;">Alumno: ${alumnoId || 'N/A'} | Fecha: ${new Date().toLocaleDateString()}</p>
-                    ${editedReport}
-                    <div style="margin-top: 40px; font-size: 10px; color: #999; text-align: center; border-top: 1px solid #eee; padding-top: 10px;">
-                        Generado por HIPATIA Ecosistema v4.0
-                    </div>
-                </div>
-            `;
+            const element = document.getElementById('full-report-container');
+            if (!element) return;
 
             // @ts-ignore
             const html2pdf = (await import('html2pdf.js')).default;
             const opt = {
-                margin: 10,
+                margin: [10, 10],
                 filename: `Correccion_${alumnoId || 'Examen'}.pdf`,
-                image: { type: 'jpeg' as const, quality: 0.98 },
-                html2canvas: { scale: 2 },
-                jsPDF: { unit: 'mm' as const, format: 'a4' as const, orientation: 'portrait' as const }
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: {
+                    scale: 2,
+                    useCORS: true,
+                    logging: false,
+                    letterRendering: true
+                },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
             };
 
-            html2pdf().set(opt).from(element).save();
+            // Estilos temporales para la impresión
+            const style = document.createElement('style');
+            style.innerHTML = `
+                @media print {
+                    .page-break-avoid { page-break-inside: avoid; }
+                    #full-report-container { background: white !important; }
+                    .no-print-section { display: none !important; }
+                }
+            `;
+            document.head.appendChild(style);
+
+            try {
+                await html2pdf().set(opt).from(element).save();
+            } finally {
+                document.head.removeChild(style);
+            }
         }
     };
 
@@ -366,16 +378,16 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
 
                 {/* Dashboard Compact Workspace */}
                 <div className="flex-1 overflow-auto p-6 lg:p-8 custom-scrollbar">
-                    <div className="max-w-7xl mx-auto grid grid-cols-12 gap-6">
+                    <div id="full-report-container" className="max-w-7xl mx-auto grid grid-cols-12 gap-6 bg-slate-50 p-4 rounded-2xl">
                         {/* Filmstrip Overlay */}
-                        <div className="col-span-12 lg:col-span-3 space-y-4 pr-2">
+                        <div className="col-span-12 lg:col-span-3 space-y-4 pr-2 no-print-section">
                             <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest px-1">Evidencias</h3>
                             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-2 gap-3 overflow-y-auto max-h-[calc(100vh-250px)] pr-2 custom-scrollbar">
                                 {examenArchivos.map((_, idx) => (
                                     <div key={idx} onClick={() => { setViewerStartingIndex(idx); setIsViewerOpen(true); }} className="relative group cursor-pointer">
                                         <div className="aspect-[3/4] bg-white border border-slate-200 rounded-lg shadow-soft flex flex-col items-center justify-center transition-all group-hover:border-indigo-400 overflow-hidden relative">
                                             <FileText className="h-6 w-6 text-slate-300 group-hover:text-indigo-400 transition-colors" />
-                                            <span className="text-[10px] font-bold text-slate-500 mt-1.5">Pág {idx + 1}</span>
+                                            <span className="text-[10px] font-bold text-slate-500 mt-1.5">P├íg {idx + 1}</span>
                                             <CheckCircle className="absolute top-1 right-1 h-3 w-3 text-indigo-600" />
                                         </div>
                                     </div>
@@ -387,7 +399,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                             {/* Score Card Hero Compact */}
                             <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-soft flex items-center justify-between">
                                 <div className="space-y-2">
-                                    <h3 className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Calificación Final</h3>
+                                    <h3 className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Calificaci├│n Final</h3>
                                     <div className="flex items-baseline gap-1.5">
                                         <span className={`text-5xl font-black ${isPass ? 'text-indigo-600' : 'text-rose-600'}`}>
                                             {extractedGrade.toFixed(2)}
@@ -395,7 +407,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                                         <span className="text-xl font-bold text-slate-300">/ 10</span>
                                     </div>
                                     <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg font-bold text-[10px] uppercase tracking-wider ${isPass ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}`}>
-                                        {isPass ? 'Promoción apta' : 'Refuerzo necesario'}
+                                        {isPass ? 'Promoci├│n apta' : 'Refuerzo necesario'}
                                     </div>
                                 </div>
                                 <div className="relative w-24 h-24 flex items-center justify-center">
@@ -409,7 +421,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
 
                             <div className="space-y-2.5">
                                 <div className="flex items-center justify-between">
-                                    <h3 className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Informe Pedagógico</h3>
+                                    <h3 className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Informe Pedag├│gico</h3>
                                     <div className="flex gap-1.5">
                                         <button onClick={() => execCmd('bold')} className="p-1 hover:bg-slate-100 rounded text-slate-400 transition-colors"><Bold className="h-3.5 w-3.5" /></button>
                                         <button onClick={() => execCmd('italic')} className="p-1 hover:bg-slate-100 rounded text-slate-400 transition-colors"><Italic className="h-3.5 w-3.5" /></button>
@@ -420,10 +432,10 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                                 <div className="bg-white rounded-xl border border-slate-200 shadow-soft min-h-[450px] p-8 overflow-hidden">
                                     <div
                                         className="outline-none prose prose-auditor prose-sm"
-                                        contentEditable
-                                        suppressContentEditableWarning
-                                        onInput={(e) => setEditedReport(e.currentTarget.innerHTML)}
-                                        dangerouslySetInnerHTML={{ __html: editedReport }}
+                                        contentEditable={true}
+                                        suppressContentEditableWarning={true}
+                                        onBlur={(e) => setEditedReport(e.currentTarget.innerHTML)}
+                                        dangerouslySetInnerHTML={{ __html: originalReport }}
                                     />
                                 </div>
                             </div>
@@ -431,7 +443,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
 
                         <div className="col-span-12 lg:col-span-3 space-y-6">
                             <div className="bg-slate-900 rounded-xl p-5 shadow-lg text-white">
-                                <h3 className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-3">Análisis Técnico</h3>
+                                <h3 className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-3">An├ílisis T├®cnico</h3>
                                 <div className="font-mono bg-slate-800/40 rounded-lg p-4 border border-slate-800">
                                     <div className="text-indigo-400 text-[8px] mb-2 font-bold tracking-widest">$ PRECISION_LOG</div>
                                     <div className="space-y-1.5 text-[11px] text-slate-400">
@@ -440,7 +452,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                                         <p>P3: <span className="text-white">+1.34</span></p>
                                         <div className="h-px bg-slate-700 my-3"></div>
                                         <p className="text-sm font-bold text-white tracking-tight">
-                                            $ Σ = <span className="text-indigo-400">{extractedGrade.toFixed(2)}</span>
+                                            $ ╬ú = <span className="text-indigo-400">{extractedGrade.toFixed(2)}</span>
                                         </p>
                                     </div>
                                 </div>
@@ -466,7 +478,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                         <Shield className="absolute inset-0 m-auto h-6 w-6 text-indigo-600 animate-pulse" />
                     </div>
                     <div className="text-center space-y-2">
-                        <h2 className="text-xl font-bold text-slate-900 tracking-tight">Preparando simulación</h2>
+                        <h2 className="text-xl font-bold text-slate-900 tracking-tight">Preparando simulaci├│n</h2>
                         <p className="text-sm text-slate-400 font-medium px-8">{loadingMsg}</p>
                     </div>
                 </div>
@@ -505,11 +517,11 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
 
                         <form onSubmit={handleSubmit} className="space-y-8">
 
-                            {/* SECTION 1: CONTEXTO (RÚBRICA & REFERENCIAS) */}
+                            {/* SECTION 1: CONTEXTO (R├ÜBRICA & REFERENCIAS) */}
                             <div className="space-y-4">
                                 <div className="flex items-center gap-2 mb-2">
                                     <div className="bg-indigo-50 p-2 rounded-lg text-indigo-600"><Shield size={16} /></div>
-                                    <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest">Contexto de la Evaluación</h3>
+                                    <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest">Contexto de la Evaluaci├│n</h3>
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -527,16 +539,16 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                                             <div className="flex items-center gap-3">
                                                 <div className="bg-white p-1.5 rounded-full shadow-sm text-emerald-500"><CheckCircle size={16} /></div>
                                                 <div className="text-left">
-                                                    <p className="text-xs font-bold text-slate-700">Rúbrica OK</p>
+                                                    <p className="text-xs font-bold text-slate-700">R├║brica OK</p>
                                                     <p className="text-[9px] text-slate-400 truncate max-w-[150px]">{rubricaFile?.name || 'Texto'}</p>
                                                 </div>
                                             </div>
                                         ) : (
                                             <div className="text-center">
                                                 <div className="flex flex-col items-center">
-                                                  <p className="text-xs font-bold text-slate-600 group-hover:text-indigo-600 transition-colors">Subir Rúbrica</p>
-                                                  <p className="text-[10px] text-slate-400 mt-1 font-medium text-center leading-tight max-w-[160px]">Lo más detallada posible para mejores resultados</p>
-                                              </div>
+                                                    <p className="text-xs font-bold text-slate-600 group-hover:text-indigo-600 transition-colors">Subir R├║brica</p>
+                                                    <p className="text-[10px] text-slate-400 mt-1 font-medium text-center leading-tight max-w-[160px]">Lo m├ís detallada posible para mejores resultados</p>
+                                                </div>
                                             </div>
                                         )}
                                     </div>
@@ -564,14 +576,14 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                                                         </span>
                                                     ))}
                                                 </div>
-                                                <p className="text-[9px] text-center text-violet-400 font-bold mt-1 group-hover:block hidden">+ Añadir más</p>
+                                                <p className="text-[9px] text-center text-violet-400 font-bold mt-1 group-hover:block hidden">+ A├▒adir m├ís</p>
                                             </div>
                                         ) : (
                                             <div className="text-center">
                                                 <div className="flex flex-col items-center">
-                                                  <p className="text-xs font-bold text-slate-600 group-hover:text-violet-600 transition-colors">Subir contenidos de referencia</p>
-                                                  <p className="text-[10px] text-slate-400 mt-1 font-medium text-center leading-tight max-w-[160px]">Para que corrija solo con tus contenidos</p>
-                                              </div>
+                                                    <p className="text-xs font-bold text-slate-600 group-hover:text-violet-600 transition-colors">Subir contenidos de referencia</p>
+                                                    <p className="text-[10px] text-slate-400 mt-1 font-medium text-center leading-tight max-w-[160px]">Para que corrija solo con tus contenidos</p>
+                                                </div>
                                             </div>
                                         )}
                                     </div>
@@ -602,7 +614,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                                             className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-indigo-500 focus:bg-white focus:shadow-md outline-none transition-all font-bold text-base text-slate-700 shadow-sm appearance-none cursor-pointer"
                                         >
                                             <option value="estricto">ESTRICTO</option>
-                                            <option value="normal">ESTÁNDAR</option>
+                                            <option value="normal">EST├üNDAR</option>
                                             <option value="acnee">ACNEE</option>
                                         </select>
                                     </div>
@@ -627,7 +639,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                                         <Upload className={`h-5 w-5 ${isDragOver ? 'text-indigo-600' : 'text-slate-400 group-hover:text-indigo-500'}`} />
                                     </div>
                                     <p className="text-xs font-bold text-slate-600">
-                                        {isDragOver ? 'Suelte aquí' : isOptimizing ? 'Optimizando...' : 'Arrastre las hojas'}
+                                        {isDragOver ? 'Suelte aqu├¡' : isOptimizing ? 'Optimizando...' : 'Arrastre las hojas'}
                                     </p>
                                     <p className="text-[9px] text-slate-400 mt-1 text-center scale-90">
                                         Tip: Usa buena luz y evita fotos borrosas
@@ -675,7 +687,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                                     />
                                 </div>
                                 <label htmlFor="legal-consent" className="text-xs text-slate-500 font-medium leading-relaxed cursor-pointer select-none">
-                                    Certifico que soy el propietario legítimo de los materiales subidos y acepto el tratamiento de datos para fines de evaluación académica según la <a href="/legal?tab=privacidad" target="_blank" className="text-indigo-600 hover:underline font-bold">Política de Privacidad</a> y el <a href="/legal?tab=aviso-legal" target="_blank" className="text-indigo-600 hover:underline font-bold">Aviso Legal</a>, incluyendo la anonimización de datos de menores.
+                                    Certifico que soy el propietario leg├¡timo de los materiales subidos y acepto el tratamiento de datos para fines de evaluaci├│n acad├®mica seg├║n la <a href="/legal?tab=privacidad" target="_blank" className="text-indigo-600 hover:underline font-bold">Pol├¡tica de Privacidad</a> y el <a href="/legal?tab=aviso-legal" target="_blank" className="text-indigo-600 hover:underline font-bold">Aviso Legal</a>, incluyendo la anonimizaci├│n de datos de menores.
                                 </label>
                             </div>
 
@@ -695,7 +707,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                                     </>
                                 ) : (
                                     <>
-                                        <span>INICIAR CORRECCIÓN</span>
+                                        <span>INICIAR CORRECCI├ôN</span>
                                         <ChevronRight size={20} className="opacity-60" />
                                     </>
                                 )}
