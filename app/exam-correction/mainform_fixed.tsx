@@ -297,78 +297,9 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
         }
     };
 
-    const handleDownloadPdf = async () => {
+    const handleDownloadPdf = () => {
         if (typeof window !== 'undefined') {
-            const element = document.getElementById('reporte-final-hipatia');
-            if (!element) return;
-
-            // @ts-ignore
-            const html2pdf = (await import('html2pdf.js')).default;
-
-            // Nombre del archivo basado en el Alumno ID para mejor organización
-            const fileName = `Informe_${alumnoId || 'Sin_ID'}_${new Date().toISOString().split('T')[0]}.pdf`;
-
-            const options = {
-                margin: [10, 10, 10, 10],
-                filename: fileName,
-                image: { type: 'jpeg', quality: 0.95 },
-                html2canvas: {
-                    scale: 1.2, // Reducido aún más para garantizar estabilidad total
-                    useCORS: true,
-                    logging: false,
-                    letterRendering: true,
-                    removeContainer: true // Ayuda a limpiar la memoria después del renderizado
-                },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-            };
-
-            // Estilos quirúrgicos para la generación del PDF
-            const style = document.createElement('style');
-            style.innerHTML = `
-                @media print {
-                    /* Ocultar todo lo que no es el núcleo del informe */
-                    .no-print-section, 
-                    button, 
-                    .filmstrip-container, 
-                    .technical-analysis-card { 
-                        display: none !important; 
-                    }
-                    
-                    #reporte-final-hipatia {
-                        width: 210mm;
-                        padding: 15mm !important;
-                        background: white !important;
-                        margin: 0 !important;
-                    }
-
-                    /* Forzar que el contenido principal ocupe todo el ancho al quitar laterales */
-                    .report-grid-container {
-                        display: block !important;
-                        grid-template-columns: none !important;
-                    }
-
-                    .main-report-column {
-                        width: 100% !important;
-                    }
-
-                    .section-avoid-break {
-                        page-break-inside: avoid;
-                        margin-bottom: 20px;
-                    }
-                }
-            `;
-            document.head.appendChild(style);
-
-            try {
-                // Seleccionamos solo el área de contenido, evitando headers globales si fuera necesario
-                await html2pdf().from(element).set(options).save();
-            } catch (error) {
-                console.error("Error generating PDF:", error);
-                alert("Hubo un error al generar el PDF. El informe es muy extenso.");
-            } finally {
-                document.head.removeChild(style);
-            }
+            window.print();
         }
     };
 
@@ -385,138 +316,118 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
         }
 
         return (
-            <div className="flex-1 bg-slate-50 flex flex-col h-full overflow-hidden animate-fade-in font-inter">
-                <div id="reporte-final-hipatia" className="flex flex-col h-full">
-                    {/* Header Superior Compact */}
-                    <div className="bg-white border-b border-slate-200 px-8 py-3.5 flex items-center justify-between shadow-sm z-10">
-                        <div className="flex items-center gap-4">
-                            <button onClick={onBack} className="p-2 hover:bg-slate-100 rounded-lg transition-colors text-slate-500 no-print-section">
-                                <ArrowLeft className="h-5 w-5" />
+            <div className="flex-1 bg-[#f0f2f5] flex flex-col h-full overflow-hidden animate-fade-in font-inter">
+                {/* Estilos Globales de Impresión y Modo Papel */}
+                <style dangerouslySetInnerHTML={{
+                    __html: `
+                    @media print {
+                        @page { size: a4; margin: 0; }
+                        body { background: white !important; }
+                        .no-print { display: none !important; }
+                        #printable-report { 
+                            margin: 0 !important; 
+                            padding: 20mm !important; 
+                            width: 210mm !important;
+                            height: auto !important;
+                            box-shadow: none !important;
+                            border: none !important;
+                            background: white !important;
+                        }
+                        .page-break { page-break-after: always; }
+                    }
+                    .paper-view {
+                        background: white;
+                        width: 210mm;
+                        min-height: 297mm;
+                        margin: 2rem auto;
+                        padding: 20mm;
+                        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+                        border: 1px solid #e2e8f0;
+                        position: relative;
+                        transition: all 0.3s ease;
+                    }
+                    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+                    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+                    .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+                `}} />
+
+                <div className="flex flex-col h-full no-print">
+                    {/* Header Superior Estilo Editor */}
+                    <div className="bg-[#1e293b] text-white px-8 py-3.5 flex items-center justify-between shadow-lg z-20">
+                        <div className="flex items-center gap-6">
+                            <button onClick={onBack} className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-xs font-bold uppercase tracking-widest">
+                                <ArrowLeft size={16} /> Volver
                             </button>
+                            <div className="h-6 w-px bg-slate-700"></div>
                             <div className="flex flex-col">
-                                <span className="text-[9px] text-slate-500 font-bold uppercase tracking-widest mb-0.5">Expediente</span>
-                                <h2 className="text-sm font-bold text-slate-900">{alumnoId || 'ID-ALUMNO'}</h2>
-                            </div>
-                            <div className="h-6 w-px bg-slate-200 ml-2"></div>
-                            <div className="flex items-center gap-2 px-3 py-1 bg-emerald-50 border border-emerald-100 rounded-full ml-2">
-                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                                <span className="text-[10px] font-bold text-emerald-700">AUDITADO</span>
+                                <span className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">Expediente</span>
+                                <h2 className="text-sm font-bold text-white">{alumnoId || 'SIN ID'}</h2>
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-3 no-print-section">
-                            <button onClick={handleDownloadPdf} className="flex items-center gap-1.5 px-3 py-1.5 border border-slate-200 rounded-lg text-[10px] font-bold text-slate-600 hover:bg-slate-50 transition-all">
-                                <FileDown className="h-3.5 w-3.5" /> PDF
+                        <div className="flex items-center gap-4">
+                            <div className="hidden md:flex items-center gap-2 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                                <span className="text-[10px] font-black text-emerald-400 uppercase tracking-widest">Auditoría Finalizada</span>
+                            </div>
+                            <button
+                                onClick={handleDownloadPdf}
+                                className="flex items-center gap-2 px-6 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-black rounded-lg transition-all shadow-lg shadow-emerald-900/20 uppercase tracking-widest"
+                            >
+                                <FileDown size={16} /> Descargar PDF
                             </button>
-                            <button onClick={() => setOriginalReport(null)} className="px-4 py-1.5 bg-slate-900 text-white rounded-lg text-[10px] font-bold hover:bg-slate-800 transition-all">
-                                NUEVA
+                            <button
+                                onClick={() => setOriginalReport(null)}
+                                className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white text-xs font-black rounded-lg transition-all uppercase tracking-widest border border-white/10"
+                            >
+                                Nueva
                             </button>
                         </div>
                     </div>
 
-                    {/* Disclaimer Banner */}
-                    <div className="bg-indigo-50/50 border-b border-indigo-100/50 px-8 py-2 flex items-center justify-center gap-2 no-print-section">
-                        <AlertCircle size={14} className="text-indigo-400" />
-                        <p className="text-[10px] font-medium text-slate-500 italic">
-                            Hipatia es muy segura, pero recuerde revisar personalmente el ejercicio por si hubiera algún error.
+                    <div className="bg-[#f8fafc] border-b border-slate-200 px-8 py-2 flex items-center justify-center gap-10 text-[11px] font-medium text-slate-500">
+                        <div className="flex items-center gap-1.5"><Bold size={14} className="text-slate-400" /> <b>B</b>: Negrita</div>
+                        <div className="flex items-center gap-1.5"><Italic size={14} className="text-slate-400" /> <i>i</i>: Cursiva</div>
+                        <div className="h-4 w-px bg-slate-200 mx-1"></div>
+                        <p className="flex items-center gap-1.5 leading-none">
+                            <Zap size={14} className="text-amber-400" />
+                            Puedes editar el informe directamente sobre la hoja
                         </p>
                     </div>
+                </div>
 
-                    {/* Dashboard Compact Workspace */}
-                    <div className="flex-1 overflow-auto p-6 lg:p-8 custom-scrollbar">
-                        <div className="max-w-7xl mx-auto grid grid-cols-12 gap-6 bg-slate-50 p-4 rounded-2xl relative report-grid-container">
-                            {/* Filmstrip Overlay */}
-                            <div className="col-span-12 lg:col-span-3 space-y-4 pr-2 no-print-section filmstrip-container" data-html2canvas-ignore="true">
-                                <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest px-1">Evidencias</h3>
-                                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-2 gap-3 overflow-y-auto max-h-[calc(100vh-250px)] pr-2 custom-scrollbar">
-                                    {examenArchivos.map((_, idx) => (
-                                        <div key={idx} onClick={() => { setViewerStartingIndex(idx); setIsViewerOpen(true); }} className="relative group cursor-pointer">
-                                            <div className="aspect-[3/4] bg-white border border-slate-200 rounded-lg shadow-soft flex flex-col items-center justify-center transition-all group-hover:border-indigo-400 overflow-hidden relative">
-                                                <FileText className="h-6 w-6 text-slate-300 group-hover:text-indigo-400 transition-colors" />
-                                                <span className="text-[10px] font-bold text-slate-500 mt-1.5">Pág {idx + 1}</span>
-                                                <CheckCircle className="absolute top-1 right-1 h-3 w-3 text-indigo-600" />
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-
-                            <div className="col-span-12 lg:col-span-6 space-y-6 main-report-column">
-                                {/* Score Card Hero Compact */}
-                                <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-soft flex items-center justify-between section-avoid-break">
-                                    <div className="space-y-2">
-                                        <h3 className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Calificación Final</h3>
-                                        <div className="flex items-baseline gap-1.5">
-                                            <span className={`text-5xl font-black ${isPass ? 'text-indigo-600' : 'text-rose-600'}`}>
-                                                {extractedGrade.toFixed(2)}
-                                            </span>
-                                            <span className="text-xl font-bold text-slate-300">/ 10</span>
-                                        </div>
-                                        <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg font-bold text-[10px] uppercase tracking-wider ${isPass ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}`}>
-                                            {isPass ? 'Promoción apta' : 'Refuerzo necesario'}
-                                        </div>
-                                    </div>
-                                    <div className="relative w-24 h-24 flex items-center justify-center">
-                                        <svg className="w-full h-full transform -rotate-90">
-                                            <circle cx="48" cy="48" r="42" stroke="currentColor" strokeWidth="8" fill="transparent" className="text-slate-100" />
-                                            <circle cx="48" cy="48" r="42" stroke="currentColor" strokeWidth="8" fill="transparent" strokeDasharray={263.8} strokeDashoffset={263.8 - (263.8 * extractedGrade) / 10} className={`${isPass ? 'text-indigo-600' : 'text-rose-500'} transition-all duration-1000`} />
-                                        </svg>
-                                        <span className="absolute text-[11px] font-bold text-slate-500">{(extractedGrade * 10).toFixed(0)}%</span>
-                                    </div>
-                                </div>
-
-                                <div className="space-y-2.5 section-avoid-break">
-                                    <div className="flex items-center justify-between">
-                                        <h3 className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Informe Pedagógico</h3>
-                                        <div className="flex gap-1.5">
-                                            <button onClick={() => execCmd('bold')} className="p-1 hover:bg-slate-100 rounded text-slate-400 transition-colors"><Bold className="h-3.5 w-3.5" /></button>
-                                            <button onClick={() => execCmd('italic')} className="p-1 hover:bg-slate-100 rounded text-slate-400 transition-colors"><Italic className="h-3.5 w-3.5" /></button>
-                                            <div className="w-px h-5 bg-slate-200 mx-1"></div>
-                                            <button onClick={handleReset} className="text-[9px] font-bold text-rose-500 uppercase hover:underline">Reset</button>
-                                        </div>
-                                    </div>
-                                    <div className="bg-white rounded-xl border border-slate-200 shadow-soft min-h-[450px] p-8 overflow-hidden">
-                                        <div
-                                            className="outline-none prose prose-auditor prose-sm"
-                                            contentEditable={true}
-                                            suppressContentEditableWarning={true}
-                                            onBlur={(e) => setEditedReport(e.currentTarget.innerHTML)}
-                                            dangerouslySetInnerHTML={{ __html: originalReport }}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="col-span-12 lg:col-span-3 space-y-6 technical-analysis-card" data-html2canvas-ignore="true">
-                                <div className="bg-slate-900 rounded-xl p-5 shadow-lg text-white section-avoid-break">
-                                    <h3 className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-3">Análisis Técnico</h3>
-                                    <div className="font-mono bg-slate-800/40 rounded-lg p-4 border border-slate-800">
-                                        <div className="text-indigo-400 text-[8px] mb-2 font-bold tracking-widest">$ PRECISION_LOG</div>
-                                        <div className="space-y-1.5 text-[11px] text-slate-400">
-                                            <p>P1: <span className="text-white">+2.00</span></p>
-                                            <p>P2: <span className="text-white">+1.50</span></p>
-                                            <p>P3: <span className="text-white">+1.34</span></p>
-                                            <div className="h-px bg-slate-700 my-3"></div>
-                                            <p className="text-sm font-bold text-white tracking-tight">
-                                                $ ╬ú = <span className="text-indigo-400">{extractedGrade.toFixed(2)}</span>
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <GradeBreakdown htmlContent={editedReport} />
+                {/* Área de Trabajo - Hoja A4 */}
+                <div className="flex-1 overflow-auto custom-scrollbar bg-[#f1f5f9]">
+                    <div id="printable-report" className="paper-view animate-slide-up">
+                        <div className="absolute top-10 right-10 no-print">
+                            <div className={`flex flex-col items-center justify-center w-20 h-20 rounded-full border-4 shadow-sm ${isPass ? 'border-emerald-100 bg-emerald-50 text-emerald-600' : 'border-rose-100 bg-rose-50 text-rose-600'}`}>
+                                <span className="text-xs font-black uppercase tracking-tighter opacity-70">Nota</span>
+                                <span className="text-2xl font-black leading-tight">{extractedGrade.toFixed(2)}</span>
                             </div>
                         </div>
-                    </div>
 
-                    {/* Botón Inferior de Descarga */}
-                    <div className="flex justify-center pb-12 no-print-section">
-                        <button
-                            onClick={handleDownloadPdf}
-                            className="flex items-center gap-2 px-8 py-4 bg-indigo-600 text-white rounded-2xl font-black shadow-xl shadow-indigo-200 hover:bg-indigo-700 transition-all transform hover:scale-[1.02] active:scale-[0.98]"
-                        >
-                            <FileDown size={20} />
-                            DESCARGAR INFORME PDF
-                        </button>
+                        {/* Contenido del Informe */}
+                        <div className="prose prose-slate prose-sm max-w-none">
+                            <div
+                                className="outline-none min-h-[800px] text-[#1e293b] leading-relaxed text-justify"
+                                contentEditable={true}
+                                suppressContentEditableWarning={true}
+                                onBlur={(e) => setEditedReport(e.currentTarget.innerHTML)}
+                                dangerouslySetInnerHTML={{ __html: originalReport }}
+                                style={{ fontSize: '11.5pt', fontFamily: 'serif' }}
+                            />
+                        </div>
+
+                        {/* Pie de página corporativo (solo para PDF) */}
+                        <div className="mt-16 pt-8 border-t border-slate-100 hidden print:flex items-center justify-between">
+                            <div className="text-[10px] text-slate-400 font-medium">
+                                <span className="font-bold">HIPATIA AI</span> - Informe Técnico de Evaluación Académica <br />
+                                Código de Verificación: {alumnoId || 'N/A'}-{Date.now().toString().slice(-6)} | Fecha: {new Date().toLocaleDateString()}
+                            </div>
+                            <div className="text-[11px] font-black text-indigo-600/30 tracking-tight">
+                                HIPATIA ECOSYSTEM v4.0
+                            </div>
+                        </div>
                     </div>
                 </div>
 
