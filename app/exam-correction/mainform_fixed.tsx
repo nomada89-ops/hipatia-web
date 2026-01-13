@@ -313,10 +313,11 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                 filename: fileName,
                 image: { type: 'jpeg', quality: 0.95 },
                 html2canvas: {
-                    scale: 1.5, // Reducido de 2 a 1.5 para mayor estabilidad en navegadores móviles/lentos
+                    scale: 1.2, // Reducido aún más para garantizar estabilidad total
                     useCORS: true,
                     logging: false,
-                    letterRendering: true
+                    letterRendering: true,
+                    removeContainer: true // Ayuda a limpiar la memoria después del renderizado
                 },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
                 pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
@@ -425,7 +426,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                     <div className="flex-1 overflow-auto p-6 lg:p-8 custom-scrollbar">
                         <div className="max-w-7xl mx-auto grid grid-cols-12 gap-6 bg-slate-50 p-4 rounded-2xl relative report-grid-container">
                             {/* Filmstrip Overlay */}
-                            <div className="col-span-12 lg:col-span-3 space-y-4 pr-2 no-print-section filmstrip-container">
+                            <div className="col-span-12 lg:col-span-3 space-y-4 pr-2 no-print-section filmstrip-container" data-html2canvas-ignore="true">
                                 <h3 className="text-xs font-bold text-slate-400 uppercase tracking-widest px-1">Evidencias</h3>
                                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-2 gap-3 overflow-y-auto max-h-[calc(100vh-250px)] pr-2 custom-scrollbar">
                                     {examenArchivos.map((_, idx) => (
@@ -486,7 +487,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                                 </div>
                             </div>
 
-                            <div className="col-span-12 lg:col-span-3 space-y-6 technical-analysis-card">
+                            <div className="col-span-12 lg:col-span-3 space-y-6 technical-analysis-card" data-html2canvas-ignore="true">
                                 <div className="bg-slate-900 rounded-xl p-5 shadow-lg text-white section-avoid-break">
                                     <h3 className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-3">Análisis Técnico</h3>
                                     <div className="font-mono bg-slate-800/40 rounded-lg p-4 border border-slate-800">
