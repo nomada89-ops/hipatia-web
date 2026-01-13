@@ -12,6 +12,7 @@ const nextConfig = {
     },
     webpack: (config) => {
         config.resolve.alias.canvas = false;
+        config.resolve.alias.html2canvas = 'html2canvas-pro';
         return config;
     },
 };
