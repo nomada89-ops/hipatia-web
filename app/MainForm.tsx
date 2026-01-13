@@ -138,7 +138,7 @@ export default function MainForm() {
   // --- FUNCIÓN 1: CORRECCIÓN INDIVIDUAL (FormData) ---
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!userToken) { alert("Por favor, introduce tu Token de Profesor."); return; }
+    
     if (examFiles.length === 0) { alert("Sube al menos una imagen del examen."); return; }
 
     setIsLoading(true);
@@ -161,7 +161,7 @@ export default function MainForm() {
       // -----------------------------------
 
       // Datos obligatorios
-      formData.append('user_token', userToken);
+      formData.append('user_token', userToken || "SIN_TOKEN");
       formData.append('id_grupo', isGroupMode ? idGrupo : "SIN_GRUPO");
       formData.append('alumno', nombreAlumno || "Alumno");
       formData.append('nivel_exigencia', exigencyLevel);
