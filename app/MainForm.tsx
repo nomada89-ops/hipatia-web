@@ -403,9 +403,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                         </div>
 
                         <div className="flex items-center gap-3 no-print-section">
-                            <button type="button" onClick={handleDownloadPdf} className="flex items-center gap-1.5 px-3 py-1.5 border border-slate-200 rounded-lg text-[10px] font-bold text-slate-600 hover:bg-slate-50 transition-all z-50 cursor-pointer">
-                                <FileDown className="h-3.5 w-3.5" /> PDF
-                            </button>
+
                             <button onClick={() => setOriginalReport(null)} className="px-4 py-1.5 bg-slate-900 text-white rounded-lg text-[10px] font-bold hover:bg-slate-800 transition-all">
                                 NUEVA
                             </button>
@@ -506,17 +504,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                         </div>
                     </div>
 
-                    {/* Botón Inferior de Descarga */}
-                    <div className="flex justify-center pb-12 no-print-section">
-                        <button
-                            type="button"
-                            onClick={handleDownloadPdf}
-                            className="flex items-center gap-2 px-8 py-4 bg-indigo-600 text-white rounded-2xl font-black shadow-xl shadow-indigo-200 hover:bg-indigo-700 transition-all transform hover:scale-[1.02] active:scale-[0.98]"
-                        >
-                            <FileDown size={20} />
-                            DESCARGAR INFORME PDF
-                        </button>
-                    </div>
+
                 </div>
 
                 <SheetViewer files={examenArchivos} isOpen={isViewerOpen} onClose={() => setIsViewerOpen(false)} />
