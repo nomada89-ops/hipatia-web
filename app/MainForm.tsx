@@ -333,7 +333,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                         }
 
                         /* CONTENEDOR DEL INFORME */
-                        #reporte-final-hipatia, #printable-report {
+                        #reporte-final-hipatia, #printable-report, [ref*="componentRef"] {
                             display: block !important;
                             height: auto !important;
                             overflow: visible !important;
@@ -352,8 +352,27 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                         }
 
                         /* OCULTAR ELEMENTOS INTERFACE */
-                        nav, .sidebar, header, footer, button, .no-print {
+                        nav, .sidebar, header, footer, button, .no-print, .no-print-section {
                             display: none !important;
+                        }
+
+                        /* Ocultar específicamente el panel lateral de evidencias */
+                        .col-span-12.lg\\:col-span-3 {
+                             display: none !important;
+                        }
+
+                        /* Forzar ancho completo para el contenido principal */
+                        .col-span-12.lg\\:col-span-6 {
+                            grid-column: span 12 !important;
+                            width: 100% !important;
+                            max-width: none !important;
+                            flex: 0 0 100% !important;
+                        }
+
+                        /* Evitar cortes feos en tarjetas */
+                        .bg-white, .rounded-xl, .shadow-soft {
+                            box-shadow: none !important;
+                            border: 1px solid #eee !important;
                         }
 
                         /* CONFIGURACIÓN DE MÁRGENES */
