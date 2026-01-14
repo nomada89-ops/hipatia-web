@@ -298,7 +298,68 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
     };
 
     const handleDownloadPdf = () => {
-        window.print();
+        const reportElement = document.getElementById('reporte-final-hipatia');
+        if (!reportElement) return;
+
+        // 1. Abrimos ventana limpia (para romper el límite de altura)
+        const printWindow = window.open('', '_blank', 'width=1100,height=900');
+        if (!printWindow) {
+            alert("Permite las ventanas emergentes para generar el informe.");
+            return;
+        }
+
+        // 2. CLONADO DE ESTILOS (La clave para mantener tu diseño)
+        // Recopilamos todas las hojas de estilo y etiquetas <style> actuales
+        const styles = Array.from(document.querySelectorAll('link[rel="stylesheet"], style'))
+            .map(node => node.outerHTML)
+            .join('');
+
+        // 3. Inyectamos el contenido en la nueva ventana
+        printWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+                <head>
+                    <title>Informe Hipatia</title>
+                    ${styles} 
+                    <style>
+                        /* Ajustes EXCLUSIVOS para asegurar la impresión completa */
+                        body { 
+                            background-color: white !important; 
+                            margin: 0; 
+                            padding: 20px; 
+                            height: auto !important; 
+                            overflow: visible !important; 
+                        }
+                        #reporte-final-hipatia {
+                            width: 100% !important;
+                            margin: 0 !important;
+                            box-shadow: none !important; /* Quitamos sombras para papel */
+                        }
+                        /* Evitamos cortes feos en mitad de una tarjeta o texto */
+                        .card, .bloque-texto, p, li, img {
+                            page-break-inside: avoid;
+                        }
+                        /* Forzamos que salgan los colores de fondo (importante para tus tarjetas azules) */
+                        * {
+                            -webkit-print-color-adjust: exact !important;
+                            print-color-adjust: exact !important;
+                        }
+                    </style>
+                </head>
+                <body>
+                    ${reportElement.outerHTML}
+                </body>
+            </html>
+        `);
+
+        printWindow.document.close();
+
+        // 4. Esperamos un instante a que carguen las fuentes/imágenes y lanzamos
+        printWindow.focus();
+        setTimeout(() => {
+            printWindow.print();
+            // printWindow.close(); // Opcional: cerrar ventana tras imprimir
+        }, 1000);
     };
 
     const extractedGrade = jsonGrade !== null
@@ -319,59 +380,43 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                 <style dangerouslySetInnerHTML={{
                     __html: `
                     @media print {
-                        /* 1. Ocultar elementos innecesarios */
-                        nav, header, footer, .sidebar, button, .no-print, .no-print-section, .navbar, .menu-tabs {
+                        /* DESBLOQUEO DE PÁGINA (Fundamental para evitar el corte en la pág 1) */
+                        html, body, #root, [class*="app-container"], [class*="main-layout"], .main-content {
+                            height: auto !important;
+                            min-height: 100% !important;
+                            overflow: visible !important;
+                            position: static !important;
+                            display: block !important;
+                        }
+
+                        /* CONTENEDOR DEL INFORME */
+                        #reporte-final-hipatia, #printable-report {
+                            display: block !important;
+                            height: auto !important;
+                            overflow: visible !important;
+                            position: relative !important;
+                            width: 100% !important;
+                        }
+
+                        /* TRATAMIENTO DE IMÁGENES */
+                        img {
+                            break-inside: avoid;
+                            page-break-inside: avoid;
+                            max-width: 100%;
+                            height: auto;
+                            display: block;
+                            margin: 10px auto;
+                        }
+
+                        /* OCULTAR ELEMENTOS INTERFACE */
+                        nav, .sidebar, header, footer, button, .no-print {
                             display: none !important;
                         }
 
-                        /* 2. Resetear contenedores padres para que no corten el contenido */
-                        html, body, #root, .app-container, .main-content {
-                            height: auto !important;
-                            overflow: visible !important;
-                            position: static !important;
-                        }
-
-                        /* 3. Ajuste del contenedor del examen */
-                        #reporte-final-hipatia {
-                            display: block !important;
-                            position: static !important;
-                            width: 100% !important;
-                            margin: 0 !important;
-                            padding: 0 !important;
-                            border: none !important;
-                            height: auto !important;
-                            overflow: visible !important;
-                        }
-
-                        /* 4. Forzar saltos de página correctos */
-                        .section-avoid-break, .pregunta-examen, .seccion-examen {
-                            page-break-inside: avoid;
-                            page-break-after: auto;
-                            margin-bottom: 30px;
-                        }
-
-                        h1, h2, h3 {
-                            page-break-after: avoid; /* No dejes títulos solos al final de página */
-                        }
-
-                        /* Forzar colores de fondo */
-                        body {
-                            -webkit-print-color-adjust: exact;
-                            print-color-adjust: exact;
-                        }
-
-                        /* Ajuste del grid */
-                        .grid {
-                            display: block !important;
-                        }
-
-                        .col-span-12 {
-                            width: 100% !important;
-                        }
-
-                        /* Ajuste de márgenes de página */
+                        /* CONFIGURACIÓN DE MÁRGENES */
                         @page {
-                            margin: 2cm;
+                            size: auto;
+                            margin: 1.5cm;
                         }
                     }
                 `}} />
