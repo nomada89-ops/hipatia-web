@@ -308,59 +308,70 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
             return;
         }
 
-        // 2. Clonar "ADN Visual" (Estilos originales de la App)
+        // 2. Clonar el reporte para manipularlo sin afectar la web
+        const reportClone = reportElement.cloneNode(true) as HTMLElement;
+
+        // --- LIMPIEZA QUIRÚRGICA (NUEVO) ---
+
+        // A. Borrado por Texto: Buscamos el título "EVIDENCIAS" y borramos el bloque entero
+        const allElements = Array.from(reportClone.querySelectorAll('*'));
+        for (const el of allElements) {
+            // Si encontramos el título...
+            if (el.textContent?.trim().toUpperCase() === 'EVIDENCIAS') {
+                // 1. Ocultamos el título
+                (el as HTMLElement).style.display = 'none';
+
+                // 2. Y ocultamos el contenedor que le sigue (donde están las fotos)
+                const nextSibling = el.nextElementSibling as HTMLElement;
+                if (nextSibling) {
+                    nextSibling.style.display = 'none';
+                }
+                break; // Paramos al encontrarlo
+            }
+        }
+
+        // B. Borrado de seguridad: Eliminar cualquier canvas o grid de imágenes residual
+        const canvases = reportClone.querySelectorAll('canvas');
+        canvases.forEach(c => c.remove());
+
+        // Intentamos borrar por clases comunes si el paso A fallara
+        const evidenciasClasses = reportClone.querySelectorAll('.evidencias-container, .grid-cols-2, .exam-images');
+        evidenciasClasses.forEach(el => (el as HTMLElement).style.display = 'none');
+
+        // ------------------------------------
+
+        // 3. Capturar estilos originales (ADN Visual)
         const styles = Array.from(document.querySelectorAll('link[rel="stylesheet"], style'))
             .map(node => node.outerHTML)
             .join('');
 
-        // 3. Construir el documento de impresión
+        // 4. Generar HTML final
         printWindow.document.write(`
             <!DOCTYPE html>
             <html>
                 <head>
                     <title>Protocolo Hipatia | Informe de evaluación</title>
-                    
                     ${styles}
-                    
                     <style>
-                        /* --- REGLAS DE IMPRESIÓN --- */
+                        /* AJUSTES FINALES DE IMPRESIÓN */
                         body { 
                             background-color: white !important; 
-                            margin: 0; 
-                            padding: 20px; 
-                            height: auto !important; 
-                            overflow: visible !important; 
+                            margin: 0; padding: 20px; 
+                            height: auto !important; overflow: visible !important; 
                             -webkit-print-color-adjust: exact !important; 
                             print-color-adjust: exact !important;
                         }
-
-                        /* Asegurar ancho completo y quitar sombras de tarjetas */
                         #reporte-final-hipatia {
-                            width: 100% !important; 
-                            margin: 0 !important; 
-                            box-shadow: none !important;
+                            width: 100% !important; margin: 0 !important; box-shadow: none !important;
                         }
-                        
-                        /* --- OCULTAR EVIDENCIAS (FOTOS DEL EXAMEN) --- */
-                        /* Oculta canvas, contenedores de imágenes y la sección específica */
-                        canvas, .evidencias-container, .exam-images-section {
-                            display: none !important;
-                        }
-                        /* Selector genérico por si acaso: Ocultar imágenes grandes que no sean logos */
-                        #reporte-final-hipatia img[alt*="Evidencia"], 
-                        h3:contains("EVIDENCIAS"), 
-                        .section-title-evidencias {
-                            display: none !important;
-                        }
-
-                        /* --- EVITAR CORTES FEOS --- */
-                        .card, p, li, h2, h3 { 
-                            page-break-inside: avoid; 
-                        }
+                        /* Evitar cortes feos en textos */
+                        .card, p, li, h2, h3 { page-break-inside: avoid; }
+                        /* Ocultar elementos de interfaz por si acaso */
+                        button, .no-print { display: none !important; }
                     </style>
                 </head>
                 <body>
-                    ${reportElement.outerHTML}
+                    ${reportClone.outerHTML}
                 </body>
             </html>
         `);
@@ -368,10 +379,8 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
         printWindow.document.close();
         printWindow.focus();
 
-        // 4. Lanzar impresión tras breve espera (para cargar fuentes/estilos)
         setTimeout(() => {
             printWindow.print();
-            // printWindow.close(); // Descomentar si deseas que la ventana se cierre sola tras imprimir
         }, 1000);
     };
 
