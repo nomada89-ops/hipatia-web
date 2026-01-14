@@ -338,10 +338,11 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                             height: auto !important;
                             min-height: 0 !important;
                             overflow: visible !important;
-                            position: static !important;
+                            position: relative !important;
                             width: 100% !important;
                             box-shadow: none !important;
                             margin: 0 !important;
+                            float: none !important;
                         }
 
                         /* CLASES DE UTILIDAD PARA IMPRESIÓN */
@@ -349,6 +350,14 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                             overflow: visible !important;
                             height: auto !important;
                             max-height: none !important;
+                        }
+                        
+                        /* RESET GLOBAL AGRESIVO PARA PAGINACIÓN */
+                        html, body {
+                            height: auto !important;
+                            min-height: 0 !important;
+                            overflow: visible !important;
+                            overflow-y: visible !important;
                         }
 
                         /* TRATAMIENTO DE IMÁGENES */
@@ -412,7 +421,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                         </div>
 
                         <div className="flex items-center gap-3 no-print-section">
-                            <button type="button" onClick={handleDownloadPdf} className="flex items-center gap-1.5 px-3 py-1.5 border border-slate-200 rounded-lg text-[10px] font-bold text-slate-600 hover:bg-slate-50 transition-all">
+                            <button type="button" onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleDownloadPdf(); }} className="flex items-center gap-1.5 px-3 py-1.5 border border-slate-200 rounded-lg text-[10px] font-bold text-slate-600 hover:bg-slate-50 transition-all z-50 relative cursor-pointer">
                                 <FileDown className="h-3.5 w-3.5" /> PDF
                             </button>
                             <button onClick={() => setOriginalReport(null)} className="px-4 py-1.5 bg-slate-900 text-white rounded-lg text-[10px] font-bold hover:bg-slate-800 transition-all">
