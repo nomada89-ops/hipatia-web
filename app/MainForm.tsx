@@ -303,6 +303,21 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
         // @ts-ignore
         content: () => componentRef.current,
         documentTitle: 'Protocolo Hipatia | Informe de evaluación',
+        pageStyle: `
+        @media print {
+            body { 
+                -webkit-print-color-adjust: exact; 
+            }
+            html, body {
+                height: auto !important;
+                overflow: visible !important;
+            }
+        }
+        @page {
+            size: auto;
+            margin: 20mm;
+        }
+        `
     });
 
     const extractedGrade = jsonGrade !== null
@@ -319,90 +334,57 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
 
         return (
             <div className="flex-1 bg-slate-50 flex flex-col h-full overflow-hidden animate-fade-in font-inter">
-                {/* Print Styles */}
+                {/* Print Styles Globales para asegurar override */}
                 <style dangerouslySetInnerHTML={{
                     __html: `
                     @media print {
-                        /* DESBLOQUEO DE PÁGINA (Fundamental para evitar el corte en la pág 1) */
-                        html, body, #root, [class*="app-container"], [class*="main-layout"], .main-content {
-                            height: auto !important;
-                            min-height: 100% !important;
-                            overflow: visible !important;
-                            position: static !important;
-                            display: block !important;
-                        }
-
-                        /* CONTENEDOR DEL INFORME */
-                        #reporte-final-hipatia, #printable-report, [ref*="componentRef"] {
-                            display: block !important;
-                            height: auto !important;
-                            min-height: 0 !important;
-                            overflow: visible !important;
-                            position: relative !important;
-                            width: 100% !important;
-                            box-shadow: none !important;
-                            margin: 0 !important;
-                            float: none !important;
-                        }
-
-                        /* CLASES DE UTILIDAD PARA IMPRESIÓN */
-                        .print-overflow-visible {
-                            overflow: visible !important;
-                            height: auto !important;
-                            max-height: none !important;
+                         /* RESET TOTAL */
+                        div, main, section {
+                            break-inside: auto !important;
                         }
                         
-                        /* RESET GLOBAL AGRESIVO PARA PAGINACIÓN */
-                        html, body {
+                        /* FUERZA BRUTA PARA PAGINACIÓN */
+                        html, body, #root, .flex, .flex-col, .h-full, .overflow-hidden {
                             height: auto !important;
-                            min-height: 0 !important;
                             overflow: visible !important;
-                            overflow-y: visible !important;
+                            display: block !important;
+                            position: static !important;
                         }
 
-                        /* TRATAMIENTO DE IMÁGENES */
-                        img {
-                            break-inside: avoid;
-                            page-break-inside: avoid;
-                            max-width: 100%;
-                            height: auto;
-                            display: block;
-                            margin: 10px auto;
+                        /* EL CONTENEDOR PRINCIPAL */
+                        #reporte-final-hipatia {
+                            width: 100% !important;
+                            margin: 0 !important;
+                            padding: 0 !important;
+                            overflow: visible !important;
+                            font-family: 'Inter', sans-serif !important;
                         }
 
-                        /* OCULTAR ELEMENTOS INTERFACE */
-                        nav, .sidebar, header, footer, button, .no-print, .no-print-section {
+                        /* OCULTAR UI */
+                        .no-print-section, button, nav {
                             display: none !important;
                         }
 
-                        /* Ocultar específicamente el panel lateral de evidencias */
+                        /* EVIDENCIAS FUERA */
                         .col-span-12.lg\\:col-span-3 {
                              display: none !important;
                         }
 
-                        /* Forzar ancho completo para el contenido principal */
+                        /* CONTENIDO EXPANDIDO */
                         .col-span-12.lg\\:col-span-6 {
-                            grid-column: span 12 !important;
                             width: 100% !important;
                             max-width: none !important;
-                            flex: 0 0 100% !important;
+                            flex: none !important;
                         }
-
-                        /* Evitar cortes feos en tarjetas */
-                        .bg-white, .rounded-xl, .shadow-soft {
-                            box-shadow: none !important;
-                            border: 1px solid #eee !important;
-                        }
-
-                        /* CONFIGURACIÓN DE MÁRGENES */
-                        /* CONFIGURACIÓN DE MÁRGENES */
-                        @page {
-                            size: auto;
-                            margin: 10mm; /* Reduced margin to fit more content */
+                        
+                        /* EVITAR CORTES EN TEXTO */
+                        p, h1, h2, h3, ul, li {
+                            page-break-inside: auto;
                         }
                     }
                 `}} />
-                <div id="reporte-final-hipatia" ref={componentRef} className="flex flex-col h-full">
+                {/* Nota: Mantenemos el style tag pero simplificado, apoyando al pageStyle */}
+                <div id="reporte-final-hipatia" ref={componentRef} className="flex flex-col h-full bg-white">
                     {/* Header Superior Compact */}
                     <div className="bg-white border-b border-slate-200 px-8 py-3.5 flex items-center justify-between shadow-sm z-10">
                         <div className="flex items-center gap-4">
@@ -421,7 +403,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                         </div>
 
                         <div className="flex items-center gap-3 no-print-section">
-                            <button type="button" onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleDownloadPdf(); }} className="flex items-center gap-1.5 px-3 py-1.5 border border-slate-200 rounded-lg text-[10px] font-bold text-slate-600 hover:bg-slate-50 transition-all z-50 relative cursor-pointer">
+                            <button type="button" onClick={handleDownloadPdf} className="flex items-center gap-1.5 px-3 py-1.5 border border-slate-200 rounded-lg text-[10px] font-bold text-slate-600 hover:bg-slate-50 transition-all z-50 cursor-pointer">
                                 <FileDown className="h-3.5 w-3.5" /> PDF
                             </button>
                             <button onClick={() => setOriginalReport(null)} className="px-4 py-1.5 bg-slate-900 text-white rounded-lg text-[10px] font-bold hover:bg-slate-800 transition-all">
