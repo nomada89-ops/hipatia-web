@@ -300,6 +300,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
     };
 
     const handleDownloadPdf = useReactToPrint({
+        // @ts-ignore
         content: () => componentRef.current,
         documentTitle: 'Protocolo Hipatia | Informe de evaluación',
     });
@@ -457,7 +458,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                                             contentEditable={true}
                                             suppressContentEditableWarning={true}
                                             onBlur={(e) => setEditedReport(e.currentTarget.innerHTML)}
-                                            dangerouslySetInnerHTML={{ __html: originalReport }}
+                                            dangerouslySetInnerHTML={{ __html: editedReport }}
                                         />
                                     </div>
                                 </div>
