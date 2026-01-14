@@ -297,55 +297,8 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
         }
     };
 
-    const handleDownloadPdf = async () => {
-        if (typeof window !== 'undefined') {
-            const element = document.getElementById('reporte-final-hipatia');
-            if (!element) return;
-
-            // @ts-ignore
-            const html2pdf = (await import('html2pdf.js')).default;
-            const options = {
-                margin: 10,
-                filename: `Informe_Hipatia_${new Date().toISOString().split('T')[0]}.pdf`,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: {
-                    scale: 2,
-                    useCORS: true,
-                    logging: false,
-                    windowHeight: element.scrollHeight
-                },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-            };
-
-            // Estilos temporales para la impresión y captura
-            const style = document.createElement('style');
-            style.innerHTML = `
-                #reporte-final-hipatia {
-                    height: auto !important;
-                    overflow: visible !important;
-                    display: block !important;
-                    background: white !important;
-                }
-                @media print {
-                    #reporte-final-hipatia {
-                        width: 210mm;
-                        padding: 0;
-                    }
-                    .no-print-section { display: none !important; }
-                    .section-avoid-break {
-                        page-break-inside: avoid;
-                    }
-                }
-            `;
-            document.head.appendChild(style);
-
-            try {
-                await html2pdf().from(element).set(options).save();
-            } finally {
-                document.head.removeChild(style);
-            }
-        }
+    const handleDownloadPdf = () => {
+        window.print();
     };
 
     const extractedGrade = jsonGrade !== null
@@ -362,6 +315,52 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
 
         return (
             <div className="flex-1 bg-slate-50 flex flex-col h-full overflow-hidden animate-fade-in font-inter">
+                {/* Print Styles */}
+                <style dangerouslySetInnerHTML={{
+                    __html: `
+                    @media print {
+                        /* Ocultar todo lo que no sea el examen */
+                        nav, header, footer, .sidebar, button, .no-print, .no-print-section {
+                            display: none !important;
+                        }
+
+                        /* Asegurar que el contenedor del examen ocupe toda la página */
+                        #reporte-final-hipatia {
+                            position: absolute;
+                            left: 0;
+                            top: 0;
+                            width: 100%;
+                            height: auto;
+                            margin: 0;
+                            padding: 20px;
+                            background: white !important;
+                            font-size: 12pt;
+                            overflow: visible !important;
+                        }
+
+                        /* Evitar que las secciones se corten a la mitad entre páginas */
+                        .section-avoid-break, .pregunta-examen {
+                            page-break-inside: avoid;
+                            margin-bottom: 20px;
+                        }
+
+                        /* Forzar colores de fondo si los hay */
+                        body {
+                            -webkit-print-color-adjust: exact;
+                            print-color-adjust: exact;
+                        }
+
+                        /* Ajustar el grid para impresión */
+                        .grid {
+                            display: block !important;
+                        }
+
+                        /* Asegurar que el contenido sea visible */
+                        .col-span-12 {
+                            width: 100% !important;
+                        }
+                    }
+                `}} />
                 <div id="reporte-final-hipatia" className="flex flex-col h-full">
                     {/* Header Superior Compact */}
                     <div className="bg-white border-b border-slate-200 px-8 py-3.5 flex items-center justify-between shadow-sm z-10">
