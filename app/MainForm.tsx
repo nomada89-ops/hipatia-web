@@ -301,48 +301,61 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
         const reportElement = document.getElementById('reporte-final-hipatia');
         if (!reportElement) return;
 
-        // 1. Abrimos ventana limpia (para romper el límite de altura)
+        // 1. Abrir ventana limpia
         const printWindow = window.open('', '_blank', 'width=1100,height=900');
         if (!printWindow) {
-            alert("Permite las ventanas emergentes para generar el informe.");
+            alert("Por favor, permite las ventanas emergentes para generar el informe PDF.");
             return;
         }
 
-        // 2. CLONADO DE ESTILOS (La clave para mantener tu diseño)
-        // Recopilamos todas las hojas de estilo y etiquetas <style> actuales
+        // 2. Clonar "ADN Visual" (Estilos originales de la App)
         const styles = Array.from(document.querySelectorAll('link[rel="stylesheet"], style'))
             .map(node => node.outerHTML)
             .join('');
 
-        // 3. Inyectamos el contenido en la nueva ventana
+        // 3. Construir el documento de impresión
         printWindow.document.write(`
             <!DOCTYPE html>
             <html>
                 <head>
-                    <title>Informe Hipatia</title>
-                    ${styles} 
+                    <title>Protocolo Hipatia | Informe de evaluación</title>
+                    
+                    ${styles}
+                    
                     <style>
-                        /* Ajustes EXCLUSIVOS para asegurar la impresión completa */
+                        /* --- REGLAS DE IMPRESIÓN --- */
                         body { 
                             background-color: white !important; 
                             margin: 0; 
                             padding: 20px; 
                             height: auto !important; 
                             overflow: visible !important; 
-                        }
-                        #reporte-final-hipatia {
-                            width: 100% !important;
-                            margin: 0 !important;
-                            box-shadow: none !important; /* Quitamos sombras para papel */
-                        }
-                        /* Evitamos cortes feos en mitad de una tarjeta o texto */
-                        .card, .bloque-texto, p, li, img {
-                            page-break-inside: avoid;
-                        }
-                        /* Forzamos que salgan los colores de fondo (importante para tus tarjetas azules) */
-                        * {
-                            -webkit-print-color-adjust: exact !important;
+                            -webkit-print-color-adjust: exact !important; 
                             print-color-adjust: exact !important;
+                        }
+
+                        /* Asegurar ancho completo y quitar sombras de tarjetas */
+                        #reporte-final-hipatia {
+                            width: 100% !important; 
+                            margin: 0 !important; 
+                            box-shadow: none !important;
+                        }
+                        
+                        /* --- OCULTAR EVIDENCIAS (FOTOS DEL EXAMEN) --- */
+                        /* Oculta canvas, contenedores de imágenes y la sección específica */
+                        canvas, .evidencias-container, .exam-images-section {
+                            display: none !important;
+                        }
+                        /* Selector genérico por si acaso: Ocultar imágenes grandes que no sean logos */
+                        #reporte-final-hipatia img[alt*="Evidencia"], 
+                        h3:contains("EVIDENCIAS"), 
+                        .section-title-evidencias {
+                            display: none !important;
+                        }
+
+                        /* --- EVITAR CORTES FEOS --- */
+                        .card, p, li, h2, h3 { 
+                            page-break-inside: avoid; 
                         }
                     </style>
                 </head>
@@ -353,12 +366,12 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
         `);
 
         printWindow.document.close();
-
-        // 4. Esperamos un instante a que carguen las fuentes/imágenes y lanzamos
         printWindow.focus();
+
+        // 4. Lanzar impresión tras breve espera (para cargar fuentes/estilos)
         setTimeout(() => {
             printWindow.print();
-            // printWindow.close(); // Opcional: cerrar ventana tras imprimir
+            // printWindow.close(); // Descomentar si deseas que la ventana se cierre sola tras imprimir
         }, 1000);
     };
 
