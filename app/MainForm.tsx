@@ -336,9 +336,12 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                         #reporte-final-hipatia, #printable-report, [ref*="componentRef"] {
                             display: block !important;
                             height: auto !important;
+                            min-height: 0 !important; /* Fix blank page */
                             overflow: visible !important;
-                            position: relative !important;
+                            position: static !important; /* Fix relative positioning issues */
                             width: 100% !important;
+                            box-shadow: none !important;
+                            margin: 0 !important;
                         }
 
                         /* TRATAMIENTO DE IMÁGENES */
@@ -376,9 +379,10 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                         }
 
                         /* CONFIGURACIÓN DE MÁRGENES */
+                        /* CONFIGURACIÓN DE MÁRGENES */
                         @page {
                             size: auto;
-                            margin: 1.5cm;
+                            margin: 10mm; /* Reduced margin to fit more content */
                         }
                     }
                 `}} />
