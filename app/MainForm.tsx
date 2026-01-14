@@ -319,45 +319,59 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                 <style dangerouslySetInnerHTML={{
                     __html: `
                     @media print {
-                        /* Ocultar todo lo que no sea el examen */
-                        nav, header, footer, .sidebar, button, .no-print, .no-print-section {
+                        /* 1. Ocultar elementos innecesarios */
+                        nav, header, footer, .sidebar, button, .no-print, .no-print-section, .navbar, .menu-tabs {
                             display: none !important;
                         }
 
-                        /* Asegurar que el contenedor del examen ocupe toda la página */
+                        /* 2. Resetear contenedores padres para que no corten el contenido */
+                        html, body, #root, .app-container, .main-content {
+                            height: auto !important;
+                            overflow: visible !important;
+                            position: static !important;
+                        }
+
+                        /* 3. Ajuste del contenedor del examen */
                         #reporte-final-hipatia {
-                            position: absolute;
-                            left: 0;
-                            top: 0;
-                            width: 100%;
-                            height: auto;
-                            margin: 0;
-                            padding: 20px;
-                            background: white !important;
-                            font-size: 12pt;
+                            display: block !important;
+                            position: static !important;
+                            width: 100% !important;
+                            margin: 0 !important;
+                            padding: 0 !important;
+                            border: none !important;
+                            height: auto !important;
                             overflow: visible !important;
                         }
 
-                        /* Evitar que las secciones se corten a la mitad entre páginas */
-                        .section-avoid-break, .pregunta-examen {
+                        /* 4. Forzar saltos de página correctos */
+                        .section-avoid-break, .pregunta-examen, .seccion-examen {
                             page-break-inside: avoid;
-                            margin-bottom: 20px;
+                            page-break-after: auto;
+                            margin-bottom: 30px;
                         }
 
-                        /* Forzar colores de fondo si los hay */
+                        h1, h2, h3 {
+                            page-break-after: avoid; /* No dejes títulos solos al final de página */
+                        }
+
+                        /* Forzar colores de fondo */
                         body {
                             -webkit-print-color-adjust: exact;
                             print-color-adjust: exact;
                         }
 
-                        /* Ajustar el grid para impresión */
+                        /* Ajuste del grid */
                         .grid {
                             display: block !important;
                         }
 
-                        /* Asegurar que el contenido sea visible */
                         .col-span-12 {
                             width: 100% !important;
+                        }
+
+                        /* Ajuste de márgenes de página */
+                        @page {
+                            margin: 2cm;
                         }
                     }
                 `}} />
