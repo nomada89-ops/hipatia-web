@@ -311,37 +311,64 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
         // 2. Clonar el reporte
         const reportClone = reportElement.cloneNode(true) as HTMLElement;
 
-        // --- PASO CRÍTICO: SINCRONIZAR EDICIONES DEL USUARIO ---
-        // Copiamos lo que el usuario ha escrito en pantalla al clon que se va a imprimir
+        // --- APLANADO DE FORMULARIO (FLATTENING) ---
+        // Convertimos inputs/textareas en texto plano para que el PDF salga perfecto e inmutable
         const originalInputs = reportElement.querySelectorAll('input, textarea, select');
         const clonedInputs = reportClone.querySelectorAll('input, textarea, select');
 
-        originalInputs.forEach((input, index) => {
-            const clone = clonedInputs[index] as HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
+        originalInputs.forEach((original, index) => {
+            const clone = clonedInputs[index] as HTMLElement;
+            let value = '';
+            let isCheckOrRadio = false;
 
-            // Si es un Input o Select, forzamos el atributo 'value' para que salga en el HTML
-            if (input.tagName === 'INPUT' || input.tagName === 'SELECT') {
-                clone.setAttribute('value', (input as HTMLInputElement).value);
-                (clone as HTMLInputElement).value = (input as HTMLInputElement).value;
-
-                // Si es un checkbox o radio, sincronizamos el estado 'checked'
-                if ((input as HTMLInputElement).type === 'checkbox' || (input as HTMLInputElement).type === 'radio') {
-                    if ((input as HTMLInputElement).checked) {
-                        clone.setAttribute('checked', 'checked');
+            // Extraer valor real según tipo
+            if (original.tagName === 'INPUT') {
+                const input = original as HTMLInputElement;
+                if (input.type === 'checkbox' || input.type === 'radio') {
+                    isCheckOrRadio = true;
+                    // Mantenemos visualmente los checks, pero aseguramos el estado
+                    if (input.checked) {
+                        (clone as HTMLInputElement).setAttribute('checked', 'checked');
                     } else {
-                        clone.removeAttribute('checked');
+                        (clone as HTMLInputElement).removeAttribute('checked');
                     }
+                } else {
+                    value = input.value;
+                }
+            } else if (original.tagName === 'TEXTAREA') {
+                value = (original as HTMLTextAreaElement).value;
+            } else if (original.tagName === 'SELECT') {
+                const select = original as HTMLSelectElement;
+                if (select.selectedIndex >= 0) {
+                    value = select.options[select.selectedIndex].text;
                 }
             }
-            // Si es un Textarea, el contenido va dentro de la etiqueta, no en 'value'
-            else if (input.tagName === 'TEXTAREA') {
-                clone.innerHTML = (input as HTMLTextAreaElement).value;
-                clone.textContent = (input as HTMLTextAreaElement).value;
+
+            // Si NO es check/radio, reemplazamos el input por un SPAN o DIV con el texto
+            if (!isCheckOrRadio) {
+                const textNode = document.createElement('div'); // Div para mayor seguridad de bloque
+                textNode.textContent = value;
+
+                // Copiamos clases para mantener fuente, color, tamaño, etc.
+                textNode.className = original.className;
+
+                // Ajustes de estilo para que parezca texto normal
+                textNode.style.border = 'none';
+                textNode.style.background = 'transparent';
+                textNode.style.padding = '0';
+                textNode.style.minHeight = '1em'; // Para que no colapse si está vacío
+                if (original.tagName === 'TEXTAREA') {
+                    textNode.style.whiteSpace = 'pre-wrap'; // Respetar saltos de línea
+                } else {
+                    textNode.style.whiteSpace = 'nowrap'; // Inputs de una línea
+                }
+
+                // Reemplazo físico
+                clone.replaceWith(textNode);
             }
         });
-        // -------------------------------------------------------
 
-        // --- LIMPIEZA DE EVIDENCIAS (Mantenemos la lógica de borrado) ---
+        // --- LIMPIEZA DE EVIDENCIAS ---
         const allElements = Array.from(reportClone.querySelectorAll('*'));
         for (const el of allElements) {
             if (el.textContent?.trim().toUpperCase() === 'EVIDENCIAS') {
@@ -351,10 +378,8 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                 break;
             }
         }
-        // Borrado de seguridad
         reportClone.querySelectorAll('canvas').forEach(c => c.remove());
         reportClone.querySelectorAll('.evidencias-container, .grid-cols-2, .exam-images').forEach(el => (el as HTMLElement).style.display = 'none');
-
 
         // 3. Capturar estilos y generar HTML
         const styles = Array.from(document.querySelectorAll('link[rel="stylesheet"], style'))
@@ -377,12 +402,10 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                         #reporte-final-hipatia {
                             width: 100% !important; margin: 0 !important; box-shadow: none !important;
                         }
-                        /* Estilos para que los inputs se vean como texto plano al imprimir (opcional pero recomendado) */
-                        input, textarea {
-                            border: none; background: transparent; resize: none; overflow: hidden;
-                            color: inherit; font-family: inherit; font-size: inherit; font-weight: inherit;
+                        /* Forzados extra para los nuevos elementos de texto */
+                        div, span, p {
+                            page-break-inside: avoid;
                         }
-                        .card, p, li, h2, h3 { page-break-inside: avoid; }
                         button, .no-print { display: none !important; }
                     </style>
                 </head>
