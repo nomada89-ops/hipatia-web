@@ -1,4 +1,5 @@
 ﻿import React, { useState, useEffect, useRef } from 'react';
+import { useReactToPrint } from 'react-to-print';
 import { useExamContext } from './ExamContext';
 import { Upload, Send, CheckCircle, AlertCircle, Loader2, FileDown, Bold, Italic, List, FileText, X, Eye, ChevronRight, Zap, ArrowLeft, Shield } from 'lucide-react';
 import { SheetViewer } from './SheetViewer';
@@ -46,6 +47,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
 
     const rubricaInputRef = useRef<HTMLInputElement>(null);
     const refInputRef = useRef<HTMLInputElement>(null);
+    const componentRef = useRef<HTMLDivElement>(null);
 
     const loadingMessages = [
         "Escaneando evidencias...",
@@ -360,7 +362,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                         }
                     }
                 `}} />
-                <div id="reporte-final-hipatia" className="flex flex-col h-full">
+                <div id="reporte-final-hipatia" ref={componentRef} className="flex flex-col h-full">
                     {/* Header Superior Compact */}
                     <div className="bg-white border-b border-slate-200 px-8 py-3.5 flex items-center justify-between shadow-sm z-10">
                         <div className="flex items-center gap-4">
