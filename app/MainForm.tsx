@@ -336,12 +336,19 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                         #reporte-final-hipatia, #printable-report, [ref*="componentRef"] {
                             display: block !important;
                             height: auto !important;
-                            min-height: 0 !important; /* Fix blank page */
+                            min-height: 0 !important;
                             overflow: visible !important;
-                            position: static !important; /* Fix relative positioning issues */
+                            position: static !important;
                             width: 100% !important;
                             box-shadow: none !important;
                             margin: 0 !important;
+                        }
+
+                        /* CLASES DE UTILIDAD PARA IMPRESIÓN */
+                        .print-overflow-visible {
+                            overflow: visible !important;
+                            height: auto !important;
+                            max-height: none !important;
                         }
 
                         /* TRATAMIENTO DE IMÁGENES */
@@ -405,7 +412,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                         </div>
 
                         <div className="flex items-center gap-3 no-print-section">
-                            <button onClick={handleDownloadPdf} className="flex items-center gap-1.5 px-3 py-1.5 border border-slate-200 rounded-lg text-[10px] font-bold text-slate-600 hover:bg-slate-50 transition-all">
+                            <button type="button" onClick={handleDownloadPdf} className="flex items-center gap-1.5 px-3 py-1.5 border border-slate-200 rounded-lg text-[10px] font-bold text-slate-600 hover:bg-slate-50 transition-all">
                                 <FileDown className="h-3.5 w-3.5" /> PDF
                             </button>
                             <button onClick={() => setOriginalReport(null)} className="px-4 py-1.5 bg-slate-900 text-white rounded-lg text-[10px] font-bold hover:bg-slate-800 transition-all">
@@ -423,7 +430,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                     </div>
 
                     {/* Dashboard Compact Workspace */}
-                    <div className="flex-1 overflow-auto p-6 lg:p-8 custom-scrollbar">
+                    <div className="flex-1 overflow-auto p-6 lg:p-8 custom-scrollbar print-overflow-visible">
                         <div className="max-w-7xl mx-auto grid grid-cols-12 gap-6 bg-slate-50 p-4 rounded-2xl relative">
                             {/* Filmstrip Overlay */}
                             <div className="col-span-12 lg:col-span-3 space-y-4 pr-2 no-print-section">
@@ -475,7 +482,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                                             <button onClick={handleReset} className="text-[9px] font-bold text-rose-500 uppercase hover:underline">Reset</button>
                                         </div>
                                     </div>
-                                    <div className="bg-white rounded-xl border border-slate-200 shadow-soft min-h-[450px] p-8 overflow-hidden">
+                                    <div className="bg-white rounded-xl border border-slate-200 shadow-soft min-h-[450px] p-8 overflow-hidden print-overflow-visible">
                                         <div
                                             className="outline-none prose prose-auditor prose-sm"
                                             contentEditable={true}
@@ -511,6 +518,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                     {/* Botón Inferior de Descarga */}
                     <div className="flex justify-center pb-12 no-print-section">
                         <button
+                            type="button"
                             onClick={handleDownloadPdf}
                             className="flex items-center gap-2 px-8 py-4 bg-indigo-600 text-white rounded-2xl font-black shadow-xl shadow-indigo-200 hover:bg-indigo-700 transition-all transform hover:scale-[1.02] active:scale-[0.98]"
                         >
