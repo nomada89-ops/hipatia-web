@@ -59,7 +59,16 @@ export default function GroupReportPage() {
                         groupsList = [];
                     }
 
-                    setAvailableGroups(groupsList);
+                    setAvailableGroups(
+                        groupsList.map(item => {
+                            if (typeof item === 'string') return item;
+                            if (item && typeof item === 'object') {
+                                // @ts-ignore
+                                return item.value || item.label || item.grupo || item.name || item.id || JSON.stringify(item);
+                            }
+                            return String(item);
+                        })
+                    );
 
                     // Pre-seleccionar el primero si existe
                     if (groupsList.length > 0) {
