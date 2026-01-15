@@ -36,7 +36,15 @@ export default function GroupReportPage() {
     useEffect(() => {
         const fetchGroups = async () => {
             try {
-                const response = await fetch('https://n8n.protocolohipatia.com/webhook/obtener-grupos-disponibles');
+                // Recuperar token para la petición segura
+                const params = new URLSearchParams(window.location.search);
+                const token = localStorage.getItem('user_token') || localStorage.getItem('token') || params.get('token');
+
+                const url = token
+                    ? `https://n8n.protocolohipatia.com/webhook/obtener-grupos-disponibles?user_token=${token}`
+                    : 'https://n8n.protocolohipatia.com/webhook/obtener-grupos-disponibles';
+
+                const response = await fetch(url);
                 if (response.ok) {
                     const data = await response.json();
                     // Asumimos que data es { grupos: ["2BACH-A", "2BACH-B", ...] } o directamente un array
