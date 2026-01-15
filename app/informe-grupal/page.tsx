@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Shield, Zap, ArrowLeft, Loader2, Users, FileText } from 'lucide-react';
+import { Shield, Zap, ArrowLeft, Loader2, Users, FileText, ChevronDown } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 export default function GroupReportPage() {
@@ -9,12 +9,14 @@ export default function GroupReportPage() {
     const [idGrupo, setIdGrupo] = useState('');
     const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
     const [htmlReport, setHtmlReport] = useState<string | null>(null);
-    const [loadingMsg, setLoadingMsg] = useState('Procesando datos grupales...');
     const [errorMsg, setErrorMsg] = useState('');
+
+    // Estados para el selector de grupos
+    const [availableGroups, setAvailableGroups] = useState<string[]>([]);
+    const [isLoadingGroups, setIsLoadingGroups] = useState(true);
 
     // --- SEGURIDAD: CHECK TOKEN (RELAJADA) ---
     useEffect(() => {
-        // Intentar recuperar de storage O de parámetros URL
         if (typeof window !== 'undefined') {
             const params = new URLSearchParams(window.location.search);
             const token = localStorage.getItem('user_token') || localStorage.getItem('token') || params.get('token');
@@ -30,6 +32,35 @@ export default function GroupReportPage() {
         }
     }, [router]);
 
+    // --- CARGAR GRUPOS DISPONIBLES ---
+    useEffect(() => {
+        const fetchGroups = async () => {
+            try {
+                const response = await fetch('https://n8n.protocolohipatia.com/webhook/get-grupos');
+                if (response.ok) {
+                    const data = await response.json();
+                    // Asumimos que data es { grupos: ["2BACH-A", "2BACH-B", ...] } o directamente un array
+                    const groupsList = Array.isArray(data) ? data : (data.grupos || []);
+                    setAvailableGroups(groupsList);
+
+                    // Pre-seleccionar el primero si existe
+                    if (groupsList.length > 0) {
+                        setIdGrupo(groupsList[0]);
+                    }
+                }
+            } catch (error) {
+                console.error("Error al cargar grupos:", error);
+                // Si falla, dejamos la lista vacía y el usuario quizás no vea nada, 
+                // pero idealmente deberíamos tener un fallback a input texto si esto fuera crítico.
+                // Por ahora, solo logueamos.
+            } finally {
+                setIsLoadingGroups(false);
+            }
+        };
+
+        fetchGroups();
+    }, []);
+
     const handleGenerate = async (e: React.FormEvent) => {
         e.preventDefault();
         const params = new URLSearchParams(window.location.search);
@@ -42,7 +73,7 @@ export default function GroupReportPage() {
         }
 
         if (!idGrupo.trim()) {
-            alert('Por favor, introduce un ID de Grupo válido.');
+            alert('Por favor, selecciona un ID de Grupo válido.');
             return;
         }
 
@@ -62,11 +93,8 @@ export default function GroupReportPage() {
 
             if (response.ok) {
                 const text = await response.text();
-                // A veces n8n devuelve JSON con { "html": "..." } o directo HTML
-                // Intentamos parsear JSON por si acaso
                 try {
                     const json = JSON.parse(text);
-                    // Priorizamos la propiedad específica solicitada por el usuario
                     setHtmlReport(json.html_report_grupal || json.html || json.output || text);
                 } catch {
                     setHtmlReport(text);
@@ -104,7 +132,7 @@ export default function GroupReportPage() {
                     </div>
                 </div>
 
-                {/* Contenido HTML Seguro - Ajustado según requerimiento del usuario */}
+                {/* Contenido HTML Seguro */}
                 <div
                     className="report-wrapper w-full bg-white overflow-auto custom-scrollbar"
                     style={{ minHeight: '100vh', width: '100%', background: '#fff' }}
@@ -165,27 +193,56 @@ export default function GroupReportPage() {
                             <FileText size={32} />
                         </div>
                         <h2 className="text-2xl font-bold text-slate-900">Generar Informe</h2>
-                        <p className="text-slate-500 mt-2">Introduce el identificador único del grupo</p>
+                        <p className="text-slate-500 mt-2">Selecciona el grupo para analizar</p>
                     </div>
 
                     <form onSubmit={handleGenerate} className="space-y-6">
                         <div className="space-y-2">
                             <label className="text-xs font-bold text-slate-500 uppercase tracking-widest pl-1">ID del Grupo</label>
-                            <input
-                                type="text"
-                                value={idGrupo}
-                                onChange={(e) => setIdGrupo(e.target.value)}
-                                placeholder="Ej: 2BACH-A"
-                                className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl focus:border-indigo-500 focus:shadow-lg outline-none transition-all font-bold text-lg text-center tracking-widest text-slate-800 placeholder:text-slate-300 placeholder:font-normal"
-                                autoFocus
-                            />
+
+                            {isLoadingGroups ? (
+                                <div className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-xl flex items-center justify-center gap-3 text-slate-400">
+                                    <Loader2 className="animate-spin" size={20} />
+                                    <span className="text-sm font-medium">Cargando grupos...</span>
+                                </div>
+                            ) : availableGroups.length > 0 ? (
+                                <div className="relative">
+                                    <select
+                                        value={idGrupo}
+                                        onChange={(e) => setIdGrupo(e.target.value)}
+                                        className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl focus:border-indigo-500 focus:shadow-lg outline-none transition-all font-bold text-lg text-slate-800 appearance-none cursor-pointer"
+                                    >
+                                        <option value="" disabled>Seleccionar grupo...</option>
+                                        {availableGroups.map(grupo => (
+                                            <option key={grupo} value={grupo}>
+                                                {grupo}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={20} />
+                                </div>
+                            ) : (
+                                <div className="space-y-2">
+                                    <input
+                                        type="text"
+                                        value={idGrupo}
+                                        onChange={(e) => setIdGrupo(e.target.value)}
+                                        placeholder="Ej: 2BACH-A"
+                                        className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl focus:border-indigo-500 focus:shadow-lg outline-none transition-all font-bold text-lg text-center tracking-widest text-slate-800 placeholder:text-slate-300 placeholder:font-normal"
+                                        autoFocus
+                                    />
+                                    <p className="text-[10px] text-amber-600 font-medium text-center">
+                                        No se pudieron cargar los grupos. Introduce el ID manualmente.
+                                    </p>
+                                </div>
+                            )}
                         </div>
 
                         <button
                             type="submit"
-                            disabled={status === 'sending' || !idGrupo.trim()}
+                            disabled={status === 'sending' || !idGrupo.trim() || (isLoadingGroups && availableGroups.length === 0)}
                             className={`w-full py-4 text-lg font-black text-white rounded-xl shadow-xl transition-all transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center gap-2
-                                ${status === 'sending' || !idGrupo.trim()
+                                ${status === 'sending' || !idGrupo.trim() || isLoadingGroups
                                     ? 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none'
                                     : 'bg-gradient-to-r from-indigo-600 to-violet-600 shadow-indigo-200'}`}
                         >
