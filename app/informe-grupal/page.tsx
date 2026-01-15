@@ -47,8 +47,18 @@ export default function GroupReportPage() {
                 const response = await fetch(url);
                 if (response.ok) {
                     const data = await response.json();
-                    // Asumimos que data es { grupos: ["2BACH-A", "2BACH-B", ...] } o directamente un array
-                    const groupsList = Array.isArray(data) ? data : (data.grupos || []);
+                    let groupsList: string[] = [];
+
+                    // Verificación estricta de array
+                    if (Array.isArray(data)) {
+                        groupsList = data;
+                    } else if (data && typeof data === 'object' && Array.isArray(data.grupos)) {
+                        groupsList = data.grupos;
+                    } else {
+                        console.warn("Formato de respuesta de grupos inesperado:", data);
+                        groupsList = [];
+                    }
+
                     setAvailableGroups(groupsList);
 
                     // Pre-seleccionar el primero si existe
