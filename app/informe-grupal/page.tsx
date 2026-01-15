@@ -1,8 +1,13 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { Shield, Zap, ArrowLeft, Loader2, Users, FileText } from 'lucide-react';
+import { Shield, Zap, ArrowLeft, Loader2, Users, FileText, ChevronDown } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+
+interface GroupOption {
+    label: string;
+    value: string;
+}
 
 export default function GroupReportPage() {
     const router = useRouter();
@@ -11,6 +16,43 @@ export default function GroupReportPage() {
     const [htmlReport, setHtmlReport] = useState<string | null>(null);
     const [loadingMsg, setLoadingMsg] = useState('Procesando datos grupales...');
     const [errorMsg, setErrorMsg] = useState('');
+
+    // Estado para el selector de grupos
+    const [availableGroups, setAvailableGroups] = useState<GroupOption[]>([]);
+    const [isLoadingGroups, setIsLoadingGroups] = useState(true);
+
+    // --- CARGA DE GRUPOS DISPONIBLES ---
+    useEffect(() => {
+        const fetchGroups = async () => {
+            try {
+                // Usamos la URL de producción explícita como solicitó el usuario
+                const response = await fetch('https://n8n.protocolohipatia.com/webhook/obtener-grupos-disponibles', {
+                    method: 'GET',
+                    mode: 'cors', // Importante para evitar bloqueos
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (Array.isArray(data)) {
+                        setAvailableGroups(data);
+                    } else {
+                        console.error('El formato de grupos no es un array:', data);
+                    }
+                } else {
+                    console.error('Error al obtener grupos:', response.status);
+                }
+            } catch (error) {
+                console.error('Error de red al obtener grupos:', error);
+            } finally {
+                setIsLoadingGroups(false);
+            }
+        };
+
+        fetchGroups();
+    }, []);
 
     // --- SEGURIDAD: CHECK TOKEN (RELAJADA) ---
     useEffect(() => {
@@ -165,20 +207,40 @@ export default function GroupReportPage() {
                             <FileText size={32} />
                         </div>
                         <h2 className="text-2xl font-bold text-slate-900">Generar Informe</h2>
-                        <p className="text-slate-500 mt-2">Introduce el identificador único del grupo</p>
+                        <h2 className="text-2xl font-bold text-slate-900">Generar Informe</h2>
+                        <p className="text-slate-500 mt-2">Selecciona el grupo corregido para ver su análisis</p>
                     </div>
 
                     <form onSubmit={handleGenerate} className="space-y-6">
                         <div className="space-y-2">
-                            <label className="text-xs font-bold text-slate-500 uppercase tracking-widest pl-1">ID del Grupo</label>
-                            <input
-                                type="text"
-                                value={idGrupo}
-                                onChange={(e) => setIdGrupo(e.target.value)}
-                                placeholder="Ej: 2BACH-A"
-                                className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl focus:border-indigo-500 focus:shadow-lg outline-none transition-all font-bold text-lg text-center tracking-widest text-slate-800 placeholder:text-slate-300 placeholder:font-normal"
-                                autoFocus
-                            />
+                            <label className="text-xs font-bold text-slate-500 uppercase tracking-widest pl-1">Selecciona un Grupo</label>
+
+                            <div className="relative">
+                                <select
+                                    value={idGrupo}
+                                    onChange={(e) => setIdGrupo(e.target.value)}
+                                    className="w-full p-4 bg-white border-2 border-slate-200 rounded-xl focus:border-indigo-500 focus:shadow-lg outline-none transition-all font-bold text-lg text-slate-800 appearance-none cursor-pointer disabled:bg-slate-50 disabled:text-slate-400"
+                                    disabled={isLoadingGroups}
+                                >
+                                    <option value="" disabled>
+                                        {isLoadingGroups ? 'Cargando grupos disponibles...' : '-- Elige una clase --'}
+                                    </option>
+
+                                    {availableGroups.map((group) => (
+                                        <option key={group.value} value={group.value}>
+                                            {group.label}
+                                        </option>
+                                    ))}
+                                </select>
+
+                                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                                    {isLoadingGroups ? (
+                                        <Loader2 className="animate-spin" size={20} />
+                                    ) : (
+                                        <ChevronDown size={20} />
+                                    )}
+                                </div>
+                            </div>
                         </div>
 
                         <button
