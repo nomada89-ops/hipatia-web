@@ -36,7 +36,7 @@ export default function GroupReportPage() {
     useEffect(() => {
         const fetchGroups = async () => {
             try {
-                const response = await fetch('https://n8n.protocolohipatia.com/webhook/get-grupos');
+                const response = await fetch('https://n8n.protocolohipatia.com/webhook/obtener-grupos-disponibles');
                 if (response.ok) {
                     const data = await response.json();
                     // Asumimos que data es { grupos: ["2BACH-A", "2BACH-B", ...] } o directamente un array
