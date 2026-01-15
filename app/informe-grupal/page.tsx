@@ -109,6 +109,11 @@ export default function GroupReportPage() {
                     className="report-wrapper w-full bg-white overflow-auto custom-scrollbar"
                     style={{ minHeight: '100vh', width: '100%', background: '#fff' }}
                 >
+                    <style dangerouslySetInnerHTML={{
+                        __html: `
+                        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+                        .report-wrapper { font-family: 'Roboto', sans-serif !important; }
+                    `}} />
                     <div
                         dangerouslySetInnerHTML={{ __html: htmlReport }}
                     />
