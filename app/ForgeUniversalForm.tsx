@@ -11,7 +11,7 @@ interface ForgeUniversalFormProps {
 
 const ForgeUniversalForm: React.FC<ForgeUniversalFormProps> = ({ onBack, userToken }) => {
     // Estados del Formulario
-    const [temarioFile, setTemarioFile] = useState<File | null>(null);
+    const [temarioFiles, setTemarioFiles] = useState<File[]>([]);
     const [temarioText, setTemarioText] = useState<string>('');
     const [modeloFile, setModeloFile] = useState<File | null>(null);
     const [modeloText, setModeloText] = useState<string>('');
@@ -41,15 +41,24 @@ const ForgeUniversalForm: React.FC<ForgeUniversalFormProps> = ({ onBack, userTok
     const editorRef = useRef<HTMLDivElement>(null);
 
     // --- MANEJADORES DE ARCHIVOS ---
-    const handleTemarioFile = async (file: File) => {
+    const handleTemarioFiles = async (files: FileList | null) => {
+        if (!files || files.length === 0) return;
+
         setIsExtractingTemario(true);
         try {
-            const text = await processFileText(file);
-            setTemarioText(text);
-            setTemarioFile(file);
+            const fileArray = Array.from(files);
+            let combinedText = "";
+
+            for (const file of fileArray) {
+                const text = await processFileText(file);
+                combinedText += `\n\n--- INICIO ARCHIVO: ${file.name} ---\n${text}\n--- FIN ARCHIVO: ${file.name} ---\n`;
+            }
+
+            setTemarioText(combinedText);
+            setTemarioFiles(fileArray);
         } catch (error) {
             console.error('Error procesando temario:', error);
-            alert('Error al leer el archivo de temario.');
+            alert('Error al leer los archivos de temario.');
         } finally {
             setIsExtractingTemario(false);
         }
@@ -125,25 +134,25 @@ const ForgeUniversalForm: React.FC<ForgeUniversalFormProps> = ({ onBack, userTok
 
     // --- PERSISTENCIA / IMPRESIÓN ---
     const handlePrint = (type: 'examen' | 'solucionario') => {
-          const originalTitle = document.title;
-          
-          if (type === 'examen') {
-              setActiveTab('examen');
-              document.title = `Examen - ${nivel} - ${new Date().toLocaleDateString()}`;
-              // Small timeout to allow state update (tab switch) to render before print
-              setTimeout(() => {
-                  window.print();
-                  document.title = originalTitle;
-              }, 100);
-          } else {
-              setActiveTab('solucionario');
-              document.title = `Solucionario_guía_evaluacion - ${nivel} - ${new Date().toLocaleDateString()}`;
-              setTimeout(() => {
-                  window.print();
-                  document.title = originalTitle;
-              }, 100);
-          }
-      };
+        const originalTitle = document.title;
+
+        if (type === 'examen') {
+            setActiveTab('examen');
+            document.title = `Examen - ${nivel} - ${new Date().toLocaleDateString()}`;
+            // Small timeout to allow state update (tab switch) to render before print
+            setTimeout(() => {
+                window.print();
+                document.title = originalTitle;
+            }, 100);
+        } else {
+            setActiveTab('solucionario');
+            document.title = `Solucionario_guía_evaluacion - ${nivel} - ${new Date().toLocaleDateString()}`;
+            setTimeout(() => {
+                window.print();
+                document.title = originalTitle;
+            }, 100);
+        }
+    };
 
     const handleReset = () => {
         if (confirm('¿Descartar examen y volver al generador?')) {
@@ -151,6 +160,8 @@ const ForgeUniversalForm: React.FC<ForgeUniversalFormProps> = ({ onBack, userTok
             setGuiaData(null);
             setStatus('idle');
             setMessage('');
+            setTemarioFiles([]);
+            setTemarioText('');
         }
     };
 
@@ -158,8 +169,8 @@ const ForgeUniversalForm: React.FC<ForgeUniversalFormProps> = ({ onBack, userTok
     if (examHtml) {
         return (
             <div className={`h-screen overflow-hidden flex flex-col font-sans print:bg-white print:h-auto print:overflow-visible ${isDyslexic ? 'font-dyslexic' : ''}`}>
-                
-                  <style>{`
+
+                <style>{`
                       .font-dyslexic * { font-family: 'OpenDyslexic', sans-serif !important; }
                   `}</style>
 
@@ -176,24 +187,24 @@ const ForgeUniversalForm: React.FC<ForgeUniversalFormProps> = ({ onBack, userTok
 
                     <div className="flex items-center gap-3">
                         {/* Tabs Selector */}
-                          <div className="flex bg-slate-100 p-1 rounded-lg mr-4 border border-slate-200 print:hidden">
-                                <button 
-                                    onClick={() => setActiveTab('examen')} 
-                                    className={`px-3 py-1 text-xs font-bold rounded-md transition-all ${activeTab === 'examen' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                        <div className="flex bg-slate-100 p-1 rounded-lg mr-4 border border-slate-200 print:hidden">
+                            <button
+                                onClick={() => setActiveTab('examen')}
+                                className={`px-3 py-1 text-xs font-bold rounded-md transition-all ${activeTab === 'examen' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                            >
+                                Examen
+                            </button>
+                            {solucionarioHtml && (
+                                <button
+                                    onClick={() => setActiveTab('solucionario')}
+                                    className={`px-3 py-1 text-xs font-bold rounded-md transition-all ${activeTab === 'solucionario' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
                                 >
-                                    Examen
+                                    Solucionario
                                 </button>
-                                {solucionarioHtml && (
-                                    <button 
-                                        onClick={() => setActiveTab('solucionario')} 
-                                        className={`px-3 py-1 text-xs font-bold rounded-md transition-all ${activeTab === 'solucionario' ? 'bg-white text-indigo-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
-                                    >
-                                        Solucionario
-                                    </button>
-                                )}
-                          </div>
-                          
-                          <div className="flex items-center gap-2 mr-4">
+                            )}
+                        </div>
+
+                        <div className="flex items-center gap-2 mr-4">
                             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Modo Dislexia</span>
                             <button
                                 onClick={() => setIsDyslexic(!isDyslexic)}
@@ -203,15 +214,15 @@ const ForgeUniversalForm: React.FC<ForgeUniversalFormProps> = ({ onBack, userTok
                             </button>
                         </div>
 
-                        
+
                         <button
                             onClick={handleReset}
                             className="px-4 py-2 text-sm font-bold text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-all"
                         >
                             Descartar
                         </button>
-                        
-                          <div className="flex gap-2">
+
+                        <div className="flex gap-2">
                             <button
                                 onClick={() => handlePrint('examen')}
                                 className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-lg shadow-lg shadow-indigo-900/20 flex items-center gap-2 transition-all active:scale-95 border border-indigo-500"
@@ -228,7 +239,7 @@ const ForgeUniversalForm: React.FC<ForgeUniversalFormProps> = ({ onBack, userTok
                                     <span className="hidden xl:inline">Solucionario</span>
                                 </button>
                             )}
-                          </div>
+                        </div>
 
                     </div>
                 </div>
@@ -236,34 +247,34 @@ const ForgeUniversalForm: React.FC<ForgeUniversalFormProps> = ({ onBack, userTok
                 {/* Editor Area */}
                 <div className="flex-1 overflow-y-auto bg-slate-100 p-8 print:p-0 print:bg-white print:overflow-visible print:overflow-visible print:overflow-visible">
                     <div className="max-w-[210mm] mx-auto bg-white shadow-xl min-h-[297mm] p-[20mm] print:shadow-none print:p-0   ">
-                        
+
                         {/* Examen View */}
                         <div className={`prose prose-slate max-w-none outline-none ${activeTab === 'examen' ? 'block' : 'hidden'}`}>
-                              <div 
-                                  ref={editorRef}
-                                  contentEditable
-                                  suppressContentEditableWarning
-                                  dangerouslySetInnerHTML={{ __html: examHtml }} 
-                              />
+                            <div
+                                ref={editorRef}
+                                contentEditable
+                                suppressContentEditableWarning
+                                dangerouslySetInnerHTML={{ __html: examHtml }}
+                            />
                         </div>
 
                         {/* Page Break for Print */}
-                        
+
 
                         {/* Solucionario View */}
                         {solucionarioHtml && (
                             <div className={`prose prose-slate max-w-none outline-none mt-10 print:mt-0 ${activeTab === 'solucionario' ? 'block' : 'hidden'}`}>
-                                  <div className="print:hidden mb-4 p-4 bg-indigo-50 text-indigo-700 font-bold rounded-lg border border-indigo-100 text-center uppercase tracking-widest text-xs">
-                                      --- Solucionario y Criterios de Corrección ---
-                                  </div>
-                                  <div 
-                                      contentEditable
-                                      suppressContentEditableWarning
-                                      dangerouslySetInnerHTML={{ __html: solucionarioHtml }} 
-                                  />
+                                <div className="print:hidden mb-4 p-4 bg-indigo-50 text-indigo-700 font-bold rounded-lg border border-indigo-100 text-center uppercase tracking-widest text-xs">
+                                    --- Solucionario y Criterios de Corrección ---
+                                </div>
+                                <div
+                                    contentEditable
+                                    suppressContentEditableWarning
+                                    dangerouslySetInnerHTML={{ __html: solucionarioHtml }}
+                                />
                             </div>
                         )}
-    
+
                     </div>
                 </div>
             </div>
@@ -317,27 +328,28 @@ const ForgeUniversalForm: React.FC<ForgeUniversalFormProps> = ({ onBack, userTok
                                         className={`group relative min-h-[6rem] h-auto border-2 border-dashed rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all p-4
                                         ${temarioText ? 'border-emerald-200 bg-emerald-50/30' : 'border-slate-200 hover:border-violet-400 hover:bg-slate-50'}`}
                                     >
-                                        <input ref={temarioInputRef} type="file" className="hidden" onChange={(e) => e.target.files?.[0] && handleTemarioFile(e.target.files[0])} accept=".pdf,.docx,.txt" />
+                                        <input ref={temarioInputRef} type="file" multiple className="hidden" onChange={(e) => handleTemarioFiles(e.target.files)} accept=".pdf,.docx,.txt" />
 
                                         {isExtractingTemario ? (
                                             <div className="flex flex-col items-center gap-2">
                                                 <Loader2 className="h-5 w-5 text-violet-500 animate-spin" />
-                                                <span className="text-xs font-bold text-violet-400">Analizando temario...</span>
+                                                <span className="text-xs font-bold text-violet-400">Analizando archivos...</span>
                                             </div>
-                                        ) : temarioText ? (
+                                        ) : temarioFiles.length > 0 ? (
                                             <div className="flex flex-col items-center gap-2 text-center w-full">
                                                 <div className="bg-white p-1.5 rounded-full shadow-sm text-emerald-500"><CheckCircle size={20} /></div>
                                                 <div>
                                                     <p className="text-xs font-bold text-slate-700">Temario Procesado</p>
-                                                    <p className="text-[10px] text-slate-400 truncate max-w-[200px] mx-auto">{temarioFile?.name}</p>
-                                                    <p className="text-[9px] text-emerald-600 font-mono mt-1">{(temarioText.length / 1000).toFixed(1)}k caracteres</p>
+                                                    <p className="text-[10px] text-slate-500 font-bold">{temarioFiles.length} archivos subidos</p>
+                                                    {temarioFiles.length === 1 && <p className="text-[10px] text-slate-400 truncate max-w-[200px] mx-auto">{temarioFiles[0].name}</p>}
+                                                    <p className="text-[9px] text-emerald-600 font-mono mt-1">{(temarioText.length / 1000).toFixed(1)}k caracteres totales</p>
                                                 </div>
                                             </div>
                                         ) : (
                                             <div className="text-center space-y-1">
                                                 <Upload className="h-6 w-6 text-slate-300 mx-auto group-hover:text-violet-500 transition-colors" />
                                                 <p className="text-xs font-bold text-slate-600 group-hover:text-violet-600 transition-colors">Sube tus apuntes (Opcional)</p>
-                                                <p className="text-[9px] text-slate-400">PDF, DOCX o TXT</p>
+                                                <p className="text-[9px] text-slate-400">Selecciona múltiples PDF, DOCX o TXT</p>
                                             </div>
                                         )}
                                     </div>
