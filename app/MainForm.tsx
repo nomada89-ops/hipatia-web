@@ -469,9 +469,20 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                                     <div className="space-y-2">
                                         <h3 className="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Calificación Final</h3>
                                         <div className="flex items-baseline gap-1.5">
-                                            <span className={`text-5xl font-black ${isPass ? 'text-indigo-600' : 'text-rose-600'}`}>
-                                                {extractedGrade.toFixed(2)}
-                                            </span>
+                                            <input
+                                                type="number"
+                                                min="0"
+                                                max="10"
+                                                step="0.01"
+                                                value={extractedGrade.toFixed(2)}
+                                                onChange={(e) => {
+                                                    const val = parseFloat(e.target.value);
+                                                    if (!isNaN(val) && val >= 0 && val <= 10) {
+                                                        setJsonGrade(val);
+                                                    }
+                                                }}
+                                                className={`text-5xl font-black bg-transparent border-none outline-none focus:ring-0 p-0 w-[140px] ${isPass ? 'text-indigo-600' : 'text-rose-600'}`}
+                                            />
                                             <span className="text-xl font-bold text-slate-300">/ 10</span>
                                         </div>
                                         <div className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg font-bold text-[10px] uppercase tracking-wider ${isPass ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'}`}>
