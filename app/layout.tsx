@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import Chatbot from './components/Chatbot';
+import IdleTimer from './components/IdleTimer';
 
 const inter = Inter({
     variable: '--font-inter',
@@ -22,6 +23,7 @@ export default function RootLayout({
     return (
         <html lang='es'>
             <body className={`${inter.variable} antialiased bg-white text-slate-900`}>
+                <IdleTimer />
                 {children}
                 <Chatbot />
             </body>

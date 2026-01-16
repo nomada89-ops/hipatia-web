@@ -50,6 +50,14 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
     const [viewMode, setViewMode] = useState<"main" | "forge">("main");
+    // @ts-ignore
+    const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
+
+    useEffect(() => {
+        if (searchParams?.get("timeout") === "true") {
+            setErrorMessage("Tu sesión ha expirado por inactividad");
+        }
+    }, []);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -183,21 +191,21 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                             {[
-                                { 
-                                    icon: Search, 
-                                    title: "Auditoría en 3 capas", 
+                                {
+                                    icon: Search,
+                                    title: "Auditoría en 3 capas",
                                     desc: "Verificación triple para una precisión absoluta en la corrección de exámenes manuscritos.",
                                     color: "indigo"
                                 },
-                                { 
-                                    icon: Zap, 
-                                    title: "Generación Reactiva", 
+                                {
+                                    icon: Zap,
+                                    title: "Generación Reactiva",
                                     desc: "Crea exámenes y materiales de apoyo en segundos a partir de tus propios contenidos.",
                                     color: "blue"
                                 },
-                                { 
-                                    icon: Shield, 
-                                    title: "Escudo LOPD", 
+                                {
+                                    icon: Shield,
+                                    title: "Escudo LOPD",
                                     desc: "Diseñado para cumplir con los estándares más estrictos de privacidad en el aula.",
                                     color: "purple"
                                 }
@@ -274,7 +282,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
                                     </div>
                                 </button>
 
-                                
+
                                 <Link href="/informe-grupal" className="group glass-emerald rounded-[32px] p-10 text-left transition-all hover:scale-[1.02] hover:shadow-2xl hover:shadow-emerald-200/50 flex flex-col gap-10">
                                     <div className="flex justify-between items-start">
                                         <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-emerald-200">
@@ -309,13 +317,13 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
                             </div>
                             <div className="text-center pt-8">
                                 <button onClick={onShowSample} className="px-8 py-3 bg-white text-slate-500 font-bold rounded-full border border-slate-200 hover:bg-slate-50 transition-all shadow-sm">
-                                     Ver Simulación de Informe Completo
+                                    Ver Simulación de Informe Completo
                                 </button>
                             </div>
                         </div>
                     ) : (
                         <div className="space-y-16 animate-in slide-in-from-right-8 duration-500">
-                             <div className="text-center space-y-4">
+                            <div className="text-center space-y-4">
                                 <div className="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 mx-auto mb-6">
                                     <Zap size={32} />
                                 </div>
