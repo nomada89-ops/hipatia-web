@@ -302,7 +302,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
     const handleDownloadPdf = useReactToPrint({
         // @ts-ignore
         content: () => componentRef.current,
-        documentTitle: 'Protocolo Hipatia | Informe de evaluación',
+        documentTitle: 'Informe de evaluación',
         pageStyle: `
         @media print {
             body { 
@@ -668,7 +668,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
 
                             {/* SECTION 3: EVIDENCIAS */}
                             <div className="space-y-3">
-                                <label className="text-xs font-bold text-slate-500 uppercase tracking-widest pl-1">Escanear Examen</label>
+                                <label className="text-xs font-bold text-slate-500 uppercase tracking-widest pl-1">Imágenes del examen o ejercicio</label>
                                 <div
                                     onDragOver={handleDragOver}
                                     onDragLeave={handleDragLeave}
