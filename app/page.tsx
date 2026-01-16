@@ -67,6 +67,7 @@ export default function ExamCorrectionPage() {
                         onSelectForgeUniversal={() => setActiveModule('forge-universal')}
                         onSelectForgeSpecialist={() => setActiveModule('forge-specialist')}
                         onShowSample={handleShowSample}
+                        userToken={userToken}
                     />
                 </div>
             ) : activeModule === 'auditor' ? (

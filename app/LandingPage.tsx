@@ -11,6 +11,7 @@ interface LandingPageProps {
     onSelectForgeUniversal: () => void;
     onSelectForgeSpecialist: () => void;
     onShowSample: () => void;
+    userToken?: string;
 }
 
 const useScrollReveal = () => {
@@ -45,10 +46,11 @@ const RevealSection: React.FC<{ children: React.ReactNode, className?: string }>
     );
 };
 
-const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn, onSelectAuditor, onSelectForgeUniversal, onSelectForgeSpecialist, onShowSample }) => {
+const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn, onSelectAuditor, onSelectForgeUniversal, onSelectForgeSpecialist, onShowSample, userToken }) => {
     const [tokenInput, setTokenInput] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
+    const [balance, setBalance] = useState<string | null>(null);
     const [viewMode, setViewMode] = useState<"main" | "forge">("main");
     // @ts-ignore
     const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
@@ -58,6 +60,34 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
             setErrorMessage("Tu sesión ha expirado por inactividad");
         }
     }, []);
+
+    // FETCH BALANCE
+    useEffect(() => {
+        const fetchBalance = async () => {
+            const token = userToken || localStorage.getItem('user_token');
+            if (isLoggedIn && token) {
+                try {
+                    const res = await fetch(`https://n8n.protocolohipatia.com/webhook/consultar-perfil?user_token=${token}`);
+                    if (res.ok) {
+                        const data = await res.json();
+                        // Extract Saldo or field_6860
+                        const saldo = data.Saldo || data.field_6860 || data.saldo;
+                        if (saldo !== undefined && saldo !== null) {
+                            // Ensure 2 decimals
+                            const formatted = Number(saldo).toFixed(2);
+                            setBalance(`${formatted} €`);
+                        }
+                    }
+                } catch (err) {
+                    console.error("Error fetching balance", err);
+                }
+            }
+        };
+
+        if (isLoggedIn) {
+            fetchBalance();
+        }
+    }, [isLoggedIn, userToken]);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -246,6 +276,12 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
                         <button onClick={() => setViewMode('main')} className="px-4 py-2 bg-slate-100 text-slate-600 rounded-lg text-xs font-bold hover:bg-slate-200 transition-all uppercase tracking-widest">
                             <LayoutGrid size={14} className="inline mr-2" /> Menú
                         </button>
+                    )}
+                    {balance && (
+                        <div className="px-4 py-2 bg-emerald-50 text-emerald-700 rounded-lg text-xs font-bold border border-emerald-100 uppercase tracking-widest flex items-center gap-2">
+                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                            Saldo: {balance}
+                        </div>
                     )}
                     <button onClick={onLogout} className="px-4 py-2 bg-indigo-50 text-indigo-700 rounded-lg text-xs font-bold hover:bg-indigo-100 transition-all flex items-center gap-2 border border-indigo-100 uppercase tracking-widest">
                         <Lock size={14} /> Salir
