@@ -35,6 +35,10 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
     const [legalAccepted, setLegalAccepted] = useState(false);
     const [idGrupo, setIdGrupo] = useState('');
 
+    // DRAG STATES
+    const [isDragOverRubrica, setIsDragOverRubrica] = useState(false);
+    const [isDragOverReferencias, setIsDragOverReferencias] = useState(false);
+
     const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>(() => {
         // HACK: Detect sample load synchronously to prevent UI flash
         if (typeof window !== 'undefined' && localStorage.getItem('hipatia_load_sample') === 'true') {
@@ -186,15 +190,37 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
         }
     }, []);
 
-    // --- HANDLERS DEL FORMULARIO ---
+    // --- SCRIPTS DE ARRASTRAR Y SOLTAR ---
+    // EXAMEN
     const handleDragOver = (e: React.DragEvent) => { e.preventDefault(); setIsDragOver(true); };
     const handleDragLeave = (e: React.DragEvent) => { e.preventDefault(); setIsDragOver(false); };
     const handleDrop = async (e: React.DragEvent) => {
-        e.preventDefault(); setIsDragOver(false);
+        e.preventDefault();
+        setIsDragOver(false);
         if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
             const rawFiles = Array.from(e.dataTransfer.files);
             await processAndAddFiles(rawFiles);
         }
+    };
+
+    // RUBRICA
+    const handleDragOverRubrica = (e: React.DragEvent) => { e.preventDefault(); setIsDragOverRubrica(true); };
+    const handleDragLeaveRubrica = (e: React.DragEvent) => { e.preventDefault(); setIsDragOverRubrica(false); };
+    const handleDropRubrica = async (e: React.DragEvent) => {
+        e.preventDefault();
+        setIsDragOverRubrica(false);
+        const file = e.dataTransfer.files?.[0];
+        if (file) handleRubricaFile(file);
+    };
+
+    // REFERENCIAS
+    const handleDragOverReferencias = (e: React.DragEvent) => { e.preventDefault(); setIsDragOverReferencias(true); };
+    const handleDragLeaveReferencias = (e: React.DragEvent) => { e.preventDefault(); setIsDragOverReferencias(false); };
+    const handleDropReferencias = async (e: React.DragEvent) => {
+        e.preventDefault();
+        setIsDragOverReferencias(false);
+        const files = Array.from(e.dataTransfer.files);
+        if (files.length > 0) handleRefFiles(files);
     };
 
     const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -562,7 +588,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
 
                         <form onSubmit={handleSubmit} className="space-y-8">
 
-                            {/* SECTION 1: CONTEXTO (R├ÜBRICA & REFERENCIAS) */}
+                            {/* SECTION 1: CONTEXTO (RÚBRICA & REFERENCIAS) */}
                             <div className="space-y-4">
                                 <div className="flex items-center gap-2 mb-2">
                                     <div className="bg-indigo-50 p-2 rounded-lg text-indigo-600"><Shield size={16} /></div>
@@ -573,8 +599,11 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                                     {/* Rubrica Upload */}
                                     <div
                                         onClick={() => rubricaInputRef.current?.click()}
+                                        onDragOver={handleDragOverRubrica}
+                                        onDragLeave={handleDragLeaveRubrica}
+                                        onDrop={handleDropRubrica}
                                         className={`group relative h-20 border-2 border-dashed rounded-xl flex items-center justify-center cursor-pointer transition-all
-                                        ${guiaCorreccion ? 'border-emerald-200 bg-emerald-50/30' : 'border-slate-200 hover:border-indigo-400 hover:bg-slate-50'}`}
+                                        ${guiaCorreccion || isDragOverRubrica ? 'border-emerald-200 bg-emerald-50/30' : 'border-slate-200 hover:border-indigo-400 hover:bg-slate-50'}`}
                                     >
                                         <input ref={rubricaInputRef} type="file" className="hidden" onChange={(e) => e.target.files?.[0] && handleRubricaFile(e.target.files[0])} accept=".pdf,.docx,.txt" />
 
@@ -601,8 +630,11 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                                     {/* Referencia Upload */}
                                     <div
                                         onClick={() => refInputRef.current?.click()}
+                                        onDragOver={handleDragOverReferencias}
+                                        onDragLeave={handleDragLeaveReferencias}
+                                        onDrop={handleDropReferencias}
                                         className={`group relative min-h-[5rem] h-auto border-2 border-dashed rounded-xl flex flex-col items-center justify-center cursor-pointer transition-all p-2
-                                        ${materialReferenciaFiles.length > 0 ? 'border-emerald-200 bg-emerald-50/30' : 'border-slate-200 hover:border-violet-400 hover:bg-slate-50'}`}
+                                        ${materialReferenciaFiles.length > 0 || isDragOverReferencias ? 'border-emerald-200 bg-emerald-50/30' : 'border-slate-200 hover:border-violet-400 hover:bg-slate-50'}`}
                                     >
                                         <input ref={refInputRef} type="file" multiple className="hidden" onChange={(e) => e.target.files && e.target.files.length > 0 && handleRefFiles(Array.from(e.target.files))} accept=".pdf,.docx,.txt" />
 
