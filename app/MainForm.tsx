@@ -706,16 +706,16 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                             {/* GROUP ID OPTIONAL */}
                             <div className="space-y-4 pt-2 pb-4">
                                 <div className="space-y-2">
-                                    <label className="text-xs font-bold text-slate-500 uppercase tracking-widest pl-1">ID de Grupo (Opcional)</label>
+                                    <label className="text-xs font-bold text-slate-500 uppercase tracking-widest pl-1">Grupo / Identificador de sesión</label>
                                     <input
                                         type="text"
                                         value={idGrupo}
                                         onChange={(e) => setIdGrupo(e.target.value)}
-                                        placeholder="Ej: 2BACH-A"
+                                        placeholder="Ej: 2BHCS-Tema1 o 2BHCS-Parte1"
                                         className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-indigo-500 focus:bg-white focus:shadow-md outline-none transition-all font-bold text-base text-slate-700 shadow-sm"
                                     />
                                     <p className="text-[10px] text-slate-400 pl-1 font-medium">
-                                        Etiqueta este examen para generar luego un informe conjunto.
+                                        Usa un nombre único si quieres generar un informe grupal específico para esta tanda de exámenes
                                     </p>
                                 </div>
                             </div>
