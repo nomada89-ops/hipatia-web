@@ -73,13 +73,20 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
                         // Extract Saldo or field_6860
                         const saldo = data.Saldo || data.field_6860 || data.saldo;
                         if (saldo !== undefined && saldo !== null) {
-                            // Ensure 2 decimals
-                            const formatted = Number(saldo).toFixed(2);
+                            // Ensure 2 decimals and handle strings
+                            let val = saldo;
+                            if (typeof val === 'string') {
+                                val = parseFloat(val.replace(',', '.').replace(/[^\d.-]/g, ''));
+                            }
+                            const formatted = Number(val).toFixed(2);
                             setBalance(`${formatted} €`);
                         }
+                    } else {
+                        setBalance("Error");
                     }
                 } catch (err) {
                     console.error("Error fetching balance", err);
+                    setBalance("Error");
                 }
             }
         };
@@ -277,12 +284,10 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
                             <LayoutGrid size={14} className="inline mr-2" /> Menú
                         </button>
                     )}
-                    {balance && (
-                        <div className="px-4 py-2 bg-emerald-50 text-emerald-700 rounded-lg text-xs font-bold border border-emerald-100 uppercase tracking-widest flex items-center gap-2">
-                            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                            Saldo: {balance}
-                        </div>
-                    )}
+                    <div className="px-4 py-2 bg-emerald-50 text-emerald-700 rounded-lg text-xs font-bold border border-emerald-100 uppercase tracking-widest flex items-center gap-2">
+                        <span className={`w-1.5 h-1.5 rounded-full bg-emerald-500 ${!balance ? 'animate-ping' : ''}`}></span>
+                        Saldo: {balance || "..."}
+                    </div>
                     <button onClick={onLogout} className="px-4 py-2 bg-indigo-50 text-indigo-700 rounded-lg text-xs font-bold hover:bg-indigo-100 transition-all flex items-center gap-2 border border-indigo-100 uppercase tracking-widest">
                         <Lock size={14} /> Salir
                     </button>
