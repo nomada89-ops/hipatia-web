@@ -1,9 +1,16 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
-import { ArrowLeft, Shield, Send, Loader2, FileText, Download, Edit, Save, CheckCircle, AlertCircle } from 'lucide-react';
+import React, { useState, useCallback } from 'react';
+import { ArrowLeft, Shield, Send, Loader2, FileText, Download, Edit, Save, CheckCircle, AlertCircle, UploadCloud, CreditCard, X } from 'lucide-react';
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
+import * as pdfjsLib from 'pdfjs-dist';
+import mammoth from 'mammoth';
+
+// Initialize PDF worker
+if (typeof window !== 'undefined' && !pdfjsLib.GlobalWorkerOptions.workerSrc) {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js`;
+}
 
 interface GuideCreatorFormProps {
     userToken: string;
@@ -27,9 +34,12 @@ export default function GuideCreatorForm({ userToken, onBack }: GuideCreatorForm
         instrucciones_adicionales: ''
     });
 
-    const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
+    const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error' | 'payment_required'>('idle');
     const [guideData, setGuideData] = useState<GuideCriterion[]>([]);
     const [loadingMsg, setLoadingMsg] = useState('Iniciando el Arquitecto de Guías...');
+    const [isDragOverExamen, setIsDragOverExamen] = useState(false);
+    const [isDragOverApuntes, setIsDragOverApuntes] = useState(false);
+    const [processingFile, setProcessingFile] = useState(false);
 
     const CCAA_LIST = [
         "Andalucía", "Aragón", "Asturias", "Baleares", "Canarias", "Cantabria", "Castilla y León", "Castilla-La Mancha", "Cataluña", "Valencia", "Extremadura", "Galicia", "Madrid", "Murcia", "Navarra", "País Vasco", "La Rioja", "Ceuta", "Melilla"
@@ -51,6 +61,14 @@ export default function GuideCreatorForm({ userToken, onBack }: GuideCreatorForm
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ ...formData, user_token: userToken })
             });
+
+            if (response.status === 402) {
+                const data = await response.json();
+                if (data.error_code === 'INSUFFICIENT_FUNDS' || true) { // Fallback standard 402 check
+                    setStatus('payment_required');
+                    return;
+                }
+            }
 
             if (response.ok) {
                 const data = await response.json();
@@ -77,6 +95,61 @@ export default function GuideCreatorForm({ userToken, onBack }: GuideCreatorForm
         const newData = [...guideData];
         newData[index] = { ...newData[index], [field]: value };
         setGuideData(newData);
+    };
+
+    const extractTextFromFile = async (file: File): Promise<string> => {
+        setProcessingFile(true);
+        try {
+            if (file.type === 'application/pdf') {
+                const arrayBuffer = await file.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                let fullText = '';
+                for (let i = 1; i <= pdf.numPages; i++) {
+                    const page = await pdf.getPage(i);
+                    const textContent = await page.getTextContent();
+                    const pageText = textContent.items.map((item: any) => item.str).join(' ');
+                    fullText += pageText + '\n';
+                }
+                return fullText;
+            } else if (file.type === 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') { // DOCX
+                const arrayBuffer = await file.arrayBuffer();
+                const result = await mammoth.extractRawText({ arrayBuffer });
+                return result.value;
+            } else if (file.type === 'text/plain') {
+                return await file.text();
+            } else {
+                throw new Error('Formato no soportado. Usa PDF, DOCX o TXT.');
+            }
+        } catch (err) {
+            console.error('Extraction error:', err);
+            alert('Error al leer el archivo. Asegúrate de que es un PDF, DOCX o TXT válido.');
+            return '';
+        } finally {
+            setProcessingFile(false);
+        }
+    };
+
+    const handleFileDrop = async (e: React.DragEvent, field: 'texto_examen' | 'texto_apuntes') => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (field === 'texto_examen') setIsDragOverExamen(false);
+        else setIsDragOverApuntes(false);
+
+        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+            const text = await extractTextFromFile(e.dataTransfer.files[0]);
+            if (text) {
+                handleInputChange(field, text);
+            }
+        }
+    };
+
+    const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>, field: 'texto_examen' | 'texto_apuntes') => {
+        if (e.target.files && e.target.files[0]) {
+            const text = await extractTextFromFile(e.target.files[0]);
+            if (text) {
+                handleInputChange(field, text);
+            }
+        }
     };
 
     const generatePDF = () => {
@@ -113,6 +186,34 @@ export default function GuideCreatorForm({ userToken, onBack }: GuideCreatorForm
 
         doc.save(`${formData.nombre_examen}_Guia.pdf`);
     };
+
+    if (status === 'payment_required') {
+        return (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in">
+                <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 text-center space-y-6 relative overflow-hidden">
+                    <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-red-500 to-pink-500"></div>
+                    <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto text-red-500 mb-2">
+                        <CreditCard size={40} />
+                    </div>
+                    <h2 className="text-2xl font-black text-slate-900 leading-tight">Créditos Insuficientes</h2>
+                    <p className="text-slate-500 font-medium text-lg leading-relaxed">
+                        Tu suscripción ha llegado al límite. Recarga para seguir usando la potencia de HIPATIA.
+                    </p>
+                    <a
+                        href="https://protocolohipatia.com/pricing" // Placeholder link
+                        target="_blank"
+                        rel="noreferrer"
+                        className="block w-full py-4 bg-gradient-to-r from-slate-900 to-slate-800 text-white font-bold rounded-xl shadow-xl hover:shadow-2xl transform hover:scale-[1.02] transition-all"
+                    >
+                        Recargar Saldo Ahora
+                    </a>
+                    <button onClick={onBack} className="text-slate-400 font-bold text-sm hover:text-slate-600">
+                        Volver al inicio
+                    </button>
+                </div>
+            </div>
+        );
+    }
 
     if (status === 'sending') {
         return (
@@ -204,20 +305,20 @@ export default function GuideCreatorForm({ userToken, onBack }: GuideCreatorForm
                     </button>
                     <h1 className="text-lg font-bold text-slate-900 flex items-center gap-2">
                         <span className="p-1.5 bg-violet-100 text-violet-700 rounded-md"><Shield size={16} /></span>
-                        Arquitecto de Guías
+                        Creación de Rúbricas
                     </h1>
                 </div>
             </div>
 
-            <main className="flex-1 overflow-y-auto p-4 md:p-8">
-                <div className="max-w-4xl mx-auto space-y-6">
+            <main className="flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar">
+                <div className="max-w-5xl mx-auto space-y-6">
                     <div className="bg-white rounded-2xl shadow-xl shadow-indigo-900/5 border border-slate-100 p-8">
                         <div className="mb-8">
                             <h2 className="text-2xl font-black text-slate-900 mb-2">Diseña tu Sistema de Evaluación</h2>
                             <p className="text-slate-500">Configura los parámetros y deja que la IA estructure los criterios según normativa.</p>
                         </div>
 
-                        <form onSubmit={handleSubmit} className="space-y-6">
+                        <form onSubmit={handleSubmit} className="space-y-8">
                             {/* Row 1 */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-2">
@@ -246,6 +347,7 @@ export default function GuideCreatorForm({ userToken, onBack }: GuideCreatorForm
                                         <option value="Matemáticas">Matemáticas</option>
                                         <option value="Biología">Biología</option>
                                         <option value="Inglés">Inglés</option>
+                                        <option value="Otras">Otras</option>
                                     </select>
                                 </div>
                             </div>
@@ -281,30 +383,78 @@ export default function GuideCreatorForm({ userToken, onBack }: GuideCreatorForm
                                 </div>
                             </div>
 
-                            {/* Text Areas */}
-                            <div className="space-y-2">
-                                <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Cuerpo del Examen (texto completo)</label>
-                                <textarea
-                                    required
-                                    value={formData.texto_examen}
-                                    onChange={(e) => handleInputChange('texto_examen', e.target.value)}
-                                    placeholder="Copia y pega aquí las preguntas del examen..."
-                                    rows={6}
-                                    className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl font-medium text-slate-600 focus:ring-2 focus:ring-indigo-500 focus:bg-white outline-none transition-all resize-none"
-                                />
-                                <p className="text-[10px] text-right text-slate-400">{formData.texto_examen.length} caracteres</p>
-                            </div>
+                            {/* Drag & Drop Areas */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                {/* Cuerpo del Examen */}
+                                <div className="space-y-3">
+                                    <div className="flex justify-between items-center">
+                                        <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Cuerpo del Examen</label>
+                                        <span className="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">PDF, DOCX, TXT</span>
+                                    </div>
+                                    <div
+                                        className={`relative group border-2 border-dashed rounded-2xl transition-all ${isDragOverExamen ? 'border-indigo-500 bg-indigo-50' : 'border-slate-200 bg-slate-50/50 hover:bg-white'}`}
+                                        onDragOver={(e) => { e.preventDefault(); setIsDragOverExamen(true); }}
+                                        onDragLeave={(e) => { e.preventDefault(); setIsDragOverExamen(false); }}
+                                        onDrop={(e) => handleFileDrop(e, 'texto_examen')}
+                                    >
+                                        <textarea
+                                            required
+                                            value={formData.texto_examen}
+                                            onChange={(e) => handleInputChange('texto_examen', e.target.value)}
+                                            placeholder="Arrastra el archivo del examen aquí o pega el texto manualmente..."
+                                            className="w-full h-48 p-4 bg-transparent border-none rounded-2xl focus:ring-0 outline-none resize-none text-sm text-slate-600 font-medium z-10 relative"
+                                        />
 
-                            <div className="space-y-2">
-                                <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Apuntes / Contenido Referencia</label>
-                                <textarea
-                                    required
-                                    value={formData.texto_apuntes}
-                                    onChange={(e) => handleInputChange('texto_apuntes', e.target.value)}
-                                    placeholder="Pega aquí el temario o los criterios base..."
-                                    rows={6}
-                                    className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl font-medium text-slate-600 focus:ring-2 focus:ring-indigo-500 focus:bg-white outline-none transition-all resize-none"
-                                />
+                                        {/* Drop Overlay Hint */}
+                                        {formData.texto_examen.length === 0 && (
+                                            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none opacity-40 group-hover:opacity-60 transition-opacity">
+                                                <UploadCloud size={32} className="mb-2 text-slate-400" />
+                                                <span className="text-xs font-bold text-slate-400">Arrastrar archivo o pegar texto</span>
+                                            </div>
+                                        )}
+
+                                        {/* File Input Trigger */}
+                                        <label className="absolute bottom-3 right-3 cursor-pointer p-2 bg-white rounded-lg shadow-sm border border-slate-200 hover:bg-indigo-50 transition-colors z-20 group-hover:opacity-100 opacity-0 group-focus-within:opacity-100">
+                                            <input type="file" className="hidden" accept=".pdf,.docx,.txt" onChange={(e) => handleFileSelect(e, 'texto_examen')} />
+                                            <FileText size={16} className="text-indigo-600" />
+                                        </label>
+                                    </div>
+                                    <p className="text-[10px] text-right text-slate-400">{formData.texto_examen.length} caracteres</p>
+                                </div>
+
+                                {/* Apuntes */}
+                                <div className="space-y-3">
+                                    <div className="flex justify-between items-center">
+                                        <label className="text-xs font-bold text-slate-500 uppercase tracking-widest">Apuntes / Referencia</label>
+                                        <span className="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">PDF, DOCX, TXT</span>
+                                    </div>
+                                    <div
+                                        className={`relative group border-2 border-dashed rounded-2xl transition-all ${isDragOverApuntes ? 'border-violet-500 bg-violet-50' : 'border-slate-200 bg-slate-50/50 hover:bg-white'}`}
+                                        onDragOver={(e) => { e.preventDefault(); setIsDragOverApuntes(true); }}
+                                        onDragLeave={(e) => { e.preventDefault(); setIsDragOverApuntes(false); }}
+                                        onDrop={(e) => handleFileDrop(e, 'texto_apuntes')}
+                                    >
+                                        <textarea
+                                            required
+                                            value={formData.texto_apuntes}
+                                            onChange={(e) => handleInputChange('texto_apuntes', e.target.value)}
+                                            placeholder="Arrastra apuntes, temario o criterios aquí..."
+                                            className="w-full h-48 p-4 bg-transparent border-none rounded-2xl focus:ring-0 outline-none resize-none text-sm text-slate-600 font-medium z-10 relative"
+                                        />
+
+                                        {formData.texto_apuntes.length === 0 && (
+                                            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none opacity-40 group-hover:opacity-60 transition-opacity">
+                                                <UploadCloud size={32} className="mb-2 text-slate-400" />
+                                                <span className="text-xs font-bold text-slate-400">Arrastrar archivo o pegar texto</span>
+                                            </div>
+                                        )}
+
+                                        <label className="absolute bottom-3 right-3 cursor-pointer p-2 bg-white rounded-lg shadow-sm border border-slate-200 hover:bg-violet-50 transition-colors z-20 group-hover:opacity-100 opacity-0 group-focus-within:opacity-100">
+                                            <input type="file" className="hidden" accept=".pdf,.docx,.txt" onChange={(e) => handleFileSelect(e, 'texto_apuntes')} />
+                                            <FileText size={16} className="text-violet-600" />
+                                        </label>
+                                    </div>
+                                </div>
                             </div>
 
                             <div className="space-y-2">
@@ -321,10 +471,11 @@ export default function GuideCreatorForm({ userToken, onBack }: GuideCreatorForm
                             <div className="pt-6">
                                 <button
                                     type="submit"
-                                    className="w-full py-4 bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-black text-lg rounded-xl shadow-lg shadow-indigo-200 hover:shadow-xl hover:scale-[1.01] transition-all active:scale-[0.99] flex items-center justify-center gap-3"
+                                    disabled={processingFile}
+                                    className="w-full py-4 bg-gradient-to-r from-indigo-600 to-violet-600 text-white font-black text-lg rounded-xl shadow-lg shadow-indigo-200 hover:shadow-xl hover:scale-[1.01] transition-all active:scale-[0.99] flex items-center justify-center gap-3 disabled:opacity-70 disabled:grayscale"
                                 >
-                                    <Shield size={20} />
-                                    Generar Guía Maestra
+                                    {processingFile ? <Loader2 className="animate-spin" /> : <Shield size={20} />}
+                                    {processingFile ? 'Procesando archivo...' : 'Generar Guía Maestra'}
                                 </button>
                             </div>
                         </form>
