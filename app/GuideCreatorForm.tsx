@@ -1,4 +1,5 @@
 'use client';
+// Force redeploy: Fix PDF export syntax error
 
 import React, { useState } from 'react';
 import { ArrowLeft, Shield, Loader2, FileText, Download, CheckCircle, UploadCloud, CreditCard } from 'lucide-react';
