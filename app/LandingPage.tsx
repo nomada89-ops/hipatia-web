@@ -10,6 +10,7 @@ interface LandingPageProps {
     onSelectAuditor: () => void;
     onSelectForgeUniversal: () => void;
     onSelectForgeSpecialist: () => void;
+    onSelectGuideCreator: () => void;
     onShowSample: () => void;
     userToken?: string;
 }
@@ -46,7 +47,7 @@ const RevealSection: React.FC<{ children: React.ReactNode, className?: string }>
     );
 };
 
-const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn, onSelectAuditor, onSelectForgeUniversal, onSelectForgeSpecialist, onShowSample, userToken }) => {
+const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn, onSelectAuditor, onSelectForgeUniversal, onSelectForgeSpecialist, onSelectGuideCreator, onShowSample, userToken }) => {
     const [tokenInput, setTokenInput] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
@@ -311,7 +312,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
                                 <p className="text-xl text-slate-500 font-medium max-w-2xl mx-auto">Selecciona la herramienta que deseas utilizar hoy.</p>
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-7xl mx-auto">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl mx-auto">
                                 <button onClick={onSelectAuditor} className="group glass-indigo rounded-[32px] p-10 text-left transition-all hover:scale-[1.02] hover:shadow-2xl hover:shadow-indigo-200/50 flex flex-col gap-10">
                                     <div className="flex justify-between items-start">
                                         <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-indigo-700 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-indigo-200">
@@ -320,8 +321,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
                                         <div className="bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">Auditoría Pro</div>
                                     </div>
                                     <div>
-                                        <h2 className="text-3xl font-bold text-slate-900 mb-3 tracking-tight">MÓDULO CORRECTOR</h2>
-                                        <p className="text-slate-500 font-medium leading-relaxed">Auditoría técnica de evidencias manuscritas y evaluación automática por rúbricas de alta precisión.</p>
+                                        <h2 className="text-2xl font-bold text-slate-900 mb-3 tracking-tight">MÓDULO CORRECTOR</h2>
+                                        <p className="text-slate-500 font-medium leading-relaxed">Auditoría técnica de evidencias manuscritas y evaluación automática.</p>
                                     </div>
                                     <div className="flex items-center gap-2 text-indigo-600 font-bold text-sm uppercase tracking-widest pt-4 group-hover:gap-4 transition-all">
                                         Acceder al corrector <ArrowRight size={18} />
@@ -337,8 +338,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
                                         <div className="bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">NUEVO</div>
                                     </div>
                                     <div>
-                                        <h2 className="text-3xl font-bold text-slate-900 mb-3 tracking-tight">INFORMES DE GRUPO</h2>
-                                        <p className="text-slate-500 font-medium leading-relaxed">Genera estadísticas comparativas y detecta patrones de aprendizaje por clase.</p>
+                                        <h2 className="text-2xl font-bold text-slate-900 mb-3 tracking-tight">INFORMES DE GRUPO</h2>
+                                        <p className="text-slate-500 font-medium leading-relaxed">Genera estadísticas comparativas y detecta patrones de aprendizaje.</p>
                                     </div>
                                     <div className="flex items-center gap-2 text-emerald-600 font-bold text-sm uppercase tracking-widest pt-4 group-hover:gap-4 transition-all">
                                         Crear informe <ArrowRight size={18} />
@@ -353,11 +354,30 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
                                         <div className="bg-slate-100 text-slate-600 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">Generación IA</div>
                                     </div>
                                     <div>
-                                        <h2 className="text-3xl font-bold text-slate-900 mb-3 tracking-tight">MÓDULO GENERADOR</h2>
-                                        <p className="text-slate-500 font-medium leading-relaxed">Creación masiva de materiales complementarios, rúbricas y exámenes oficiales en segundos.</p>
+                                        <h2 className="text-2xl font-bold text-slate-900 mb-3 tracking-tight">MÓDULO GENERADOR</h2>
+                                        <p className="text-slate-500 font-medium leading-relaxed">Creación masiva de materiales complementarios y exámenes oficiales.</p>
                                     </div>
                                     <div className="flex items-center gap-2 text-slate-900 font-bold text-sm uppercase tracking-widest pt-4 group-hover:gap-4 transition-all">
                                         Elegir modo <ArrowRight size={18} />
+                                    </div>
+                                </button>
+
+                                <button onClick={onSelectGuideCreator} className="group glass-violet rounded-[32px] p-10 text-left transition-all hover:scale-[1.02] hover:shadow-2xl hover:shadow-violet-200/50 flex flex-col gap-10 relative overflow-hidden bg-white/60 border border-violet-100">
+                                    <div className="absolute top-0 right-0 w-32 h-32 bg-violet-50 rounded-bl-[100px] opacity-50 z-0 group-hover:scale-110 transition-transform origin-top-right"></div>
+                                    <div className="relative z-10 flex flex-col gap-10">
+                                        <div className="flex justify-between items-start">
+                                            <div className="w-16 h-16 bg-gradient-to-br from-violet-500 to-violet-700 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-violet-200">
+                                                <Shield size={32} />
+                                            </div>
+                                            <div className="bg-violet-50 text-violet-700 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">BETA</div>
+                                        </div>
+                                        <div>
+                                            <h2 className="text-2xl font-bold text-slate-900 mb-3 tracking-tight">ARQUITECTO DE GUÍAS</h2>
+                                            <p className="text-slate-500 font-medium leading-relaxed">Diseña rúbricas y guías de evaluación basadas en normativa oficial.</p>
+                                        </div>
+                                        <div className="flex items-center gap-2 text-violet-600 font-bold text-sm uppercase tracking-widest pt-4 group-hover:gap-4 transition-all">
+                                            Diseñar guía <ArrowRight size={18} />
+                                        </div>
                                     </div>
                                 </button>
                             </div>

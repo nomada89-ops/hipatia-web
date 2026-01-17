@@ -5,12 +5,13 @@ import MainForm from './MainForm';
 import LandingPage from './LandingPage';
 import ForgeForm from './ForgeForm';
 import ForgeUniversalForm from './ForgeUniversalForm';
+import GuideCreatorForm from './GuideCreatorForm';
 import { ExamProvider } from './ExamContext';
 import { OnboardingModal } from './components/OnboardingModal';
 import { HelpFab } from './components/HelpFab';
 
 export default function ExamCorrectionPage() {
-    const [activeModule, setActiveModule] = useState<'landing' | 'auditor' | 'forge-universal' | 'forge-specialist'>('landing');
+    const [activeModule, setActiveModule] = useState<'landing' | 'auditor' | 'forge-universal' | 'forge-specialist' | 'guide-creator'>('landing');
     const [userToken, setUserToken] = useState<string>('');
 
     // RESTAURACIÓN DE SESIÓN GLOBAL
@@ -66,6 +67,7 @@ export default function ExamCorrectionPage() {
                         onSelectAuditor={() => setActiveModule('auditor')}
                         onSelectForgeUniversal={() => setActiveModule('forge-universal')}
                         onSelectForgeSpecialist={() => setActiveModule('forge-specialist')}
+                        onSelectGuideCreator={() => setActiveModule('guide-creator')}
                         onShowSample={handleShowSample}
                         userToken={userToken}
                     />
@@ -77,6 +79,10 @@ export default function ExamCorrectionPage() {
             ) : activeModule === 'forge-universal' ? (
                 <div className="h-screen bg-gray-50 overflow-hidden flex flex-col">
                     <ForgeUniversalForm userToken={userToken} onBack={() => setActiveModule('landing')} />
+                </div>
+            ) : activeModule === 'guide-creator' ? (
+                <div className="h-screen bg-gray-50 overflow-hidden flex flex-col">
+                    <GuideCreatorForm userToken={userToken} onBack={() => setActiveModule('landing')} />
                 </div>
             ) : (
                 <div className="h-screen bg-gray-50 overflow-hidden flex flex-col">
