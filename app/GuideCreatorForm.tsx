@@ -185,10 +185,26 @@ export default function GuideCreatorForm({ userToken, onBack }: GuideCreatorForm
     const handlePrint = useReactToPrint({
         content: () => componentRef.current,
         documentTitle: `${formData.nombre_examen}_Guia`,
-        bodyClass: 'print-body'
+        bodyClass: 'print-body',
+        onBeforeGetContent: () => {
+            console.log("Preparing to print...");
+        },
+        onAfterPrint: () => {
+            console.log("Print dialog closed"); // Doesn't necessarily mean success, but means interaction happened
+        },
+        onPrintError: (errorLocation, error) => {
+            console.error("Print Error:", errorLocation, error);
+            alert("Error al intentar imprimir/descargar: " + String(error));
+        }
     });
 
     const generatePDF = () => {
+        console.log("Generate PDF clicked");
+        if (!componentRef.current) {
+            console.error("Component ref is null");
+            alert("Error: No se encuentra el contenido para imprimir.");
+            return;
+        }
         handlePrint();
     };
 
