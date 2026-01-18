@@ -181,7 +181,12 @@ export default function GuideCreatorForm({ userToken, onBack }: GuideCreatorForm
     };
 
     const generatePDF = () => {
+        const originalTitle = document.title;
+        document.title = "HIPATIA _ Rúbrica de examen";
         window.print();
+        setTimeout(() => {
+            document.title = originalTitle;
+        }, 100);
     };
 
     if (status === 'payment_required') {
