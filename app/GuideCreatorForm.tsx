@@ -1,8 +1,8 @@
 'use client';
 // Force redeploy: Fix PDF export syntax error
 
-import React, { useState } from 'react';
-import { ArrowLeft, Shield, Loader2, FileText, Download, CheckCircle, UploadCloud, CreditCard } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ArrowLeft, Shield, Loader2, FileText, Download, CheckCircle, UploadCloud, CreditCard, AlertTriangle, Save } from 'lucide-react';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as pdfjsLib from 'pdfjs-dist';
@@ -32,7 +32,8 @@ export default function GuideCreatorForm({ userToken, onBack }: GuideCreatorForm
         ccaa: '',
         texto_examen: '',
         texto_apuntes: '',
-        instrucciones_adicionales: ''
+        instrucciones_adicionales: '',
+        criterios_profesor: ''
     });
 
     const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error' | 'payment_required'>('idle');
@@ -40,7 +41,24 @@ export default function GuideCreatorForm({ userToken, onBack }: GuideCreatorForm
     const [loadingMsg, setLoadingMsg] = useState('Iniciando el Arquitecto de Guías...');
     const [isDragOverExamen, setIsDragOverExamen] = useState(false);
     const [isDragOverApuntes, setIsDragOverApuntes] = useState(false);
+    const [isDragOverCriterios, setIsDragOverCriterios] = useState(false);
     const [processingFile, setProcessingFile] = useState(false);
+
+    // Load criteria from localStorage on mount
+    useEffect(() => {
+        const savedCriteria = localStorage.getItem('saved_criterios_profesor');
+        if (savedCriteria) {
+            setFormData(prev => ({ ...prev, criterios_profesor: savedCriteria }));
+        }
+    }, []);
+
+    // Save criteria to localStorage when it changes
+    useEffect(() => {
+        const timeoutId = setTimeout(() => {
+            localStorage.setItem('saved_criterios_profesor', formData.criterios_profesor);
+        }, 1000); // Debounce save
+        return () => clearTimeout(timeoutId);
+    }, [formData.criterios_profesor]);
 
     const CCAA_LIST = [
         "Andalucía", "Aragón", "Asturias", "Baleares", "Canarias", "Cantabria", "Castilla y León", "Castilla-La Mancha", "Cataluña", "Valencia", "Extremadura", "Galicia", "Madrid", "Murcia", "Navarra", "País Vasco", "La Rioja", "Ceuta", "Melilla"
@@ -130,11 +148,12 @@ export default function GuideCreatorForm({ userToken, onBack }: GuideCreatorForm
         }
     };
 
-    const handleFileDrop = async (e: React.DragEvent, field: 'texto_examen' | 'texto_apuntes') => {
+    const handleFileDrop = async (e: React.DragEvent, field: 'texto_examen' | 'texto_apuntes' | 'criterios_profesor') => {
         e.preventDefault();
         e.stopPropagation();
         if (field === 'texto_examen') setIsDragOverExamen(false);
-        else setIsDragOverApuntes(false);
+        else if (field === 'texto_apuntes') setIsDragOverApuntes(false);
+        else if (field === 'criterios_profesor') setIsDragOverCriterios(false);
 
         if (e.dataTransfer.files && e.dataTransfer.files[0]) {
             const text = await extractTextFromFile(e.dataTransfer.files[0]);
@@ -144,7 +163,7 @@ export default function GuideCreatorForm({ userToken, onBack }: GuideCreatorForm
         }
     };
 
-    const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>, field: 'texto_examen' | 'texto_apuntes') => {
+    const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>, field: 'texto_examen' | 'texto_apuntes' | 'criterios_profesor') => {
         if (e.target.files && e.target.files[0]) {
             const text = await extractTextFromFile(e.target.files[0]);
             if (text) {
@@ -460,6 +479,53 @@ export default function GuideCreatorForm({ userToken, onBack }: GuideCreatorForm
                                         </label>
                                     </div>
                                 </div>
+                            </div>
+
+                            {/* Criterios Profesor */}
+                            <div className="space-y-3">
+                                <div className="flex justify-between items-center">
+                                    <label className="text-xs font-bold text-slate-500 uppercase tracking-widest flex items-center gap-2">
+                                        Criterios de Evaluación / Programación
+                                        {formData.criterios_profesor && (
+                                            <span className="flex items-center gap-1 text-[10px] text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full capitalize">
+                                                <Save size={10} /> Guardado
+                                            </span>
+                                        )}
+                                    </label>
+                                    <span className="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full">Opcional • Persistente</span>
+                                </div>
+                                <div
+                                    className={`relative group border-2 border-dashed rounded-2xl transition-all ${isDragOverCriterios ? 'border-amber-500 bg-amber-50' : 'border-slate-200 bg-slate-50/50 hover:bg-white'}`}
+                                    onDragOver={(e) => { e.preventDefault(); setIsDragOverCriterios(true); }}
+                                    onDragLeave={(e) => { e.preventDefault(); setIsDragOverCriterios(false); }}
+                                    onDrop={(e) => handleFileDrop(e, 'criterios_profesor')}
+                                >
+                                    <textarea
+                                        value={formData.criterios_profesor}
+                                        onChange={(e) => handleInputChange('criterios_profesor', e.target.value)}
+                                        placeholder="Sube tus criterios personales o programación docente (PDF) para que la IA los priorice..."
+                                        className="w-full h-32 p-4 bg-transparent border-none rounded-2xl focus:ring-0 outline-none resize-none text-sm text-slate-600 font-medium z-10 relative"
+                                    />
+
+                                    {formData.criterios_profesor.length === 0 && (
+                                        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none opacity-40 group-hover:opacity-60 transition-opacity">
+                                            <UploadCloud size={32} className="mb-2 text-slate-400" />
+                                            <span className="text-xs font-bold text-slate-400">Subir Criterios (PDF/DOCX)</span>
+                                        </div>
+                                    )}
+
+                                    <label className="absolute bottom-3 right-3 cursor-pointer p-2 bg-white rounded-lg shadow-sm border border-slate-200 hover:bg-amber-50 transition-colors z-20 group-hover:opacity-100 opacity-0 group-focus-within:opacity-100">
+                                        <input type="file" className="hidden" accept=".pdf,.docx,.txt" onChange={(e) => handleFileSelect(e, 'criterios_profesor')} />
+                                        <FileText size={16} className="text-amber-600" />
+                                    </label>
+                                </div>
+
+                                {formData.criterios_profesor.length > 150000 && (
+                                    <div className="flex items-center gap-2 text-amber-600 bg-amber-50 p-3 rounded-lg text-xs font-semibold">
+                                        <AlertTriangle size={16} />
+                                        Documento muy extenso ({formData.criterios_profesor.length} caracteres). El procesamiento podría tardar unos segundos extra.
+                                    </div>
+                                )}
                             </div>
 
                             <div className="space-y-2">
