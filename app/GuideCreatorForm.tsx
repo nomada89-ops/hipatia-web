@@ -77,7 +77,7 @@ export default function GuideCreatorForm({ userToken, onBack }: GuideCreatorForm
         setLoadingMsg(`HIPATIA está diseñando la guía basada en la normativa oficial de ${formData.ccaa || 'tu comunidad'}...`);
 
         try {
-            const response = await fetch('https://n8n.protocolohipatia.com/webhook-test/arquitecto-guias', {
+            const response = await fetch('https://n8n.protocolohipatia.com/webhook/arquitecto-guias', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ ...formData, user_token: userToken })
