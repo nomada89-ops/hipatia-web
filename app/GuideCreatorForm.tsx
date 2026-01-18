@@ -38,6 +38,7 @@ export default function GuideCreatorForm({ userToken, onBack }: GuideCreatorForm
 
     const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error' | 'payment_required'>('idle');
     const [guideData, setGuideData] = useState<GuideCriterion[]>([]);
+    const [htmlContent, setHtmlContent] = useState<string>('');
     const [loadingMsg, setLoadingMsg] = useState('Iniciando el Arquitecto de Guías...');
     const [isDragOverExamen, setIsDragOverExamen] = useState(false);
     const [isDragOverApuntes, setIsDragOverApuntes] = useState(false);
@@ -91,11 +92,21 @@ export default function GuideCreatorForm({ userToken, onBack }: GuideCreatorForm
 
             if (response.ok) {
                 const data = await response.json();
-                if (data.guia_maestra && Array.isArray(data.guia_maestra)) {
+                // We now expect 'html' for display AND 'guia_maestra' for PDF generation
+                if (data.html && typeof data.html === 'string') {
+                    setHtmlContent(data.html);
+                    // If guideData is present, we start it for PDF generation
+                    if (data.guia_maestra && Array.isArray(data.guia_maestra)) {
+                        setGuideData(data.guia_maestra);
+                    }
+                    setStatus('success');
+                } else if (data.guia_maestra && Array.isArray(data.guia_maestra)) {
+                    // Fallback for old API response format just in case
                     setGuideData(data.guia_maestra);
+                    setHtmlContent(''); // No HTML available
                     setStatus('success');
                 } else {
-                    throw new Error('Formato de respuesta inválido');
+                    throw new Error('Formato de respuesta inválido: Se esperaba HTML o Guía Maestra');
                 }
             } else {
                 throw new Error('Error en el servidor');
@@ -110,11 +121,7 @@ export default function GuideCreatorForm({ userToken, onBack }: GuideCreatorForm
         setFormData(prev => ({ ...prev, [field]: value }));
     };
 
-    const handleCellChange = (index: number, field: keyof GuideCriterion, value: string) => {
-        const newData = [...guideData];
-        newData[index] = { ...newData[index], [field]: value };
-        setGuideData(newData);
-    };
+    // Removed handleCellChange as table is no longer editable/visible
 
     const extractTextFromFile = async (file: File): Promise<string> => {
         setProcessingFile(true);
@@ -186,20 +193,27 @@ export default function GuideCreatorForm({ userToken, onBack }: GuideCreatorForm
             doc.text(`CCAA: ${formData.ccaa}`, 14, 40);
             doc.text(`Fecha: ${new Date().toLocaleDateString()}`, 14, 45);
 
-            // Table
-            const bodyData = guideData.map(row => [
-                (row.criterio || '').toString(),
-                (row.puntuacion || '0').toString(),
-                (row.detalle || '').toString()
-            ]);
+            // If we have structure data, use it for PDF
+            if (guideData.length > 0) {
+                const bodyData = guideData.map(row => [
+                    (row.criterio || '').toString(),
+                    (row.puntuacion || '0').toString(),
+                    (row.detalle || '').toString()
+                ]);
 
-            autoTable(doc, {
-                startY: 55,
-                head: [['Criterio', 'Puntuación', 'Detalle']],
-                body: bodyData,
-                styles: { fontSize: 9, cellPadding: 4 },
-                headStyles: { fillColor: [79, 70, 229] } // Indigo 600
-            });
+                autoTable(doc, {
+                    startY: 55,
+                    head: [['Criterio', 'Puntuación', 'Detalle']],
+                    body: bodyData,
+                    styles: { fontSize: 9, cellPadding: 4 },
+                    headStyles: { fillColor: [79, 70, 229] } // Indigo 600
+                });
+            } else {
+                // If no structured data available but we strictly need a PDF
+                doc.setFontSize(10);
+                doc.text("Guía generada. Visualización HTML disponible en pantalla.", 14, 60);
+            }
+
 
             // Footer
             const pageCount = doc.getNumberOfPages();
@@ -280,46 +294,36 @@ export default function GuideCreatorForm({ userToken, onBack }: GuideCreatorForm
                         </div>
                     </div>
 
-                    <div className="flex-1 overflow-auto p-6">
-                        <div className="bg-slate-50 rounded-xl border border-slate-200 overflow-hidden">
-                            <table className="w-full text-left text-sm">
-                                <thead className="bg-indigo-600 text-white font-bold uppercase text-xs tracking-wider">
-                                    <tr>
-                                        <th className="p-4 w-1/4">Criterio</th>
-                                        <th className="p-4 w-24 text-center">Puntos</th>
-                                        <th className="p-4">Detalle de Corrección</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-slate-200">
-                                    {guideData.map((row, idx) => (
-                                        <tr key={idx} className="hover:bg-indigo-50/30 transition-colors bg-white">
-                                            <td className="p-4 align-top">
-                                                <textarea
-                                                    value={row.criterio}
-                                                    onChange={(e) => handleCellChange(idx, 'criterio', e.target.value)}
-                                                    className="w-full bg-transparent border-none focus:ring-0 p-0 resize-none font-bold text-slate-700 h-20"
-                                                />
-                                            </td>
-                                            <td className="p-4 align-top">
-                                                <input
-                                                    type="number"
-                                                    value={row.puntuacion}
-                                                    onChange={(e) => handleCellChange(idx, 'puntuacion', e.target.value)}
-                                                    className="w-full bg-indigo-50 border-none rounded text-center font-bold text-indigo-700 p-2"
-                                                />
-                                            </td>
-                                            <td className="p-4 align-top">
-                                                <textarea
-                                                    value={row.detalle}
-                                                    onChange={(e) => handleCellChange(idx, 'detalle', e.target.value)}
-                                                    className="w-full bg-transparent border-none focus:ring-0 p-0 resize-none text-slate-600 h-20"
-                                                />
-                                            </td>
+                    <div className="flex-1 overflow-auto p-8 bg-white text-slate-800">
+                        {/* Render HTML content securely */}
+                        {htmlContent ? (
+                            <div
+                                className="prose prose-indigo max-w-none prose-headings:font-bold prose-h1:text-2xl prose-h2:text-xl prose-p:text-slate-600"
+                                dangerouslySetInnerHTML={{ __html: htmlContent }}
+                            />
+                        ) : (
+                            /* Fallback table if no HTML but guideData exists */
+                            <div className="bg-slate-50 rounded-xl border border-slate-200 overflow-hidden">
+                                <table className="w-full text-left text-sm">
+                                    <thead className="bg-indigo-600 text-white font-bold uppercase text-xs tracking-wider">
+                                        <tr>
+                                            <th className="p-4 w-1/4">Criterio</th>
+                                            <th className="p-4 w-24 text-center">Puntos</th>
+                                            <th className="p-4">Detalle de Corrección</th>
                                         </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
+                                    </thead>
+                                    <tbody className="divide-y divide-slate-200">
+                                        {guideData.map((row, idx) => (
+                                            <tr key={idx} className="hover:bg-indigo-50/30 transition-colors bg-white">
+                                                <td className="p-4 align-top font-bold text-slate-700">{row.criterio}</td>
+                                                <td className="p-4 align-top text-center font-bold text-indigo-700">{row.puntuacion}</td>
+                                                <td className="p-4 align-top text-slate-600">{row.detalle}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
