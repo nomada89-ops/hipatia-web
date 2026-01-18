@@ -180,32 +180,8 @@ export default function GuideCreatorForm({ userToken, onBack }: GuideCreatorForm
         }
     };
 
-    const componentRef = React.useRef(null);
-
-    const handlePrint = useReactToPrint({
-        content: () => componentRef.current,
-        documentTitle: `${formData.nombre_examen}_Guia`,
-        bodyClass: 'print-body',
-        onBeforeGetContent: () => {
-            console.log("Preparing to print...");
-        },
-        onAfterPrint: () => {
-            console.log("Print dialog closed"); // Doesn't necessarily mean success, but means interaction happened
-        },
-        onPrintError: (errorLocation, error) => {
-            console.error("Print Error:", errorLocation, error);
-            alert("Error al intentar imprimir/descargar: " + String(error));
-        }
-    });
-
     const generatePDF = () => {
-        console.log("Generate PDF clicked");
-        if (!componentRef.current) {
-            console.error("Component ref is null");
-            alert("Error: No se encuentra el contenido para imprimir.");
-            return;
-        }
-        handlePrint();
+        window.print();
     };
 
     if (status === 'payment_required') {
@@ -249,8 +225,30 @@ export default function GuideCreatorForm({ userToken, onBack }: GuideCreatorForm
     if (status === 'success') {
         return (
             <div className="h-full flex flex-col bg-slate-50 p-6 overflow-hidden">
+                <style jsx global>{`
+                    @media print {
+                        body * {
+                            visibility: hidden;
+                        }
+                        #guide-report, #guide-report * {
+                            visibility: visible;
+                        }
+                        #guide-report {
+                            position: absolute;
+                            left: 0;
+                            top: 0;
+                            width: 100%;
+                            padding: 2rem !important;
+                            background: white;
+                        }
+                        .no-print {
+                            display: none !important;
+                        }
+                    }
+                `}</style>
+
                 <div className="max-w-6xl mx-auto w-full flex-1 flex flex-col bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-200">
-                    <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-indigo-50/50">
+                    <div className="p-6 border-b border-slate-100 flex justify-between items-center bg-indigo-50/50 no-print">
                         <div className="flex items-center gap-3">
                             <div className="p-2 bg-emerald-100 text-emerald-600 rounded-lg">
                                 <CheckCircle size={24} />
@@ -271,8 +269,8 @@ export default function GuideCreatorForm({ userToken, onBack }: GuideCreatorForm
                     </div>
 
                     <div className="flex-1 overflow-auto p-8 bg-white text-slate-800 printable-content">
-                        <div ref={componentRef} className="p-8 min-h-screen">
-                            {/* Hidden header that only shows on print/pdf usually, but we include it here for WYSIWYG */}
+                        <div id="guide-report" className="p-8 min-h-screen">
+                            {/* Header that only shows on print/pdf usually, but we include it here for WYSIWYG */}
                             <div className="mb-6 border-b border-slate-200 pb-4">
                                 <h1 className="text-2xl font-black text-indigo-900">HIPATIA | Informe de Evaluación</h1>
                                 <div className="mt-2 text-sm text-slate-600 grid grid-cols-2 gap-2">
