@@ -187,10 +187,16 @@ export default function GuideCreatorForm({ userToken, onBack }: GuideCreatorForm
             doc.text(`Fecha: ${new Date().toLocaleDateString()}`, 14, 45);
 
             // Table
+            const bodyData = guideData.map(row => [
+                (row.criterio || '').toString(),
+                (row.puntuacion || '0').toString(),
+                (row.detalle || '').toString()
+            ]);
+
             autoTable(doc, {
                 startY: 55,
                 head: [['Criterio', 'Puntuación', 'Detalle']],
-                body: guideData.map(row => [row.criterio, row.puntuacion.toString(), row.detalle]),
+                body: bodyData,
                 styles: { fontSize: 9, cellPadding: 4 },
                 headStyles: { fillColor: [79, 70, 229] } // Indigo 600
             });
@@ -207,7 +213,8 @@ export default function GuideCreatorForm({ userToken, onBack }: GuideCreatorForm
             doc.save(`${formData.nombre_examen}_Guia.pdf`);
         } catch (error) {
             console.error("Error generating PDF:", error);
-            alert("Hubo un error al generar el PDF. Por favor, intenta de nuevo.");
+            const msg = error instanceof Error ? error.message : String(error);
+            alert(`Hubo un error al generar el PDF: ${msg}. Por favor, intentalo de nuevo o contacta soporte.`);
         }
     };
 
