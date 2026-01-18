@@ -5,6 +5,7 @@ import React, { useState, useEffect } from 'react';
 import { ArrowLeft, Shield, Loader2, FileText, Download, CheckCircle, UploadCloud, CreditCard, AlertTriangle, Save } from 'lucide-react';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
+import { useReactToPrint } from 'react-to-print';
 import * as pdfjsLib from 'pdfjs-dist';
 import mammoth from 'mammoth';
 
@@ -179,57 +180,16 @@ export default function GuideCreatorForm({ userToken, onBack }: GuideCreatorForm
         }
     };
 
+    const componentRef = React.useRef(null);
+
+    const handlePrint = useReactToPrint({
+        content: () => componentRef.current,
+        documentTitle: `${formData.nombre_examen}_Guia`,
+        bodyClass: 'print-body'
+    });
+
     const generatePDF = () => {
-        try {
-            const doc = new jsPDF();
-
-            // Header
-            doc.setFontSize(18);
-            doc.text("HIPATIA | Informe de Evaluación", 14, 20);
-
-            doc.setFontSize(10);
-            doc.text(`Examen: ${formData.nombre_examen}`, 14, 30);
-            doc.text(`Materia: ${formData.materia} - Nivel: ${formData.nivel}`, 14, 35);
-            doc.text(`CCAA: ${formData.ccaa}`, 14, 40);
-            doc.text(`Fecha: ${new Date().toLocaleDateString()}`, 14, 45);
-
-            // If we have structure data, use it for PDF
-            if (guideData.length > 0) {
-                const bodyData = guideData.map(row => [
-                    (row.criterio || '').toString(),
-                    (row.puntuacion || '0').toString(),
-                    (row.detalle || '').toString()
-                ]);
-
-                autoTable(doc, {
-                    startY: 55,
-                    head: [['Criterio', 'Puntuación', 'Detalle']],
-                    body: bodyData,
-                    styles: { fontSize: 9, cellPadding: 4 },
-                    headStyles: { fillColor: [79, 70, 229] } // Indigo 600
-                });
-            } else {
-                // If no structured data available but we strictly need a PDF
-                doc.setFontSize(10);
-                doc.text("Guía generada. Visualización HTML disponible en pantalla.", 14, 60);
-            }
-
-
-            // Footer
-            const pageCount = doc.getNumberOfPages();
-            for (let i = 1; i <= pageCount; i++) {
-                doc.setPage(i);
-                doc.setFontSize(8);
-                doc.text('Generado por HIPATIA - Basado en normativa oficial.', 14, 285);
-                doc.text(`Página ${i} de ${pageCount}`, 190, 285, { align: 'right' });
-            }
-
-            doc.save(`${formData.nombre_examen}_Guia.pdf`);
-        } catch (error) {
-            console.error("Error generating PDF:", error);
-            const msg = error instanceof Error ? error.message : String(error);
-            alert(`Hubo un error al generar el PDF: ${msg}. Por favor, intentalo de nuevo o contacta soporte.`);
-        }
+        handlePrint();
     };
 
     if (status === 'payment_required') {
@@ -281,7 +241,7 @@ export default function GuideCreatorForm({ userToken, onBack }: GuideCreatorForm
                             </div>
                             <div>
                                 <h2 className="text-lg font-bold text-slate-900">Guía Generada con Éxito</h2>
-                                <p className="text-xs text-slate-500">Guardada en tu biblioteca personal de Baserow</p>
+                                <p className="text-xs text-slate-500">Editables para PDF. Los cambios se reflejarán al descargar.</p>
                             </div>
                         </div>
                         <div className="flex gap-3">
@@ -294,36 +254,55 @@ export default function GuideCreatorForm({ userToken, onBack }: GuideCreatorForm
                         </div>
                     </div>
 
-                    <div className="flex-1 overflow-auto p-8 bg-white text-slate-800">
-                        {/* Render HTML content securely */}
-                        {htmlContent ? (
-                            <div
-                                className="prose prose-indigo max-w-none prose-headings:font-bold prose-h1:text-2xl prose-h2:text-xl prose-p:text-slate-600"
-                                dangerouslySetInnerHTML={{ __html: htmlContent }}
-                            />
-                        ) : (
-                            /* Fallback table if no HTML but guideData exists */
-                            <div className="bg-slate-50 rounded-xl border border-slate-200 overflow-hidden">
-                                <table className="w-full text-left text-sm">
-                                    <thead className="bg-indigo-600 text-white font-bold uppercase text-xs tracking-wider">
-                                        <tr>
-                                            <th className="p-4 w-1/4">Criterio</th>
-                                            <th className="p-4 w-24 text-center">Puntos</th>
-                                            <th className="p-4">Detalle de Corrección</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-slate-200">
-                                        {guideData.map((row, idx) => (
-                                            <tr key={idx} className="hover:bg-indigo-50/30 transition-colors bg-white">
-                                                <td className="p-4 align-top font-bold text-slate-700">{row.criterio}</td>
-                                                <td className="p-4 align-top text-center font-bold text-indigo-700">{row.puntuacion}</td>
-                                                <td className="p-4 align-top text-slate-600">{row.detalle}</td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
+                    <div className="flex-1 overflow-auto p-8 bg-white text-slate-800 printable-content">
+                        <div ref={componentRef} className="p-8 min-h-screen">
+                            {/* Hidden header that only shows on print/pdf usually, but we include it here for WYSIWYG */}
+                            <div className="mb-6 border-b border-slate-200 pb-4">
+                                <h1 className="text-2xl font-black text-indigo-900">HIPATIA | Informe de Evaluación</h1>
+                                <div className="mt-2 text-sm text-slate-600 grid grid-cols-2 gap-2">
+                                    <p><span className="font-bold">Examen:</span> {formData.nombre_examen}</p>
+                                    <p><span className="font-bold">Materia:</span> {formData.materia} - {formData.nivel}</p>
+                                    <p><span className="font-bold">CCAA:</span> {formData.ccaa}</p>
+                                    <p><span className="font-bold">Fecha:</span> {new Date().toLocaleDateString()}</p>
+                                </div>
                             </div>
-                        )}
+
+                            {/* Render HTML content securely */}
+                            {htmlContent ? (
+                                <div
+                                    contentEditable={true}
+                                    suppressContentEditableWarning={true}
+                                    className="prose prose-indigo max-w-none prose-headings:font-bold prose-h1:text-2xl prose-h2:text-xl prose-p:text-slate-600 focus:outline-none focus:ring-2 focus:ring-indigo-100 rounded-lg p-2 transition-all"
+                                    dangerouslySetInnerHTML={{ __html: htmlContent }}
+                                />
+                            ) : (
+                                /* Fallback table if no HTML but guideData exists */
+                                <div className="bg-slate-50 rounded-xl border border-slate-200 overflow-hidden" contentEditable={true} suppressContentEditableWarning={true}>
+                                    <table className="w-full text-left text-sm">
+                                        <thead className="bg-indigo-600 text-white font-bold uppercase text-xs tracking-wider">
+                                            <tr>
+                                                <th className="p-4 w-1/4">Criterio</th>
+                                                <th className="p-4 w-24 text-center">Puntos</th>
+                                                <th className="p-4">Detalle de Corrección</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-slate-200">
+                                            {guideData.map((row, idx) => (
+                                                <tr key={idx} className="hover:bg-indigo-50/30 transition-colors bg-white">
+                                                    <td className="p-4 align-top font-bold text-slate-700">{row.criterio}</td>
+                                                    <td className="p-4 align-top text-center font-bold text-indigo-700">{row.puntuacion}</td>
+                                                    <td className="p-4 align-top text-slate-600">{row.detalle}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
+
+                            <div className="mt-12 pt-4 border-t border-slate-100 text-xs text-slate-400 text-center">
+                                Generado por HIPATIA - Basado en normativa oficial.
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
