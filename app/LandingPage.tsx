@@ -322,7 +322,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
                                     </div>
                                     <div>
                                         <h2 className="text-2xl font-bold text-slate-900 mb-3 tracking-tight">MÓDULO CORRECTOR</h2>
-                                        <p className="text-slate-500 font-medium leading-relaxed">Auditoría técnica de evidencias manuscritas y evaluación automática.</p>
+                                        <p className="text-slate-500 font-medium leading-relaxed">Evaluación inteligente de exámenes a mano. Resultados inmediatos basados en tus propios criterios de corrección.</p>
                                     </div>
                                     <div className="flex items-center gap-2 text-indigo-600 font-bold text-sm uppercase tracking-widest pt-4 group-hover:gap-4 transition-all">
                                         Acceder al corrector <ArrowRight size={18} />
@@ -355,7 +355,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
                                     </div>
                                     <div>
                                         <h2 className="text-2xl font-bold text-slate-900 mb-3 tracking-tight">MÓDULO GENERADOR</h2>
-                                        <p className="text-slate-500 font-medium leading-relaxed">Creación masiva de materiales complementarios y exámenes oficiales.</p>
+                                        <p className="text-slate-500 font-medium leading-relaxed">Diseña exámenes y materiales de apoyo en segundos. Sube tus contenidos y deja que HIPATIA estructure el aprendizaje.</p>
                                     </div>
                                     <div className="flex items-center gap-2 text-slate-900 font-bold text-sm uppercase tracking-widest pt-4 group-hover:gap-4 transition-all">
                                         Elegir modo <ArrowRight size={18} />
@@ -372,8 +372,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
                                             <div className="bg-violet-50 text-violet-700 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">BETA</div>
                                         </div>
                                         <div>
-                                            <h2 className="text-2xl font-bold text-slate-900 mb-3 tracking-tight">ARQUITECTO DE GUÍAS</h2>
-                                            <p className="text-slate-500 font-medium leading-relaxed">Diseña rúbricas y guías de evaluación basadas en normativa oficial.</p>
+                                            <h2 className="text-2xl font-bold text-slate-900 mb-3 tracking-tight">GENERADOR DE RÚBRICAS</h2>
+                                            <p className="text-slate-500 font-medium leading-relaxed">Diseña escalas de evaluación y guías detalladas adaptadas a tus criterios pedagógicos.</p>
                                         </div>
                                         <div className="flex items-center gap-2 text-violet-600 font-bold text-sm uppercase tracking-widest pt-4 group-hover:gap-4 transition-all">
                                             Diseñar guía <ArrowRight size={18} />

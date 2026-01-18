@@ -338,7 +338,7 @@ export default function GuideCreatorForm({ userToken, onBack }: GuideCreatorForm
                     </button>
                     <h1 className="text-lg font-bold text-slate-900 flex items-center gap-2">
                         <span className="p-1.5 bg-violet-100 text-violet-700 rounded-md"><Shield size={16} /></span>
-                        Creación de Rúbricas
+                        Generador de Rúbricas
                     </h1>
                 </div>
             </div>
