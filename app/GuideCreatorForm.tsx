@@ -159,23 +159,55 @@ export default function GuideCreatorForm({ userToken, onBack }: GuideCreatorForm
     const handleFileDrop = async (e: React.DragEvent, field: 'texto_examen' | 'texto_apuntes' | 'criterios_profesor') => {
         e.preventDefault();
         e.stopPropagation();
+
         if (field === 'texto_examen') setIsDragOverExamen(false);
         else if (field === 'texto_apuntes') setIsDragOverApuntes(false);
         else if (field === 'criterios_profesor') setIsDragOverCriterios(false);
 
-        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-            const text = await extractTextFromFile(e.dataTransfer.files[0]);
-            if (text) {
-                handleInputChange(field, text);
+        if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+            let newText = '';
+
+            // For single file fields (Examen), we just take the first one
+            // For "Apuntes", we iterate if there are multiple, or just take the one
+            const files = Array.from(e.dataTransfer.files);
+
+            // Logic: If field is 'texto_apuntes', we ALLOW appending multiple files.
+            // For others, we might stick to single file replacement for simplicity, or allow appending too.
+            // Let's allow appending for Apuntes specifically as requested.
+
+            if (field === 'texto_apuntes') {
+                for (const file of files) {
+                    const text = await extractTextFromFile(file);
+                    if (text) {
+                        newText += `\n\n--- ${file.name} ---\n${text}`;
+                    }
+                }
+                // Append to existing
+                handleInputChange(field, formData[field] + newText);
+            } else {
+                // Default single behavior for others (replace)
+                const text = await extractTextFromFile(files[0]);
+                if (text) handleInputChange(field, text);
             }
         }
     };
 
     const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>, field: 'texto_examen' | 'texto_apuntes' | 'criterios_profesor') => {
-        if (e.target.files && e.target.files[0]) {
-            const text = await extractTextFromFile(e.target.files[0]);
-            if (text) {
-                handleInputChange(field, text);
+        if (e.target.files && e.target.files.length > 0) {
+            const files = Array.from(e.target.files);
+
+            if (field === 'texto_apuntes') {
+                let newText = '';
+                for (const file of files) {
+                    const text = await extractTextFromFile(file);
+                    if (text) {
+                        newText += `\n\n--- ${file.name} ---\n${text}`;
+                    }
+                }
+                handleInputChange(field, formData[field] + newText);
+            } else {
+                const text = await extractTextFromFile(files[0]);
+                if (text) handleInputChange(field, text);
             }
         }
     };
@@ -471,7 +503,7 @@ export default function GuideCreatorForm({ userToken, onBack }: GuideCreatorForm
                                             required
                                             value={formData.texto_apuntes}
                                             onChange={(e) => handleInputChange('texto_apuntes', e.target.value)}
-                                            placeholder="Arrastra apuntes, temario o criterios aquí..."
+                                            placeholder="Sube uno o varios archivos (Apuntes, Temario...) o pega el texto aquí. Los nuevos archivos se añadirán al final..."
                                             className="w-full h-48 p-4 bg-transparent border-none rounded-2xl focus:ring-0 outline-none resize-none text-sm text-slate-600 font-medium z-10 relative"
                                         />
 
@@ -483,7 +515,7 @@ export default function GuideCreatorForm({ userToken, onBack }: GuideCreatorForm
                                         )}
 
                                         <label className="absolute bottom-3 right-3 cursor-pointer p-2 bg-white rounded-lg shadow-sm border border-slate-200 hover:bg-violet-50 transition-colors z-20 group-hover:opacity-100 opacity-0 group-focus-within:opacity-100">
-                                            <input type="file" className="hidden" accept=".pdf,.docx,.txt" onChange={(e) => handleFileSelect(e, 'texto_apuntes')} />
+                                            <input type="file" className="hidden" multiple accept=".pdf,.docx,.txt" onChange={(e) => handleFileSelect(e, 'texto_apuntes')} />
                                             <FileText size={16} className="text-violet-600" />
                                         </label>
                                     </div>
