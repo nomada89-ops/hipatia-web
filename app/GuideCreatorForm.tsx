@@ -184,6 +184,13 @@ export default function GuideCreatorForm({ userToken, onBack }: GuideCreatorForm
                 }
                 // Append to existing
                 handleInputChange(field, formData[field] + newText);
+            } else if (field === 'texto_examen') {
+                // For Exam Body, we replace but include the filename header
+                const file = files[0];
+                const text = await extractTextFromFile(file);
+                if (text) {
+                    handleInputChange(field, `--- ${file.name} ---\n\n${text}`);
+                }
             } else {
                 // Default single behavior for others (replace)
                 const text = await extractTextFromFile(files[0]);
@@ -205,6 +212,12 @@ export default function GuideCreatorForm({ userToken, onBack }: GuideCreatorForm
                     }
                 }
                 handleInputChange(field, formData[field] + newText);
+            } else if (field === 'texto_examen') {
+                const file = files[0];
+                const text = await extractTextFromFile(file);
+                if (text) {
+                    handleInputChange(field, `--- ${file.name} ---\n\n${text}`);
+                }
             } else {
                 const text = await extractTextFromFile(files[0]);
                 if (text) handleInputChange(field, text);
