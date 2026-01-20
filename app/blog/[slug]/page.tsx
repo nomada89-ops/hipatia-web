@@ -29,8 +29,77 @@ export default async function BlogPostPage({ params }: Props) {
         notFound();
     }
 
+    const jsonLd: any = {
+        '@context': 'https://schema.org',
+        '@type': 'Article',
+        headline: post.title,
+        description: post.excerpt,
+        image: post.imageUrl ? `https://hipatia.vercel.app${post.imageUrl}` : undefined,
+        datePublished: post.isoDate,
+        dateModified: post.isoDate,
+        author: {
+            '@type': 'Organization',
+            name: 'Equipo HIPATIA',
+            url: 'https://hipatia.vercel.app'
+        },
+        publisher: {
+            '@type': 'Organization',
+            name: 'HIPATIA Educational Ecosystem',
+            logo: {
+                '@type': 'ImageObject',
+                url: 'https://hipatia.vercel.app/icon.png'
+            }
+        },
+        mainEntityOfPage: {
+            '@type': 'WebPage',
+            '@id': `https://hipatia.vercel.app/blog/${post.slug}`
+        }
+    };
+
+    if (post.faq && post.faq.length > 0) {
+        const faqSchema = {
+            '@type': 'FAQPage',
+            mainEntity: post.faq.map(q => ({
+                '@type': 'Question',
+                name: q.question,
+                acceptedAnswer: {
+                    '@type': 'Answer',
+                    text: q.answer
+                }
+            }))
+        };
+        // We can include multiple schemas in an array or just render two scripts. 
+        // For simplicity, let's just push to an array if we were using one, but here let's combine if possible or just inject separately.
+        // Google recommends checking specificity. Array of graph is best.
+    }
+
     return (
         <div className="min-h-screen bg-white font-sans selection:bg-indigo-100 selection:text-indigo-700">
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+            />
+
+            {post.faq && (
+                <script
+                    type="application/ld+json"
+                    dangerouslySetInnerHTML={{
+                        __html: JSON.stringify({
+                            '@context': 'https://schema.org',
+                            '@type': 'FAQPage',
+                            mainEntity: post.faq.map(q => ({
+                                '@type': 'Question',
+                                name: q.question,
+                                acceptedAnswer: {
+                                    '@type': 'Answer',
+                                    text: q.answer
+                                }
+                            }))
+                        })
+                    }}
+                />
+            )}
+
             {/* Progress Bar (Simulated with scroll listener would be better, but keeping simple for Server Component) */}
 
             <header className="fixed top-0 left-0 w-full bg-white/80 backdrop-blur-md border-b border-slate-200 z-50">

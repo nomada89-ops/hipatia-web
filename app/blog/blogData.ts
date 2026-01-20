@@ -11,6 +11,8 @@ export interface BlogPost {
     imageUrl?: string;
     imageAlt?: string; // Alt text for SEO
     keywords?: string;
+    isoDate: string; // YYYY-MM-DD for JSON-LD
+    faq?: { question: string; answer: string }[]; // For FAQPage Schema
 }
 
 export const blogPosts: BlogPost[] = [
@@ -24,6 +26,7 @@ export const blogPosts: BlogPost[] = [
         readTime: "6 min lectura",
         category: "Innovación Educativa",
         keywords: "Calificación académica con IA",
+        isoDate: "2026-01-10",
         imageUrl: "/blog-ethics.png",
         imageAlt: "Imagen del flujo de trabajo de Hipatia: Triple Consenso Pedagógico",
         content: `
@@ -57,6 +60,7 @@ export const blogPosts: BlogPost[] = [
         readTime: "4 min lectura",
         category: "Privacidad y Ética",
         keywords: "Privacidad datos educación, Anonimización IA",
+        isoDate: "2026-01-12",
         imageUrl: "/imagen seguridad lopd.webp",
         imageAlt: "Protocolo de Seguridad y LOPD de Hipatia",
         content: `
@@ -94,6 +98,7 @@ export const blogPosts: BlogPost[] = [
         readTime: "5 min lectura",
         category: "Tecnología Educativa",
         keywords: "OCR manuscrito, Digitalización exámenes, Transcripción académica",
+        isoDate: "2026-01-14",
         imageUrl: "/Imagen articulo 2.webp",
         imageAlt: "Transformación de texto manuscrito a datos digitales en Hipatia",
         content: `
@@ -126,6 +131,7 @@ export const blogPosts: BlogPost[] = [
         readTime: "5 min lectura",
         category: "Productividad Docente",
         keywords: "Generador de exámenes y rúbricas con IA",
+        isoDate: "2026-01-16",
         imageUrl: "/imagen articulo 4.webp",
         imageAlt: "Interfaz de generación de exámenes y rúbricas en Hipatia",
         content: `
@@ -163,6 +169,7 @@ export const blogPosts: BlogPost[] = [
         readTime: "7 min lectura",
         category: "Derecho Educativo",
         keywords: "Justificación de notas, reclamaciones exámenes, IA educación",
+        isoDate: "2026-01-20",
         imageUrl: "/imagen articulo 5.webp",
         imageAlt: "Protocolo de generación de informes blindados en Hipatia",
         content: `
