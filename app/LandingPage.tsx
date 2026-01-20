@@ -263,172 +263,180 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
                             ))}
                         </div>
                     </RevealSection>
-                </section >
+                    </RevealSection>
+                </section>
+                
+                <footer className="px-8 py-6 text-center text-slate-400 text-[10px] uppercase tracking-[0.3em] font-sans pb-10 flex flex-col gap-4 border-t border-slate-100 bg-white">
+                    <span className="font-bold">HIPATIA ACADEMIC ECOSYSTEM v4.0 ENGINEERED FOR EDUCATION</span>
+                    <Link href="/legal?tab=privacidad" className="hover:text-indigo-500 transition-colors border-b border-transparent hover:border-indigo-500 w-fit mx-auto">
+                        Aviso Legal y Privacidad
+                    </Link>
+                </footer>
             </div >
         );
     }
 
-    return (
-        <div className="flex-1 bg-mesh h-screen overflow-hidden flex flex-col font-sans selection:bg-indigo-100 selection:text-indigo-900">
-            {/* --- DASHBOARD HEADER --- */}
-            <header className="px-8 py-5 flex justify-between items-center glass border-b border-slate-200/50 z-30">
-                <div className="flex items-center gap-8">
-                    <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
-                        <div className="w-7 h-7 bg-indigo-600 rounded-md flex items-center justify-center text-white shadow-md">
-                            <Shield size={14} />
-                        </div>
-                        <span className="font-bold text-slate-900 text-lg tracking-tight">HIPATIA</span>
-                    </Link>
-                    <nav className="hidden md:flex items-center gap-6 text-xs font-bold text-slate-500">
-                        <Link href="/blog" className="hover:text-indigo-600 transition-colors uppercase tracking-widest flex items-center gap-1.5"><BookOpen size={14} /> Blog</Link>
-                        <Link href="/contacto" className="hover:text-indigo-600 transition-colors uppercase tracking-widest flex items-center gap-1.5"><Mail size={14} /> Contacto</Link>
-                    </nav>
-                </div>
-                <div className="flex items-center gap-4">
-                    {viewMode === 'forge' && (
-                        <button onClick={() => setViewMode('main')} className="px-4 py-2 bg-slate-100 text-slate-600 rounded-lg text-xs font-bold hover:bg-slate-200 transition-all uppercase tracking-widest">
-                            <LayoutGrid size={14} className="inline mr-2" /> Menú
-                        </button>
-                    )}
-                    <div className="px-4 py-2 bg-emerald-50 text-emerald-700 rounded-lg text-xs font-bold border border-emerald-100 uppercase tracking-widest flex items-center gap-2">
-                        <span className={`w-1.5 h-1.5 rounded-full bg-emerald-500 ${!balance ? 'animate-ping' : ''}`}></span>
-                        Saldo: {balance || "..."}
+return (
+    <div className="flex-1 bg-mesh h-screen overflow-hidden flex flex-col font-sans selection:bg-indigo-100 selection:text-indigo-900">
+        {/* --- DASHBOARD HEADER --- */}
+        <header className="px-8 py-5 flex justify-between items-center glass border-b border-slate-200/50 z-30">
+            <div className="flex items-center gap-8">
+                <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+                    <div className="w-7 h-7 bg-indigo-600 rounded-md flex items-center justify-center text-white shadow-md">
+                        <Shield size={14} />
                     </div>
-                    <button onClick={onLogout} className="px-4 py-2 bg-indigo-50 text-indigo-700 rounded-lg text-xs font-bold hover:bg-indigo-100 transition-all flex items-center gap-2 border border-indigo-100 uppercase tracking-widest">
-                        <Lock size={14} /> Salir
-                    </button>
-                </div>
-            </header>
-
-            <main className="flex-1 overflow-y-auto p-12 custom-scrollbar relative z-10 flex flex-col items-center">
-                <div className="w-full max-w-6xl">
-                    {viewMode === 'main' ? (
-                        <div className="space-y-16 animate-in fade-in slide-in-from-bottom-8 duration-700">
-                            <div className="text-center space-y-6">
-                                <h1 className="text-5xl md:text-7xl font-black text-slate-900 tracking-tight">
-                                    Bienvenid@ al futuro <br />
-                                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-blue-700">del aula inteligente.</span>
-                                </h1>
-                                <p className="text-xl text-slate-500 font-medium max-w-2xl mx-auto">Selecciona la herramienta que deseas utilizar hoy.</p>
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl mx-auto">
-                                <button onClick={onSelectAuditor} className="group glass-indigo rounded-[32px] p-10 text-left transition-all hover:scale-[1.02] hover:shadow-2xl hover:shadow-indigo-200/50 flex flex-col gap-10">
-                                    <div className="flex justify-between items-start">
-                                        <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-indigo-700 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-indigo-200">
-                                            <Search size={32} />
-                                        </div>
-                                        <div className="bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">Auditoría Pro</div>
-                                    </div>
-                                    <div>
-                                        <h2 className="text-2xl font-bold text-slate-900 mb-3 tracking-tight">MÓDULO CORRECTOR</h2>
-                                        <p className="text-slate-500 font-medium leading-relaxed">Evaluación inteligente de exámenes a mano. Resultados inmediatos basados en tus propios criterios de corrección.</p>
-                                    </div>
-                                    <div className="flex items-center gap-2 text-indigo-600 font-bold text-sm uppercase tracking-widest pt-4 group-hover:gap-4 transition-all">
-                                        Acceder al corrector <ArrowRight size={18} />
-                                    </div>
-                                </button>
-
-
-                                <Link href="/informe-grupal" className="group glass-emerald rounded-[32px] p-10 text-left transition-all hover:scale-[1.02] hover:shadow-2xl hover:shadow-emerald-200/50 flex flex-col gap-10">
-                                    <div className="flex justify-between items-start">
-                                        <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-emerald-200">
-                                            <Users size={32} />
-                                        </div>
-                                        <div className="bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">NUEVO</div>
-                                    </div>
-                                    <div>
-                                        <h2 className="text-2xl font-bold text-slate-900 mb-3 tracking-tight">INFORMES DE GRUPO</h2>
-                                        <p className="text-slate-500 font-medium leading-relaxed">Genera estadísticas comparativas y detecta patrones de aprendizaje.</p>
-                                    </div>
-                                    <div className="flex items-center gap-2 text-emerald-600 font-bold text-sm uppercase tracking-widest pt-4 group-hover:gap-4 transition-all">
-                                        Crear informe <ArrowRight size={18} />
-                                    </div>
-                                </Link>
-
-                                <button onClick={() => setViewMode('forge')} className="group glass rounded-[32px] p-10 text-left transition-all hover:scale-[1.02] hover:shadow-2xl hover:shadow-slate-200/20 flex flex-col gap-10">
-                                    <div className="flex justify-between items-start">
-                                        <div className="w-16 h-16 bg-slate-900 rounded-2xl flex items-center justify-center text-white shadow-lg">
-                                            <Zap size={32} />
-                                        </div>
-                                        <div className="bg-slate-100 text-slate-600 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">Generación IA</div>
-                                    </div>
-                                    <div>
-                                        <h2 className="text-2xl font-bold text-slate-900 mb-3 tracking-tight">MÓDULO GENERADOR</h2>
-                                        <p className="text-slate-500 font-medium leading-relaxed">Diseña exámenes y materiales de apoyo en segundos. Sube tus contenidos y deja que HIPATIA estructure el aprendizaje.</p>
-                                    </div>
-                                    <div className="flex items-center gap-2 text-slate-900 font-bold text-sm uppercase tracking-widest pt-4 group-hover:gap-4 transition-all">
-                                        Elegir modo <ArrowRight size={18} />
-                                    </div>
-                                </button>
-
-                                <button onClick={onSelectGuideCreator} className="group glass-violet rounded-[32px] p-10 text-left transition-all hover:scale-[1.02] hover:shadow-2xl hover:shadow-violet-200/50 flex flex-col gap-10 relative overflow-hidden bg-white/60 border border-violet-100">
-                                    <div className="absolute top-0 right-0 w-32 h-32 bg-violet-50 rounded-bl-[100px] opacity-50 z-0 group-hover:scale-110 transition-transform origin-top-right"></div>
-                                    <div className="relative z-10 flex flex-col gap-10">
-                                        <div className="flex justify-between items-start">
-                                            <div className="w-16 h-16 bg-gradient-to-br from-violet-500 to-violet-700 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-violet-200">
-                                                <Shield size={32} />
-                                            </div>
-                                            <div className="bg-violet-50 text-violet-700 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">BETA</div>
-                                        </div>
-                                        <div>
-                                            <h2 className="text-2xl font-bold text-slate-900 mb-3 tracking-tight">GENERADOR DE RÚBRICAS</h2>
-                                            <p className="text-slate-500 font-medium leading-relaxed">Diseña escalas de evaluación y guías detalladas adaptadas a tus criterios pedagógicos.</p>
-                                        </div>
-                                        <div className="flex items-center gap-2 text-violet-600 font-bold text-sm uppercase tracking-widest pt-4 group-hover:gap-4 transition-all">
-                                            Diseñar guía <ArrowRight size={18} />
-                                        </div>
-                                    </div>
-                                </button>
-                            </div>
-                            <div className="text-center pt-8">
-                                <button onClick={onShowSample} className="px-8 py-3 bg-white text-slate-500 font-bold rounded-full border border-slate-200 hover:bg-slate-50 transition-all shadow-sm">
-                                    Ver Simulación de Informe Completo
-                                </button>
-                            </div>
-                        </div>
-                    ) : (
-                        <div className="space-y-16 animate-in slide-in-from-right-8 duration-500">
-                            <div className="text-center space-y-4">
-                                <div className="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 mx-auto mb-6">
-                                    <Zap size={32} />
-                                </div>
-                                <h1 className="text-4xl md:text-6xl font-black text-slate-900 tracking-tight">Especialidades</h1>
-                                <p className="text-slate-500 font-medium text-lg">Selecciona tu modo de generación preferido.</p>
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-                                <button onClick={onSelectForgeUniversal} className="group glass p-10 rounded-[32px] text-left transition-all hover:-translate-y-2 hover:shadow-xl flex gap-6">
-                                    <div className="bg-indigo-50 p-4 rounded-2xl text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-all shadow-sm"><BookOpen size={32} /></div>
-                                    <div>
-                                        <h3 className="text-2xl font-bold text-slate-900 mb-2">MODO GENERAL</h3>
-                                        <p className="text-slate-500 font-medium mb-6">Cualquier materia y nivel. Sube tus contenidos y genera exámenes.</p>
-                                        <div className="text-indigo-600 font-bold uppercase tracking-widest text-xs flex items-center gap-2">Abrir herramienta <ExternalLink size={14} /></div>
-                                    </div>
-                                </button>
-
-                                <button onClick={onSelectForgeSpecialist} className="group glass p-10 rounded-[32px] text-left transition-all hover:-translate-y-2 hover:shadow-xl flex gap-6">
-                                    <div className="bg-blue-50 p-4 rounded-2xl text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all shadow-sm"><Award size={32} /></div>
-                                    <div>
-                                        <h3 className="text-2xl font-bold text-slate-900 mb-2">MODO ESPECIALISTA</h3>
-                                        <p className="text-slate-500 font-medium mb-6">Historia de España (2 Bach). Protocolo oficial UCLM.</p>
-                                        <div className="text-blue-600 font-bold uppercase tracking-widest text-xs flex items-center gap-2">Abrir herramienta <ExternalLink size={14} /></div>
-                                    </div>
-                                </button>
-                            </div>
-                        </div>
-                    )}
-                </div>
-            </main>
-
-            <footer className="px-8 py-6 text-center text-slate-400 text-[10px] uppercase tracking-[0.3em] font-sans pb-10 flex flex-col gap-4">
-                <span className="font-bold">HIPATIA ACADEMIC ECOSYSTEM v4.0 ENGINEERED FOR EDUCATION</span>
-                <Link href="/legal?tab=privacidad" className="hover:text-indigo-500 transition-colors border-b border-transparent hover:border-indigo-500 w-fit mx-auto">
-                    Aviso Legal y Privacidad
+                    <span className="font-bold text-slate-900 text-lg tracking-tight">HIPATIA</span>
                 </Link>
-            </footer>
-        </div>
-    );
+                <nav className="hidden md:flex items-center gap-6 text-xs font-bold text-slate-500">
+                    <Link href="/blog" className="hover:text-indigo-600 transition-colors uppercase tracking-widest flex items-center gap-1.5"><BookOpen size={14} /> Blog</Link>
+                    <Link href="/contacto" className="hover:text-indigo-600 transition-colors uppercase tracking-widest flex items-center gap-1.5"><Mail size={14} /> Contacto</Link>
+                </nav>
+            </div>
+            <div className="flex items-center gap-4">
+                {viewMode === 'forge' && (
+                    <button onClick={() => setViewMode('main')} className="px-4 py-2 bg-slate-100 text-slate-600 rounded-lg text-xs font-bold hover:bg-slate-200 transition-all uppercase tracking-widest">
+                        <LayoutGrid size={14} className="inline mr-2" /> Menú
+                    </button>
+                )}
+                <div className="px-4 py-2 bg-emerald-50 text-emerald-700 rounded-lg text-xs font-bold border border-emerald-100 uppercase tracking-widest flex items-center gap-2">
+                    <span className={`w-1.5 h-1.5 rounded-full bg-emerald-500 ${!balance ? 'animate-ping' : ''}`}></span>
+                    Saldo: {balance || "..."}
+                </div>
+                <button onClick={onLogout} className="px-4 py-2 bg-indigo-50 text-indigo-700 rounded-lg text-xs font-bold hover:bg-indigo-100 transition-all flex items-center gap-2 border border-indigo-100 uppercase tracking-widest">
+                    <Lock size={14} /> Salir
+                </button>
+            </div>
+        </header>
+
+        <main className="flex-1 overflow-y-auto p-12 custom-scrollbar relative z-10 flex flex-col items-center">
+            <div className="w-full max-w-6xl">
+                {viewMode === 'main' ? (
+                    <div className="space-y-16 animate-in fade-in slide-in-from-bottom-8 duration-700">
+                        <div className="text-center space-y-6">
+                            <h1 className="text-5xl md:text-7xl font-black text-slate-900 tracking-tight">
+                                Bienvenid@ al futuro <br />
+                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-blue-700">del aula inteligente.</span>
+                            </h1>
+                            <p className="text-xl text-slate-500 font-medium max-w-2xl mx-auto">Selecciona la herramienta que deseas utilizar hoy.</p>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl mx-auto">
+                            <button onClick={onSelectAuditor} className="group glass-indigo rounded-[32px] p-10 text-left transition-all hover:scale-[1.02] hover:shadow-2xl hover:shadow-indigo-200/50 flex flex-col gap-10">
+                                <div className="flex justify-between items-start">
+                                    <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-indigo-700 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-indigo-200">
+                                        <Search size={32} />
+                                    </div>
+                                    <div className="bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">Auditoría Pro</div>
+                                </div>
+                                <div>
+                                    <h2 className="text-2xl font-bold text-slate-900 mb-3 tracking-tight">MÓDULO CORRECTOR</h2>
+                                    <p className="text-slate-500 font-medium leading-relaxed">Evaluación inteligente de exámenes a mano. Resultados inmediatos basados en tus propios criterios de corrección.</p>
+                                </div>
+                                <div className="flex items-center gap-2 text-indigo-600 font-bold text-sm uppercase tracking-widest pt-4 group-hover:gap-4 transition-all">
+                                    Acceder al corrector <ArrowRight size={18} />
+                                </div>
+                            </button>
+
+
+                            <Link href="/informe-grupal" className="group glass-emerald rounded-[32px] p-10 text-left transition-all hover:scale-[1.02] hover:shadow-2xl hover:shadow-emerald-200/50 flex flex-col gap-10">
+                                <div className="flex justify-between items-start">
+                                    <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-emerald-700 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-emerald-200">
+                                        <Users size={32} />
+                                    </div>
+                                    <div className="bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">NUEVO</div>
+                                </div>
+                                <div>
+                                    <h2 className="text-2xl font-bold text-slate-900 mb-3 tracking-tight">INFORMES DE GRUPO</h2>
+                                    <p className="text-slate-500 font-medium leading-relaxed">Genera estadísticas comparativas y detecta patrones de aprendizaje.</p>
+                                </div>
+                                <div className="flex items-center gap-2 text-emerald-600 font-bold text-sm uppercase tracking-widest pt-4 group-hover:gap-4 transition-all">
+                                    Crear informe <ArrowRight size={18} />
+                                </div>
+                            </Link>
+
+                            <button onClick={() => setViewMode('forge')} className="group glass rounded-[32px] p-10 text-left transition-all hover:scale-[1.02] hover:shadow-2xl hover:shadow-slate-200/20 flex flex-col gap-10">
+                                <div className="flex justify-between items-start">
+                                    <div className="w-16 h-16 bg-slate-900 rounded-2xl flex items-center justify-center text-white shadow-lg">
+                                        <Zap size={32} />
+                                    </div>
+                                    <div className="bg-slate-100 text-slate-600 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">Generación IA</div>
+                                </div>
+                                <div>
+                                    <h2 className="text-2xl font-bold text-slate-900 mb-3 tracking-tight">MÓDULO GENERADOR</h2>
+                                    <p className="text-slate-500 font-medium leading-relaxed">Diseña exámenes y materiales de apoyo en segundos. Sube tus contenidos y deja que HIPATIA estructure el aprendizaje.</p>
+                                </div>
+                                <div className="flex items-center gap-2 text-slate-900 font-bold text-sm uppercase tracking-widest pt-4 group-hover:gap-4 transition-all">
+                                    Elegir modo <ArrowRight size={18} />
+                                </div>
+                            </button>
+
+                            <button onClick={onSelectGuideCreator} className="group glass-violet rounded-[32px] p-10 text-left transition-all hover:scale-[1.02] hover:shadow-2xl hover:shadow-violet-200/50 flex flex-col gap-10 relative overflow-hidden bg-white/60 border border-violet-100">
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-violet-50 rounded-bl-[100px] opacity-50 z-0 group-hover:scale-110 transition-transform origin-top-right"></div>
+                                <div className="relative z-10 flex flex-col gap-10">
+                                    <div className="flex justify-between items-start">
+                                        <div className="w-16 h-16 bg-gradient-to-br from-violet-500 to-violet-700 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-violet-200">
+                                            <Shield size={32} />
+                                        </div>
+                                        <div className="bg-violet-50 text-violet-700 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">BETA</div>
+                                    </div>
+                                    <div>
+                                        <h2 className="text-2xl font-bold text-slate-900 mb-3 tracking-tight">GENERADOR DE RÚBRICAS</h2>
+                                        <p className="text-slate-500 font-medium leading-relaxed">Diseña escalas de evaluación y guías detalladas adaptadas a tus criterios pedagógicos.</p>
+                                    </div>
+                                    <div className="flex items-center gap-2 text-violet-600 font-bold text-sm uppercase tracking-widest pt-4 group-hover:gap-4 transition-all">
+                                        Diseñar guía <ArrowRight size={18} />
+                                    </div>
+                                </div>
+                            </button>
+                        </div>
+                        <div className="text-center pt-8">
+                            <button onClick={onShowSample} className="px-8 py-3 bg-white text-slate-500 font-bold rounded-full border border-slate-200 hover:bg-slate-50 transition-all shadow-sm">
+                                Ver Simulación de Informe Completo
+                            </button>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="space-y-16 animate-in slide-in-from-right-8 duration-500">
+                        <div className="text-center space-y-4">
+                            <div className="w-16 h-16 bg-indigo-50 rounded-2xl flex items-center justify-center text-indigo-600 mx-auto mb-6">
+                                <Zap size={32} />
+                            </div>
+                            <h1 className="text-4xl md:text-6xl font-black text-slate-900 tracking-tight">Especialidades</h1>
+                            <p className="text-slate-500 font-medium text-lg">Selecciona tu modo de generación preferido.</p>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                            <button onClick={onSelectForgeUniversal} className="group glass p-10 rounded-[32px] text-left transition-all hover:-translate-y-2 hover:shadow-xl flex gap-6">
+                                <div className="bg-indigo-50 p-4 rounded-2xl text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-all shadow-sm"><BookOpen size={32} /></div>
+                                <div>
+                                    <h3 className="text-2xl font-bold text-slate-900 mb-2">MODO GENERAL</h3>
+                                    <p className="text-slate-500 font-medium mb-6">Cualquier materia y nivel. Sube tus contenidos y genera exámenes.</p>
+                                    <div className="text-indigo-600 font-bold uppercase tracking-widest text-xs flex items-center gap-2">Abrir herramienta <ExternalLink size={14} /></div>
+                                </div>
+                            </button>
+
+                            <button onClick={onSelectForgeSpecialist} className="group glass p-10 rounded-[32px] text-left transition-all hover:-translate-y-2 hover:shadow-xl flex gap-6">
+                                <div className="bg-blue-50 p-4 rounded-2xl text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all shadow-sm"><Award size={32} /></div>
+                                <div>
+                                    <h3 className="text-2xl font-bold text-slate-900 mb-2">MODO ESPECIALISTA</h3>
+                                    <p className="text-slate-500 font-medium mb-6">Historia de España (2 Bach). Protocolo oficial UCLM.</p>
+                                    <div className="text-blue-600 font-bold uppercase tracking-widest text-xs flex items-center gap-2">Abrir herramienta <ExternalLink size={14} /></div>
+                                </div>
+                            </button>
+                        </div>
+                    </div>
+                )}
+            </div>
+        </main>
+
+        <footer className="px-8 py-6 text-center text-slate-400 text-[10px] uppercase tracking-[0.3em] font-sans pb-10 flex flex-col gap-4">
+            <span className="font-bold">HIPATIA ACADEMIC ECOSYSTEM v4.0 ENGINEERED FOR EDUCATION</span>
+            <Link href="/legal?tab=privacidad" className="hover:text-indigo-500 transition-colors border-b border-transparent hover:border-indigo-500 w-fit mx-auto">
+                Aviso Legal y Privacidad
+            </Link>
+        </footer>
+    </div>
+);
 };
 
 export default LandingPage;
