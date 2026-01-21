@@ -35,6 +35,13 @@ const ForgeUniversalForm: React.FC<ForgeUniversalFormProps> = ({ onBack, userTok
     const [guiaData, setGuiaData] = useState<any>(null); // Para persistencia
     const [isDyslexic, setIsDyslexic] = useState(false);
 
+    // Nuevos estados para Modo Inclusión DUA
+    const [modoInclusion, setModoInclusion] = useState(false);
+    const [acneaeHtml, setAcneaeHtml] = useState<string | null>(null);
+    const [acsHtml, setAcsHtml] = useState<string | null>(null);
+    const [pedagogicalData, setPedagogicalData] = useState<string | null>(null);
+    const [activeVersion, setActiveVersion] = useState<'estandar' | 'acneae' | 'acs'>('estandar');
+
     // Refs
     const temarioInputRef = useRef<HTMLInputElement>(null);
     const modeloInputRef = useRef<HTMLInputElement>(null);
@@ -98,6 +105,8 @@ const ForgeUniversalForm: React.FC<ForgeUniversalFormProps> = ({ onBack, userTok
 
         try {
             const payload = {
+                user_token: userToken,
+                tipo_generacion: modoInclusion ? "Triple_ACNEE" : "Simple",
                 texto_temario: temarioText,
                 texto_modelo_examen: modeloText, // Opcional
                 configuracion: {
@@ -118,8 +127,24 @@ const ForgeUniversalForm: React.FC<ForgeUniversalFormProps> = ({ onBack, userTok
             const data = await response.json();
 
             // Procesar respuesta
-            const htmlContent = data.examen_html || data.output || '<h3>Error: Sin contenido generado</h3>';
-            setExamHtml(htmlContent); setSolucionarioHtml(data.solucionario_html || null);
+            // Procesar respuesta
+            if (data.version_estandar) {
+                // Modo Triple
+                setExamHtml(data.version_estandar);
+                setAcneaeHtml(data.version_no_significativa);
+                setAcsHtml(data.version_significativa);
+                setPedagogicalData(data.metadata_pedagogica?.justificacion_dua || null);
+                setActiveVersion('estandar');
+            } else {
+                // Modo Simple (Legacy support)
+                const htmlContent = data.examen_html || data.output || '<h3>Error: Sin contenido generado</h3>';
+                setExamHtml(htmlContent);
+                setAcneaeHtml(null);
+                setAcsHtml(null);
+                setPedagogicalData(null);
+            }
+
+            setSolucionarioHtml(data.solucionario_html || null);
             setGuiaData(data.guia_correccion_data || null);
 
             setStatus('success');
@@ -138,7 +163,8 @@ const ForgeUniversalForm: React.FC<ForgeUniversalFormProps> = ({ onBack, userTok
 
         if (type === 'examen') {
             setActiveTab('examen');
-            document.title = `Examen - ${nivel} - ${new Date().toLocaleDateString()}`;
+            const versionSuffix = activeVersion === 'estandar' ? '' : `-${activeVersion.toUpperCase()}`;
+            document.title = `Examen - ${nivel}${versionSuffix} - ${new Date().toLocaleDateString()}`;
             // Small timeout to allow state update (tab switch) to render before print
             setTimeout(() => {
                 window.print();
@@ -160,8 +186,14 @@ const ForgeUniversalForm: React.FC<ForgeUniversalFormProps> = ({ onBack, userTok
             setGuiaData(null);
             setStatus('idle');
             setMessage('');
+            setMessage('');
             setTemarioFiles([]);
             setTemarioText('');
+            // Reset DUA states
+            setAcneaeHtml(null);
+            setAcsHtml(null);
+            setPedagogicalData(null);
+            setActiveVersion('estandar');
         }
     };
 
@@ -203,6 +235,30 @@ const ForgeUniversalForm: React.FC<ForgeUniversalFormProps> = ({ onBack, userTok
                                 </button>
                             )}
                         </div>
+
+                        {/* Version Tabs (Solo si hay contenido DUA) */}
+                        {(acneaeHtml || acsHtml) && activeTab === 'examen' && (
+                            <div className="flex bg-slate-800 p-1 rounded-lg mr-4 border border-slate-700 print:hidden">
+                                <button
+                                    onClick={() => setActiveVersion('estandar')}
+                                    className={`px-3 py-1 text-xs font-bold rounded-md transition-all ${activeVersion === 'estandar' ? 'bg-violet-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
+                                >
+                                    Estándar
+                                </button>
+                                <button
+                                    onClick={() => setActiveVersion('acneae')}
+                                    className={`px-3 py-1 text-xs font-bold rounded-md transition-all ${activeVersion === 'acneae' ? 'bg-emerald-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
+                                >
+                                    ACNEAE (Acceso)
+                                </button>
+                                <button
+                                    onClick={() => setActiveVersion('acs')}
+                                    className={`px-3 py-1 text-xs font-bold rounded-md transition-all ${activeVersion === 'acs' ? 'bg-amber-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'}`}
+                                >
+                                    ACS (Significativa)
+                                </button>
+                            </div>
+                        )}
 
                         <div className="flex items-center gap-2 mr-4">
                             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Modo Dislexia</span>
@@ -250,12 +306,57 @@ const ForgeUniversalForm: React.FC<ForgeUniversalFormProps> = ({ onBack, userTok
 
                         {/* Examen View */}
                         <div className={`prose prose-slate max-w-none outline-none ${activeTab === 'examen' ? 'block' : 'hidden'}`}>
+
+                            {/* Version Info Warning */}
+                            {activeVersion === 'acneae' && (
+                                <div className="bg-emerald-50 border-l-4 border-emerald-500 p-4 mb-6 print:hidden">
+                                    <p className="font-bold text-emerald-700 text-sm">Adaptación de Acceso (ACNEAE)</p>
+                                    <p className="text-emerald-600 text-xs">Mantiene objetivos curriculares pero simplifica formato y enunciados.</p>
+                                </div>
+                            )}
+                            {activeVersion === 'acs' && (
+                                <div className="bg-amber-50 border-l-4 border-amber-500 p-4 mb-6 print:hidden">
+                                    <p className="font-bold text-amber-700 text-sm">Adaptación Curricular Significativa (ACS)</p>
+                                    <p className="text-amber-600 text-xs">Ajuste de complejidad cognitiva y vocabulario según DUA.</p>
+                                </div>
+                            )}
+
                             <div
                                 ref={editorRef}
                                 contentEditable
                                 suppressContentEditableWarning
-                                dangerouslySetInnerHTML={{ __html: examHtml }}
+                                dangerouslySetInnerHTML={{
+                                    __html: activeVersion === 'estandar' ? examHtml : (activeVersion === 'acneae' ? acneaeHtml : acsHtml) || ''
+                                }}
                             />
+                        </div>
+
+                        {/* Pedagogical Justification Card */}
+                        {pedagogicalData && (
+                            <div className="mt-12 bg-slate-50 rounded-xl border border-slate-200 overflow-hidden break-inside-avoid print:break-before-auto">
+                                <div className="bg-slate-100 px-6 py-3 border-b border-slate-200 flex justify-between items-center">
+                                    <h3 className="text-sm font-bold text-slate-700 flex items-center gap-2">
+                                        <BookOpen size={16} className="text-violet-500" />
+                                        Evidencia Pedagógica y Justificación DUA
+                                    </h3>
+                                    <button
+                                        onClick={() => navigator.clipboard.writeText(pedagogicalData)}
+                                        className="text-xs text-violet-600 hover:text-violet-800 font-medium px-2 py-1 rounded hover:bg-violet-50 transition-colors"
+                                    >
+                                        Copiar Texto
+                                    </button>
+                                </div>
+                                <div className="p-6 text-sm text-slate-600 leading-relaxed font-serif whitespace-pre-wrap">
+                                    {pedagogicalData}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Legal Footer */}
+                        <div className="mt-12 pt-6 border-t border-slate-100 text-center">
+                            <p className="text-[10px] text-slate-400 max-w-2xl mx-auto leading-tight">
+                                Nota legal: Las adaptaciones generadas por Hipatia se basan en modelos de IA entrenados en normativa LOMLOE y principios DUA. La validación final y firma de cualquier Adaptación Curricular (ACS) es responsabilidad exclusiva del docente y el equipo de orientación del centro, según lo estipulado en la normativa vigente.
+                            </p>
                         </div>
 
                         {/* Page Break for Print */}
@@ -437,6 +538,25 @@ const ForgeUniversalForm: React.FC<ForgeUniversalFormProps> = ({ onBack, userTok
                                 </div>
                             </div>
 
+                            {/* DUA Inclusion Toggle */}
+                            <div
+                                onClick={() => setModoInclusion(!modoInclusion)}
+                                className={`p-4 rounded-xl border-2 transition-all cursor-pointer flex items-center justify-between ${modoInclusion ? 'bg-fuchsia-50 border-fuchsia-400' : 'bg-slate-50 border-transparent hover:border-slate-200'}`}
+                            >
+                                <div className="flex items-center gap-3">
+                                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors ${modoInclusion ? 'bg-fuchsia-500 text-white' : 'bg-white text-slate-400'}`}>
+                                        <Eye size={20} />
+                                    </div>
+                                    <div>
+                                        <h3 className={`font-black text-xs uppercase tracking-widest ${modoInclusion ? 'text-fuchsia-900' : 'text-slate-500'}`}>Activar Modo Inclusión DUA</h3>
+                                        <p className="text-[10px] text-slate-400 font-medium">Genera automáticamente 3 versiones adaptadas bajo normativa LOMLOE</p>
+                                    </div>
+                                </div>
+                                <div className={`w-12 h-7 rounded-full p-1 transition-colors flex items-center ${modoInclusion ? 'bg-fuchsia-500 justify-end' : 'bg-slate-200 justify-start'}`}>
+                                    <div className="w-5 h-5 bg-white rounded-full shadow-sm"></div>
+                                </div>
+                            </div>
+
                             {/* ACTION BUTTON */}
                             <div className="pt-2">
                                 <button
@@ -445,17 +565,19 @@ const ForgeUniversalForm: React.FC<ForgeUniversalFormProps> = ({ onBack, userTok
                                     className={`w-full py-4 rounded-xl font-black text-sm uppercase tracking-widest transition-all shadow-lg flex items-center justify-center gap-3
                                     ${isGenerating
                                             ? 'bg-slate-100 text-slate-400 cursor-not-allowed shadow-none'
-                                            : 'bg-slate-900 text-white hover:bg-slate-800 hover:shadow-xl hover:scale-[1.01] active:scale-[0.99]'}`}
+                                            : modoInclusion
+                                                ? 'bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white hover:shadow-fuchsia-200 hover:shadow-xl hover:scale-[1.01]'
+                                                : 'bg-slate-900 text-white hover:bg-slate-800 hover:shadow-xl hover:scale-[1.01]'}`}
                                 >
                                     {isGenerating ? (
                                         <>
                                             <Loader2 className="h-5 w-5 animate-spin text-violet-500" />
-                                            <span>Forjando Examen Universal...</span>
+                                            <span>{modoInclusion ? 'Forjando Pack DUA...' : 'Forjando Examen Universal...'}</span>
                                         </>
                                     ) : (
                                         <>
-                                            <Zap className="h-5 w-5 text-violet-400" />
-                                            <span>Generar Examen</span>
+                                            <Zap className="h-5 w-5 text-white/80" />
+                                            <span>{modoInclusion ? 'Generar Pack DUA (0,80 créditos)' : 'Generar Examen (0,40 créditos)'}</span>
                                         </>
                                     )}
                                 </button>
