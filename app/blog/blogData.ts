@@ -366,7 +366,7 @@ export const blogPosts: BlogPost[] = [
         category: "Productividad",
         keywords: "Productividad docente, Generador de exámenes IA, Rúbricas automatizadas, Materiales educativos, HIPATIA Forge",
         isoDate: "2026-01-21",
-        imageUrl: "/blog-productivity.webp",
+        imageUrl: "/blog-forge.jpg",
         imageAlt: "Productividad Docente y Generación de Exámenes con Hipatia Forge",
         faq: [
             { question: "¿HIPATIA Forge puede crear exámenes de cualquier asignatura?", answer: "Sí, nuestro sistema es agnóstico a la materia. Puedes generar materiales para ciencias, humanidades, idiomas o formación profesional subiendo tus propios contenidos de referencia." },
@@ -412,7 +412,7 @@ export const blogPosts: BlogPost[] = [
         category: "Innovación",
         keywords: "Evaluación formativa, Feedback pedagógico, IA en educación, Mejora del aprendizaje, Informes de evaluación Hipatia",
         isoDate: "2026-01-21",
-        imageUrl: "/blog-feedback.webp",
+        imageUrl: "/blog-feedback.jpg",
         imageAlt: "Evaluación Formativa y Feedback Inteligente en Hipatia",
         faq: [
             { question: "¿Cómo mejora la IA la evaluación formativa?", answer: "La IA permite procesar grandes volúmenes de exámenes proporcionando comentarios específicos, inmediatos y personalizados que serían inasumibles de forma manual para un docente." },
@@ -458,7 +458,7 @@ export const blogPosts: BlogPost[] = [
         category: "Analítica",
         keywords: "Diagnóstico de aula, informe grupal de evaluación, análisis DAFO educativo, analítica de aprendizaje, gestión de aula con IA",
         isoDate: "2026-01-21",
-        imageUrl: "/blog-dafo.webp",
+        imageUrl: "/DAFO.webp",
         imageAlt: "Análisis DAFO Educativo y Gestión de Aula con Hipatia",
         faq: [
             { question: "¿Cómo se genera el análisis DAFO de una clase?", answer: "Hipatia agrega los resultados de todas las correcciones individuales de un grupo y utiliza modelos de IA para identificar patrones comunes, clasificándolos en fortalezas, debilidades, amenazas y oportunidades pedagógicas." },
