@@ -129,27 +129,38 @@ const ForgeUniversalForm: React.FC<ForgeUniversalFormProps> = ({ onBack, userTok
             const data = await response.json();
 
             // Procesar respuesta
-            // Procesar respuesta
             if (data.version_estandar) {
-                // Modo Triple
-                setExamHtml(data.version_estandar.html);
-                setAcneaeHtml(data.version_no_significativa.html);
-                setAcsHtml(data.version_significativa.html);
+                // Modo Triple DUA
+                setStdData({
+                    html: data.version_estandar.html || '',
+                    solucionario: data.version_estandar.solucionario || null
+                });
+                setAcneaeData({
+                    html: data.version_no_significativa.html || '',
+                    solucionario: data.version_no_significativa.solucionario || null
+                });
+                setAcsData({
+                    html: data.version_significativa.html || '',
+                    solucionario: data.version_significativa.solucionario || null
+                });
                 setPedagogicalData(data.metadata_pedagogica?.justificacion_dua || null);
                 setActiveVersion('estandar');
             } else {
-                // Modo Simple (Legacy support)
+                // Modo Simple (Legacy mapping to Standard)
                 const htmlContent = data.examen_html || data.output || '<h3>Error: Sin contenido generado</h3>';
-                setExamHtml(htmlContent);
-                setAcneaeHtml(null);
-                setAcsHtml(null);
+                setStdData({
+                    html: htmlContent,
+                    solucionario: data.solucionario_html || null
+                });
+                setAcneaeData(null);
+                setAcsData(null);
                 setPedagogicalData(null);
             }
 
-            setSolucionarioHtml(data.solucionario_html || null);
             setGuiaData(data.guia_correccion_data || null);
 
             setStatus('success');
+            setViewMode('examen');
         } catch (error) {
             console.error('Generation invalid:', error);
             setStatus('error');
