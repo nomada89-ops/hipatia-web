@@ -320,7 +320,7 @@ export const blogPosts: BlogPost[] = [
         category: "Accesibilidad",
         keywords: "Accesibilidad educativa, EAA, Alumnos ACNEE, IA en educación inclusiva, Ley Europea de Accesibilidad",
         isoDate: "2026-01-21",
-        imageUrl: "/blog-accessibility.webp",
+        imageUrl: "/blog-accessibility.jpg",
         imageAlt: "Accesibilidad Educativa y IA en Hipatia",
         faq: [
             { question: "¿Cómo ayuda Hipatia a cumplir con la Ley Europea de Accesibilidad?", answer: "Hipatia integra estándares de diseño accesible y funciones de IA que adaptan la evaluación a las necesidades específicas de cada alumno, garantizando la equidad." },
