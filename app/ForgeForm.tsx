@@ -19,6 +19,7 @@ export default function ForgeForm({ onBack, userToken }: ForgeFormProps) {
         conceptos: '',
         modo_dislexia: false,
     });
+    const [isDyslexic, setIsDyslexic] = useState(false);
 
     // Conexión con n8n esperando JSON { "html": "..." }
     const handleGenerate = async () => {
@@ -72,7 +73,7 @@ export default function ForgeForm({ onBack, userToken }: ForgeFormProps) {
     // --- VISTA EDITOR / PREVISUALIZACIÓN ---
     if (examHtml) {
         return (
-            <div className="h-screen overflow-hidden flex flex-col font-sans print:bg-white print:h-auto print:overflow-visible">
+            <div className={`h-screen overflow-hidden flex flex-col font-sans print:bg-white print:h-auto print:overflow-visible ${isDyslexic ? 'font-dyslexic' : ''}`}>
                 {/* Header - Oculto al imprimir */}
                 <div className="bg-slate-900 text-white px-6 py-4 flex items-center justify-between shadow-md print:hidden z-50">
                     <div className="flex items-center gap-4">
@@ -84,6 +85,16 @@ export default function ForgeForm({ onBack, userToken }: ForgeFormProps) {
                     </div>
 
                     <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-2 mr-4">
+                            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">Modo Dislexia</span>
+                            <button
+                                onClick={() => setIsDyslexic(!isDyslexic)}
+                                className={`w-10 h-6 rounded-full flex items-center transition-colors p-1 ${isDyslexic ? 'bg-violet-500 justify-end' : 'bg-slate-700 justify-start'}`}
+                            >
+                                <div className="w-4 h-4 bg-white rounded-full shadow-sm"></div>
+                            </button>
+                        </div>
+
                         <div className="text-xs text-amber-400 flex items-center gap-2 mr-4 bg-amber-900/30 px-3 py-1 rounded-full border border-amber-700/50">
                             <AlertCircle size={14} />
                             <span>Puedes editar el texto directamente abajo</span>
@@ -134,6 +145,8 @@ export default function ForgeForm({ onBack, userToken }: ForgeFormProps) {
                         font-weight: bold;
                         font-style: normal;
                     }
+
+                    .font-dyslexic * { font-family: 'OpenDyslexic', sans-serif !important; }
 
                     /* Editor Base Styles */
                     .forge-editor-content {
@@ -250,23 +263,7 @@ export default function ForgeForm({ onBack, userToken }: ForgeFormProps) {
                                 />
                             </div>
 
-                            <div
-                                className={`flex items-center justify-between p-4 rounded-xl border-2 transition-all cursor-pointer ${formData.modo_dislexia ? 'bg-amber-50 border-amber-500' : 'bg-slate-50 border-transparent hover:border-slate-200'}`}
-                                onClick={() => setFormData({ ...formData, modo_dislexia: !formData.modo_dislexia })}
-                            >
-                                <div className="flex items-center gap-3">
-                                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center text-lg shadow-sm ${formData.modo_dislexia ? 'bg-amber-500 text-white' : 'bg-white text-slate-400'}`}>
-                                        👓
-                                    </div>
-                                    <div>
-                                        <span className={`block font-black text-xs uppercase tracking-tight ${formData.modo_dislexia ? 'text-amber-900' : 'text-slate-600'}`}>Modo Accesibilidad</span>
-                                        <span className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">OpenDyslexic</span>
-                                    </div>
-                                </div>
-                                <div className={`w-12 h-7 flex items-center rounded-full p-1 duration-300 ${formData.modo_dislexia ? 'bg-amber-500' : 'bg-slate-300'}`}>
-                                    <div className={`bg-white w-5 h-5 rounded-full shadow-md transform duration-300 ${formData.modo_dislexia ? 'translate-x-5' : ''}`}></div>
-                                </div>
-                            </div>
+
 
                             <button
                                 onClick={handleGenerate}
