@@ -3,6 +3,37 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ArrowLeft, CheckCircle, Upload, Zap, Eye, Printer, Loader2, BookOpen, AlertCircle, HelpCircle } from 'lucide-react';
 import { processFileText } from './utils';
+import katex from 'katex';
+import 'katex/dist/katex.min.css';
+
+// Función para renderizar LaTeX en HTML
+const renderLatex = (html: string | undefined | null) => {
+    if (!html) return '';
+
+    // Primero reemplazamos $$ formula $$ (Bloque)
+    let processed = html.replace(/\$\$([\s\S]*?)\$\$/g, (match, tex) => {
+        try {
+            return katex.renderToString(tex, { displayMode: true, throwOnError: false });
+        } catch (e) {
+            return match;
+        }
+    });
+
+    // Luego reemplazamos $ formula $ (En línea)
+    // Usamos una regex que evite falsos positivos simples, aunque asume que el usuario usa formato correcto
+    processed = processed.replace(/\$([^$]+?)\$/g, (match, tex) => {
+        // Validación simple para evitar convertir precios o textos con símbolos de moneda aislados
+        if (tex.trim().length === 0) return match;
+
+        try {
+            return katex.renderToString(tex, { displayMode: false, throwOnError: false });
+        } catch (e) {
+            return match;
+        }
+    });
+
+    return processed;
+};
 
 interface ForgeUniversalFormProps {
     onBack: () => void;
@@ -432,7 +463,7 @@ const ForgeUniversalForm: React.FC<ForgeUniversalFormProps> = ({ onBack, userTok
                                 contentEditable
                                 suppressContentEditableWarning
                                 dangerouslySetInnerHTML={{
-                                    __html: activeData?.html || '<p>Error de carga...</p>'
+                                    __html: renderLatex(activeData?.html) || '<p>Error de carga...</p>'
                                 }}
                             />
                         </div>
@@ -460,7 +491,7 @@ const ForgeUniversalForm: React.FC<ForgeUniversalFormProps> = ({ onBack, userTok
                                 <div
                                     contentEditable
                                     suppressContentEditableWarning
-                                    dangerouslySetInnerHTML={{ __html: activeData?.solucionario || '' }}
+                                    dangerouslySetInnerHTML={{ __html: renderLatex(activeData?.solucionario) || '' }}
                                 />
                             </div>
                         )}
