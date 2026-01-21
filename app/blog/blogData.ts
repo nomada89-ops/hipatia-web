@@ -515,7 +515,7 @@ export const blogPosts: BlogPost[] = [
         category: "Inclusión",
         keywords: "Adaptaciones curriculares, ACNEE, ACNEAE, inclusión educativa, IA para docentes, diseño universal para el aprendizaje, DUA, LOMLOE",
         isoDate: "2026-01-21",
-        imageUrl: "/Adaptacion.webp",
+        imageUrl: "/Adaptacion2.webp",
         imageAlt: "Adaptación de exámenes para diversidad e inclusión con Hipatia",
         faq: [
             { question: "¿Cómo adapta la IA los exámenes para alumnos ACNEE?", answer: "La IA pedagógica de Hipatia reduce la carga cognitiva, simplifica la sintaxis, utiliza formato DUA y ajusta los objetivos curriculares (en el caso de las ACS) basándose en el temario estándar proporcionado por el docente." },
