@@ -182,14 +182,33 @@ const ForgeUniversalForm: React.FC<ForgeUniversalFormProps> = ({ onBack, userTok
     };
 
     // --- IMPRESIÓN INTELIGENTE ---
-    const handlePrint = () => {
-        const originalTitle = document.title;
-        const versionSuffix = activeVersion === 'estandar' ? '' : `-${activeVersion.toUpperCase()}`;
-        document.title = `Examen_Hipatia-${nivel}${versionSuffix}-${new Date().toLocaleDateString()}`;
-
-        window.print();
-        document.title = originalTitle;
-    };
+    // --- IMPRESIÓN INTELIGENTE ---
+    const handlePrint = useReactToPrint({
+        content: () => printableRef.current,
+        documentTitle: `Examen_Hipatia-${nivel}-${activeVersion}-${new Date().toLocaleDateString()}`,
+        pageStyle: `
+            @media print {
+                body { 
+                    -webkit-print-color-adjust: exact; 
+                }
+                @page {
+                    size: auto;
+                    margin: 20mm;
+                }
+                /* Ocultar elementos específicos de UI al imprimir dentro del ref */
+                .no-print {
+                    display: none !important;
+                }
+                
+                /* Asegurar que los contenedores no corten contenido */
+                .prose {
+                    max-width: none !important;
+                    width: 100% !important;
+                    overflow: visible !important;
+                }
+            }
+        `
+    });
 
     const handleCopySolucionario = () => {
         const currentData = getActiveData();
@@ -322,7 +341,7 @@ const ForgeUniversalForm: React.FC<ForgeUniversalFormProps> = ({ onBack, userTok
 
                 {/* Editor Area */}
                 <div className="flex-1 overflow-y-auto bg-slate-100 p-8 print:p-0 print:bg-white print:overflow-visible print:overflow-visible print:overflow-visible">
-                    <div className="max-w-[210mm] mx-auto bg-white shadow-xl min-h-[297mm] p-[20mm] print:shadow-none print:p-0">
+                    <div ref={printableRef} className="max-w-[210mm] mx-auto bg-white shadow-xl min-h-[297mm] p-[20mm] print:shadow-none print:p-0">
 
                         {/* EXAMEN CONTAINER */}
                         <div className={`prose prose-slate max-w-none outline-none ${viewMode === 'examen' ? 'block' : 'hidden print:block'}`}>
