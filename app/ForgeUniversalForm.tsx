@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
+import { useReactToPrint } from 'react-to-print';
 import { ArrowLeft, CheckCircle, Upload, Zap, Eye, Printer, Loader2, BookOpen, AlertCircle, HelpCircle } from 'lucide-react';
 import { processFileText } from './utils';
 
@@ -48,6 +49,7 @@ const ForgeUniversalForm: React.FC<ForgeUniversalFormProps> = ({ onBack, userTok
     const temarioInputRef = useRef<HTMLInputElement>(null);
     const modeloInputRef = useRef<HTMLInputElement>(null);
     const editorRef = useRef<HTMLDivElement>(null);
+    const printableRef = useRef<HTMLDivElement>(null);
 
     // --- MANEJADORES DE ARCHIVOS ---
     const handleTemarioFiles = async (files: FileList | null) => {
