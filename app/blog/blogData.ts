@@ -446,6 +446,63 @@ export const blogPosts: BlogPost[] = [
             <h2>Conclusión: Hacia una educación basada en el crecimiento</h2>
             <p>La evaluación formativa no es un lujo, es una necesidad para una educación de calidad. Con Hipatia, democratizamos el feedback de alto nivel, permitiendo que cada alumno, independientemente de la asignatura, reciba la atención y la guía que merece para alcanzar su máximo potencial.</p>
         `
+    },
+    {
+        slug: "informes-grupo-analisis-dafo-educativo-hipatia",
+        title: "Informes de grupo y análisis DAFO: Cómo entender el rendimiento de tu clase en segundos",
+        seoTitle: "Análisis DAFO Educativo: Informes Grupales con IA en Hipatia",
+        excerpt: "¿Sabes realmente cómo progresa tu clase? Descubre cómo los Informes de Grupo de Hipatia transforman los resultados individuales en un diagnóstico estratégico DAFO para optimizar tu enseñanza.",
+        date: "21 Enero, 2026",
+        author: "Equipo HIPATIA",
+        readTime: "6 min lectura",
+        category: "Analítica",
+        keywords: "Diagnóstico de aula, informe grupal de evaluación, análisis DAFO educativo, analítica de aprendizaje, gestión de aula con IA",
+        isoDate: "2026-01-21",
+        imageUrl: "/blog-dafo.webp",
+        imageAlt: "Análisis DAFO Educativo y Gestión de Aula con Hipatia",
+        faq: [
+            { question: "¿Cómo se genera el análisis DAFO de una clase?", answer: "Hipatia agrega los resultados de todas las correcciones individuales de un grupo y utiliza modelos de IA para identificar patrones comunes, clasificándolos en fortalezas, debilidades, amenazas y oportunidades pedagógicas." },
+            { question: "¿Es posible descargar el informe grupal?", answer: "Sí, el sistema genera un informe interactivo en pantalla que puede exportarse a PDF para su uso en juntas de evaluación o como evidencia de seguimiento docente." }
+        ],
+        content: `
+            <p class="lead">Corregir 30 exámenes permite saber cómo está cada alumno, pero no siempre ofrece una visión clara de cómo está el grupo. A menudo, el profesor detecta "sensaciones" (como que la mayoría ha fallado en la misma pregunta), pero carece de un dato objetivo para rediseñar su programación. Con <strong>Hipatia</strong>, esa intuición se convierte en dato estratégico.</p>
+
+            <h2>Del dato individual al diagnóstico estratégico</h2>
+            <p>La función de <strong>Informes de Grupo de Hipatia</strong> automatiza la recopilación de resultados para realizar un análisis cruzado. El sistema recupera los registros de corrección para transformar una simple lista de notas en un diagnóstico profundo basado en una <strong>Matriz DAFO de aula</strong>.</p>
+
+            <h3>¿Qué información aporta la Matriz DAFO?</h3>
+            <p>A diferencia de un informe tradicional, el análisis DAFO (Debilidades, Amenazas, Fortalezas y Oportunidades) permite al docente tomar decisiones pedagógicas inmediatas para la siguiente clase:</p>
+
+            <ul>
+                <li><strong>Fortalezas:</strong> Identifica qué contenidos o competencias han sido dominados por más del 80% de la clase. Esto permite al profesor avanzar con seguridad o profundizar en temas más complejos.</li>
+                <li><strong>Debilidades:</strong> Detecta errores sistémicos. Si el 60% de los alumnos comete el mismo error en un concepto específico, el problema no es del alumno, sino de la asimilación general, indicando la necesidad de un nuevo enfoque didáctico.</li>
+                <li><strong>Amenazas:</strong> Localiza de forma temprana a los alumnos en "zona de riesgo" o con una evolución negativa, permitiendo intervenciones preventivas antes de que el desfase sea insalvable.</li>
+                <li><strong>Oportunidades:</strong> Sugiere actividades de refuerzo o ampliación basadas en el nivel medio real detectado, optimizando la curva de aprendizaje de todo el grupo.</li>
+            </ul>
+
+            <hr class="my-8" />
+
+            <h2>Visualización y toma de decisiones</h2>
+            <p>El informe grupal no solo ofrece texto; incluye una <strong>visualización de la distribución de calificaciones</strong>. De un vistazo, puedes ver si tu clase tiene una curva de aprendizaje equilibrada o si existe una brecha profunda entre grupos de alumnos, lo que facilita la creación de grupos de nivel o tutorías entre iguales.</p>
+
+            <h2>Aplicación práctica: Menos administración, más enseñanza</h2>
+            <p>Tener este informe listo nada más terminar de corregir permite al docente:</p>
+            <ol>
+                <li><strong>Optimizar el tiempo de clase:</strong> No perder minutos valiosos repasando lo que el grupo ya domina.</li>
+                <li><strong>Personalizar el refuerzo:</strong> Agrupar a los alumnos por el tipo de error cometido (Debilidades comunes) para sesiones de apoyo dirigidas.</li>
+                <li><strong>Rigor administrativo:</strong> Generar evidencias del seguimiento pedagógico en formato PDF para el departamento o las reuniones de evaluación.</li>
+            </ol>
+
+            <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 1.5rem; border-radius: 0.75rem; margin-top: 2rem;">
+                <h4 style="margin-top: 0; color: #4f46e5;">Ficha técnica:</h4>
+                <p style="font-size: 0.9rem; margin-bottom: 0;">
+                    <strong>Origen de datos:</strong> Baserow (Histórico de exámenes).<br>
+                    <strong>Procesamiento:</strong> n8n + Gemini 3 (Análisis de tendencias).<br>
+                    <strong>Visualización:</strong> Gráficos de distribución y matriz pedagógica dinámica.<br>
+                    <strong>Acción:</strong> Informe descargable para el cuaderno del profesor.
+                </p>
+            </div>
+        `
     }
 ];
 
