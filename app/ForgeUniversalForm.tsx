@@ -130,9 +130,9 @@ const ForgeUniversalForm: React.FC<ForgeUniversalFormProps> = ({ onBack, userTok
             // Procesar respuesta
             if (data.version_estandar) {
                 // Modo Triple
-                setExamHtml(data.version_estandar);
-                setAcneaeHtml(data.version_no_significativa);
-                setAcsHtml(data.version_significativa);
+                setExamHtml(data.version_estandar.html);
+                setAcneaeHtml(data.version_no_significativa.html);
+                setAcsHtml(data.version_significativa.html);
                 setPedagogicalData(data.metadata_pedagogica?.justificacion_dua || null);
                 setActiveVersion('estandar');
             } else {
