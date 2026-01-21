@@ -503,6 +503,53 @@ export const blogPosts: BlogPost[] = [
                 </p>
             </div>
         `
+    },
+    {
+        slug: "adaptacion-examenes-acnee-acneae-ia-hipatia",
+        title: "El fin de las noches sin dormir: Adapta tus exámenes (ACNEE/ACNEAE) en 30 segundos",
+        seoTitle: "Cómo adaptar exámenes ACNEE y ACNEAE con IA en segundos | Hipatia",
+        excerpt: "¿Pasas horas adaptando exámenes para atender a la diversidad? Descubre cómo el Generador Triple de Hipatia crea versiones Estándar, ACNEAE y ACS de forma simultánea con justificación técnica pedagógica.",
+        date: "21 Enero, 2026",
+        author: "Equipo HIPATIA",
+        readTime: "5 min lectura",
+        category: "Inclusión",
+        keywords: "Adaptaciones curriculares, ACNEE, ACNEAE, inclusión educativa, IA para docentes, diseño universal para el aprendizaje, DUA, LOMLOE",
+        isoDate: "2026-01-21",
+        imageUrl: "/blog-acnee.jpg",
+        imageAlt: "Adaptación de exámenes para diversidad e inclusión con Hipatia",
+        faq: [
+            { question: "¿Cómo adapta la IA los exámenes para alumnos ACNEE?", answer: "La IA pedagógica de Hipatia reduce la carga cognitiva, simplifica la sintaxis, utiliza formato DUA y ajusta los objetivos curriculares (en el caso de las ACS) basándose en el temario estándar proporcionado por el docente." },
+            { question: "¿Qué diferencia hay entre una adaptación ACNEAE y una ACS en Hipatia?", answer: "La adaptación ACNEAE se centra en el acceso (formato, claridad, estructura) siguiendo principios DUA, mientras que la ACS (Significativa) modifica la taxonomía de los objetivos y contenidos para ajustarlos al nivel competencial real del alumno." }
+        ],
+        content: `
+            <p class="lead">¿Cuántas horas pasas después de clase adaptando contenidos? ¿Cuántas veces has sentido que la burocracia de las ACS (Adaptaciones Curriculares Significativas) te impide centrarte en lo que de verdad importa: tus alumnos? En <strong>Hipatia</strong>, sabemos que atender a la diversidad en un aula de 30 estudiantes es un reto heroico.</p>
+
+            <p>Por eso, hemos lanzado nuestra función más ambiciosa hasta la fecha: la <strong>Generación Triple de Exámenes con IA Pedagógica</strong>.</p>
+
+            <h2>1. Un solo temario, tres realidades distintas</h2>
+            <p>Ya no tienes que redactar tres veces el mismo examen. Ahora, al introducir tu material base, Hipatia genera de forma simultánea:</p>
+
+            <ul>
+                <li><strong>Versión Estándar:</strong> El rigor académico que esperas para tu nivel (ESO/Bachillerato).</li>
+                <li><strong>Adaptación de Acceso (ACNEAE):</strong> Enunciados directos, limpieza visual y formato DUA (Diseño Universal para el Aprendizaje) para alumnos con dislexia o TDAH.</li>
+                <li><strong>Adaptación Significativa (ACS):</strong> Un ajuste real de la taxonomía. Pasamos del "analiza" al "identifica", manteniendo el mismo tema para que ningún alumno se sienta segregado.</li>
+            </ul>
+
+            <hr class="my-8" />
+
+            <h2>2. La "Magia" que adoran los Orientadores</h2>
+            <p>Lo que diferencia a Hipatia no es solo que el examen sea más fácil o difícil. Es que Hipatia razona como un especialista en Pedagogía Terapéutica. Cada examen triple incluye automáticamente un bloque de <strong>Metadatos Pedagógicos</strong>.</p>
+            <p>En él encontrarás la justificación técnica basada en la <strong>LOMLOE</strong> y los principios DUA aplicados. Copia, pega en tu programación didáctica, y listo. Se acabó el estrés burocrático.</p>
+
+            <h2>3. Inclusión real, no solo en el papel</h2>
+            <p>El mayor temor de un alumno con necesidades especiales es recibir una hoja que no se parece en nada a la de sus compañeros. Hipatia mantiene la <strong>coherencia visual</strong>. Los iconos, el estilo y el contexto son los mismos. Cambiamos la complejidad, no el sentimiento de pertenencia al grupo.</p>
+
+            <div style="background-color: #f0f9ff; border-left: 4px solid #0ea5e9; padding: 1.5rem; margin-top: 2rem; border-radius: 0.5rem;">
+                <h4 style="margin-top: 0; color: #0369a1;">¿Cómo puedes empezar?</h4>
+                <p style="margin-bottom: 0;">Esta función ya está disponible en tu panel de control bajo el modo <strong>"Generador Triple ACNEE"</strong>.</p>
+                <p style="margin-top: 1rem; font-style: italic; font-size: 0.9rem;"><strong>Tip de experto:</strong> Prueba a subir un texto complejo sobre la Revolución Industrial o el Enlace Químico. Te sorprenderá ver cómo Hipatia es capaz de bajar dos niveles curriculares sin perder la esencia del tema.</p>
+            </div>
+        `
     }
 ];
 
