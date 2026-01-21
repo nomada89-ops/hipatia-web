@@ -308,6 +308,144 @@ export const blogPosts: BlogPost[] = [
                 <li><strong>Ahorro de tiempo:</strong> Hipatia redacta esto en segundos tras escanear el papel.</li>
             </ul>
         `
+    },
+    {
+        slug: "accesibilidad-educativa-eaa-ia-hipatia",
+        title: "Accesibilidad Universal: Cómo la IA de Hipatia se adelanta a la Ley Europea de Accesibilidad (EAA)",
+        seoTitle: "Accesibilidad Educativa: HIPATIA y el cumplimiento de la EAA con IA",
+        excerpt: "Descubre cómo Hipatia transforma la educación inclusiva, permitiendo que alumnos con necesidades especiales accedan a una evaluación justa y adaptada mediante IA.",
+        date: "21 Enero, 2026",
+        author: "Equipo HIPATIA",
+        readTime: "5 min lectura",
+        category: "Accesibilidad",
+        keywords: "Accesibilidad educativa, EAA, Alumnos ACNEE, IA en educación inclusiva, Ley Europea de Accesibilidad",
+        isoDate: "2026-01-21",
+        imageUrl: "/blog-accessibility.webp",
+        imageAlt: "Accesibilidad Educativa y IA en Hipatia",
+        faq: [
+            { question: "¿Cómo ayuda Hipatia a cumplir con la Ley Europea de Accesibilidad?", answer: "Hipatia integra estándares de diseño accesible y funciones de IA que adaptan la evaluación a las necesidades específicas de cada alumno, garantizando la equidad." },
+            { question: "¿Es posible evaluar a alumnos con adaptaciones curriculares?", answer: "Sí, Hipatia permite configurar niveles de exigencia específicos (modo ACNEE) y generar rúbricas personalizadas para cada perfil de aprendizaje." }
+        ],
+        content: `
+            <p class="lead">La educación del siglo XXI no puede permitirse dejar a nadie atrás. Con la entrada en vigor de la <strong>Ley Europea de Accesibilidad (EAA)</strong>, las instituciones educativas se enfrentan al resto de garantizar que sus herramientas digitales sean plenamente inclusivas. En este escenario, <strong>Hipatia</strong> no solo cumple con la norma, sino que redefine lo que significa la "adaptación curricular" en la era de la inteligencia artificial.</p>
+
+            <h2>¿Qué es la EAA y por qué es vital para el docente?</h2>
+            <p>La EAA (European Accessibility Act) establece requisitos estrictos para que los productos y servicios digitales sean utilizables por personas con discapacidad. En el aula, esto se traduce en que cualquier plataforma de evaluación debe ser capaz de adaptarse a las necesidades de alumnos con baja visión, problemas motores o dificultades de aprendizaje.</p>
+            <p>Hipatia ha sido diseñada desde su origen bajo estos principios, permitiendo que el proceso de "corregir un examen" deje de ser una barrera y se convierta en una oportunidad de equidad.</p>
+
+            <h2>La IA como motor de inclusión para alumnos ACNEE</h2>
+            <p>Para los alumnos con <strong>Necesidades Específicas de Apoyo Educativo (ACNEE)</strong>, el sistema tradicional de evaluación suele ser rígido. Hipatia rompe esta barrera mediante varias funcionalidades clave:</p>
+            <ul>
+                <li><strong>Adaptación de contenidos:</strong> Nuestro motor permite ajustar el nivel de exigencia (modo ACNEE) para centrarse en los objetivos mínimos alcanzables, proporcionando un feedback que motiva en lugar de frustrar.</li>
+                <li><strong>Multimodalidad:</strong> Al digitalizar el papel, alumnos que prefieren o necesitan escribir a mano (por motivos motores o cognitivos) pueden seguir haciéndolo, mientras que la IA se encarga de que su esfuerzo sea evaluado con la misma precisión que un texto digital.</li>
+                <li><strong>Lectura y análisis simplificado:</strong> Los informes generados por Hipatia utilizan una estructura clara y jerárquica, facilitandola comprensión para alumnos con trastornos del espectro autista o dificultades de procesamiento.</li>
+            </ul>
+
+            <hr class="my-8" />
+
+            <h2>Beneficios para el Centro Educativo</h2>
+            <p>Implementar soluciones que cumplen con la EAA no es solo una obligación legal; es un sello de calidad y ética pedagógica. Hipatia ayuda a los centros a:</p>
+            <ol>
+                <li><strong>Reducir la brecha digital:</strong> Asegurando que la tecnología sea un puente, no un muro.</li>
+                <li><strong>Cumplimiento Normativo Automático:</strong> Al usar Hipatia, el centro se asegura de que sus procesos de evaluación cumplen con los estándares internacionales de accesibilidad (WCAG).</li>
+                <li><strong>Atención a la diversidad real:</strong> Facilitando a los profesores la gestión de aulas heterogéneas sin aumentar su carga administrativa.</li>
+            </ol>
+
+            <h2>Conclusión: Un futuro sin barreras</h2>
+            <p>La accesibilidad no es un "añadido" para unos pocos; es una mejora de la experiencia para todos. Con Hipatia, estamos construyendo un ecosistema donde el talento de cada alumno pueda brillar, sin que su forma de escribir, leer o procesar la información sea un impedimento para demostrar lo que sabe.</p>
+        `
+    },
+    {
+        slug: "productividad-docente-hipatia-forge-generador-examenes",
+        title: "Productividad Docente: Cómo HIPATIA Forge elimina el síndrome del folio en blanco",
+        seoTitle: "HIPATIA Forge: Generador de Exámenes y Rúbricas para Profesores",
+        excerpt: "Diseñar un examen desde cero consume horas. Descubre cómo HIPATIA Forge utiliza la IA para generar materiales educativos de alta calidad en segundos, manteniendo siempre tu criterio pedagógico.",
+        date: "21 Enero, 2026",
+        author: "Equipo HIPATIA",
+        readTime: "5 min lectura",
+        category: "Productividad",
+        keywords: "Productividad docente, Generador de exámenes IA, Rúbricas automatizadas, Materiales educativos, HIPATIA Forge",
+        isoDate: "2026-01-21",
+        imageUrl: "/blog-productivity.webp",
+        imageAlt: "Productividad Docente y Generación de Exámenes con Hipatia Forge",
+        faq: [
+            { question: "¿HIPATIA Forge puede crear exámenes de cualquier asignatura?", answer: "Sí, nuestro sistema es agnóstico a la materia. Puedes generar materiales para ciencias, humanidades, idiomas o formación profesional subiendo tus propios contenidos de referencia." },
+            { question: "¿Puedo modificar las preguntas que genera la IA?", answer: "Por supuesto. El sistema presenta una interfaz editable en tiempo real donde puedes cambiar cada palabra antes de descargar el documento final." }
+        ],
+        content: `
+            <p class="lead">Cualquier docente sabe que la parte más difícil de evaluar no es poner la nota, sino el diseño previo: crear preguntas que realmente midan el aprendizaje y redactar rúbricas que no dejen lugar a la duda. Este proceso, a menudo solitario y nocturno, es lo que llamamos el <strong>"síndrome del folio en blanco"</strong>. Con <strong>HIPATIA Forge</strong>, ese bloqueo ha terminado.</p>
+
+            <h2>De la idea al examen en 60 segundos</h2>
+            <p>Imagina que acabas de terminar un tema sobre el metabolismo celular. Tienes tus apuntes, pero necesitas un examen variado, con diferentes niveles de complejidad. En lugar de pasar dos horas redactando, simplemente subes tu material de referencia a Hipatia y defines tus objetivos. El sistema, actuando como un artesano digital, te propone una estructura completa en segundos.</p>
+            <p>Lo que hace especial a Forge no es solo que "escriba" preguntas, sino que las estructura con <strong>rigor académico</strong>, asegurando que cubren todas las competencias necesarias.</p>
+
+            <h2>Control total: La IA propone, el docente dispone</h2>
+            <p>En Hipatia creemos firmemente en la soberanía docente. Por eso, el contenido generado por Forge no es algo cerrado. Es un lienzo dinámico donde tú tienes la última palabra:</p>
+            <ul>
+                <li><strong>Edición fluida:</strong> ¿Una pregunta te parece demasiado difícil? Pulsa un botón y pide una alternativa, o edita el texto directamente en pantalla.</li>
+                <li><strong>Personalización de rúbricas:</strong> El sistema genera automáticamente los criterios de evaluación, pero tú puedes ajustar los porcentajes y descriptores para que encajen exactamente con tu estilo de enseñanza.</li>
+                <li><strong>Formato listo para el aula:</strong> Una vez estés satisfecho, puedes descargar un PDF profesional, maquetado y listo para imprimir. Sin complicaciones de formato en Word o tablas rebeldes en Excel.</li>
+            </ul>
+
+            <hr class="my-8" />
+
+            <h2>Recuperando el tiempo para lo que importa</h2>
+            <p>¿Qué harías si tuvieras 5 horas más a la semana? Automatizar el diseño de materiales no es "hacer trampas", es <strong>optimizar tu energía profesional</strong>. Al liberar al docente de la carga mecánica de la redacción y maquetación, Hipatia permite que el profesor se centre en:</p>
+            <ol>
+                <li><strong>La atención individualizada:</strong> Pasar más tiempo resolviendo dudas que redactando enunciados.</li>
+                <li><strong>La innovación metodológica:</strong> Diseñar nuevas actividades de aula mientras la IA prepara los instrumentos de evaluación.</li>
+                <li><strong>El bienestar personal:</strong> Porque un docente descansado es, sin duda, un mejor docente.</li>
+</ol>
+
+            <h2>Conclusión: Tu asistente de taller creativo</h2>
+            <p>HIPATIA Forge no viene a sustituir tu creatividad, sino a escalarla. Es la herramienta que te permite ser más eficiente sin sacrificar la calidad pedagógica, convirtiendo la preparación de clases en un proceso ágil, moderno y, sobre todo, satisfactorio.</p>
+        `
+    },
+    {
+        slug: "evaluacion-formativa-ia-feedback-pedagogico-hipatia",
+        title: "Evaluación Formativa: El Feedback que Transforma",
+        seoTitle: "Evaluación Formativa con IA: El poder del feedback en Hipatia",
+        excerpt: "La nota es solo el final del camino. Descubre cómo Hipatia utiliza la IA para proporcionar una evaluación formativa real, con feedback constructivo y personalizado que ayuda al alumno a crecer.",
+        date: "21 Enero, 2026",
+        author: "Equipo HIPATIA",
+        readTime: "6 min lectura",
+        category: "Innovación",
+        keywords: "Evaluación formativa, Feedback pedagógico, IA en educación, Mejora del aprendizaje, Informes de evaluación Hipatia",
+        isoDate: "2026-01-21",
+        imageUrl: "/blog-feedback.webp",
+        imageAlt: "Evaluación Formativa y Feedback Inteligente en Hipatia",
+        faq: [
+            { question: "¿Cómo mejora la IA la evaluación formativa?", answer: "La IA permite procesar grandes volúmenes de exámenes proporcionando comentarios específicos, inmediatos y personalizados que serían inasumibles de forma manual para un docente." },
+            { question: "¿El feedback generado por Hipatia es siempre igual?", answer: "No, nuestro sistema analiza cada examen de forma única, vinculando los comentarios a las evidencias encontradas en el texto del alumno y a los objetivos de la rúbrica." }
+        ],
+        content: `
+            <p class="lead">Durante décadas, la evaluación se ha centrado en el resultado final: una cifra escrita en rojo que sentencia el destino de un examen. Pero, ¿y si la evaluación fuera en realidad el inicio del aprendizaje? Con la irrupción de la inteligencia artificial, estamos siendo testigos de la era dorada de la <strong>evaluación formativa</strong>.</p>
+
+            <h2>Más que un número: El feedback como diálogo</h2>
+            <p>La evaluación formativa se basa en una premisa sencilla: el alumno necesita saber no solo cuánto ha fallado, sino <strong>por qué</strong> y <strong>cómo mejorar</strong>. En un aula saturada, es físicamente imposible para un docente proporcionar un feedback detallado y personalizado a 30 alumnos en cada prueba. Aquí es donde Hipatia se convierte en el aliado perfecto.</p>
+            <p>Nuestros motores de IA no solo corrigen; conversan con el texto del alumno. Identifican el razonamiento detrás de una respuesta incorrecta y proporcionan una pista, un refuerzo o una corrección que el alumno puede procesar para su siguiente intento.</p>
+
+            <h2>Las tres claves del feedback en Hipatia</h2>
+            <p>Para que el feedback sea efectivo, debe cumplir tres condiciones que hemos integrado en el ADN de nuestra plataforma:</p>
+            <ul>
+                <li><strong>Inmediatez:</strong> El aprendizaje se pierde cuando la corrección llega dos semanas tarde. Hipatia permite que el alumno reciba su informe casi al instante, cuando el contenido aún está fresco en su memoria.</li>
+                <li><strong>Especificidad:</strong> No basta con un "buen trabajo". Los informes de Hipatia señalan la evidencia directa en el examen ("En este párrafo confundes el concepto X con el Y") para que la mejora sea tangible.</li>
+                <li><strong>Tono Pedagógico:</strong> Gracias a nuestra arquitectura de Triple Consenso, el feedback final es redactado con un tono alentador y profesional, diseñado para motivar el crecimiento y no para penalizar el error.</li>
+            </ul>
+
+            <hr class="my-8" />
+
+            <h2>Cambiando el paradigma: Del castigo a la hoja de ruta</h2>
+            <p>Cuando un alumno lee un informe de Hipatia, no ve un callejón sin salida. Ve una <strong>hoja de ruta personalizada</strong>. El sistema genera automáticamente sugerencias de estudio basadas en las áreas donde se ha detectado mayor dificultad, convirtiendo el error en una oportunidad diagnóstica.</p>
+            <ol>
+                <li><strong>Identificación de lagunas:</strong> La IA agrupa los errores por competencias, permitiendo ver patrones que a veces pasan desapercibidos.</li>
+                <li><strong>Guía de mejora:</strong> Propone pasos específicos: "Repasa este concepto", "Prueba a redactar de esta otra forma".</li>
+                <li><strong>Empoderamiento del alumno:</strong> Al entender su proceso, el alumno se siente dueño de su aprendizaje.</li>
+            </ol>
+
+            <h2>Conclusión: Hacia una educación basada en el crecimiento</h2>
+            <p>La evaluación formativa no es un lujo, es una necesidad para una educación de calidad. Con Hipatia, democratizamos el feedback de alto nivel, permitiendo que cada alumno, independientemente de la asignatura, reciba la atención y la guía que merece para alcanzar su máximo potencial.</p>
+        `
     }
 ];
 
