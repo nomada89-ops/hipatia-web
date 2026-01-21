@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { useReactToPrint } from 'react-to-print';
 import { ArrowLeft, CheckCircle, Upload, Zap, Eye, Printer, Loader2, BookOpen, AlertCircle, HelpCircle } from 'lucide-react';
 import { processFileText } from './utils';
 
@@ -182,33 +181,10 @@ const ForgeUniversalForm: React.FC<ForgeUniversalFormProps> = ({ onBack, userTok
     };
 
     // --- IMPRESIÓN INTELIGENTE ---
-    // --- IMPRESIÓN INTELIGENTE ---
-    const handlePrint = useReactToPrint({
-        content: () => printableRef.current,
-        documentTitle: `Examen_Hipatia-${nivel}-${activeVersion}-${new Date().toLocaleDateString()}`,
-        pageStyle: `
-            @media print {
-                body { 
-                    -webkit-print-color-adjust: exact; 
-                }
-                @page {
-                    size: auto;
-                    margin: 20mm;
-                }
-                /* Ocultar elementos específicos de UI al imprimir dentro del ref */
-                .no-print {
-                    display: none !important;
-                }
-                
-                /* Asegurar que los contenedores no corten contenido */
-                .prose {
-                    max-width: none !important;
-                    width: 100% !important;
-                    overflow: visible !important;
-                }
-            }
-        `
-    });
+    // --- IMPRESIÓN INTELIGENTE (ESTRATEGIA FORGE FORM) ---
+    const handlePrint = () => {
+        window.print();
+    };
 
     const handleCopySolucionario = () => {
         const currentData = getActiveData();
@@ -248,9 +224,92 @@ const ForgeUniversalForm: React.FC<ForgeUniversalFormProps> = ({ onBack, userTok
         return (
             <div className={`h-screen overflow-hidden flex flex-col font-sans print:bg-white print:h-auto print:overflow-visible ${isDyslexic ? 'font-dyslexic' : ''}`}>
 
-                <style>{`
-                      .font-dyslexic * { font-family: 'OpenDyslexic', sans-serif !important; }
-                  `}</style>
+                <style dangerouslySetInnerHTML={{
+                    __html: `
+                    /* Fonts - Using correct CDN package */
+                    @font-face {
+                        font-family: 'OpenDyslexic';
+                        src: url('https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/otf/OpenDyslexic-Regular.otf') format('opentype');
+                        src: url('https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/woff/OpenDyslexic-Regular.woff') format('woff'),
+                             url('https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/ttf/OpenDyslexic-Regular.ttf') format('truetype');
+                        font-weight: normal;
+                        font-style: normal;
+                    }
+                    @font-face {
+                        font-family: 'OpenDyslexic';
+                        src: url('https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/otf/OpenDyslexic-Bold.otf') format('opentype');
+                        src: url('https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/woff/OpenDyslexic-Bold.woff') format('woff'),
+                             url('https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.3/ttf/OpenDyslexic-Bold.ttf') format('truetype');
+                        font-weight: bold;
+                        font-style: normal;
+                    }
+
+                    .font-dyslexic * { font-family: 'OpenDyslexic', sans-serif !important; }
+
+                    /* Styling for print media - Optimized for A4 PDF */
+                    @media print {
+                        @page {
+                            size: A4;
+                            margin: 2cm;
+                        }
+                        
+                        body {
+                            background: white !important;
+                            -webkit-print-color-adjust: exact;
+                        }
+
+                        /* Force reset of all containers to allow paging */
+                        html, body, #__next, div[class*="min-h-screen"], div[class*="h-screen"], .h-screen, .overflow-hidden {
+                            height: auto !important;
+                            overflow: visible !important;
+                            position: static !important;
+                        }
+
+                        /* Hide UI elements */
+                        button, .print\\:hidden, .no-print {
+                            display: none !important;
+                        }
+
+                        /* Content styling */
+                        .prose, div[contenteditable] {
+                            box-shadow: none !important;
+                            max-width: 100% !important;
+                            width: 100% !important;
+                            padding: 0 !important;
+                            margin: 0 !important;
+                            font-size: 11pt !important;
+                            line-height: 1.4 !important;
+                        }
+
+                        /* Prevent awkward breaks */
+                        h1, h2, h3 {
+                            break-after: avoid;
+                        }
+                        img {
+                            max-width: 100%;
+                            height: auto;
+                            break-inside: avoid;
+                        }
+                        p, li {
+                            break-inside: avoid;
+                            widows: 3;
+                            orphans: 3;
+                        }
+                        
+                        /* Fix overflow clipping */
+                        * {
+                            overflow: visible !important;
+                        }
+                        
+                        /* Specifically target the container to remove shadows/margins during print */
+                        .max-w-\\[210mm\\] {
+                            max-width: none !important;
+                            margin: 0 !important;
+                            box-shadow: none !important;
+                            padding: 0 !important;
+                        }
+                    }
+                `}} />
 
                 {/* Header - Oculto al imprimir */}
                 <div className="bg-slate-900 text-white px-6 py-4 flex items-center justify-between shadow-md print:hidden z-50">
