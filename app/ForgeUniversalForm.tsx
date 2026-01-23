@@ -94,14 +94,14 @@ const ForgeUniversalForm: React.FC<ForgeUniversalFormProps> = ({ onBack, userTok
         if (count > limits.RISK) {
             newStatus = 'blocked';
             newColor = 'text-rose-500';
-            newMessage = `❌ Capacidad Excedida: El texto es demasiado largo (${count.toLocaleString()} caract). Por favor, reduce el temario. (Límite: ${limits.RISK.toLocaleString()})`;
+            newMessage = `❌ Capacidad Excedida: El texto es demasiado largo (${count.toLocaleString()} caract). Por favor, reduce el temario. (Límite: ${limits.RISK.toLocaleString()}). 💡 Tip Pro: Usa ChatGPT o Gemini para resumir tus temas antes de subirlos.`;
         } else if (count > limits.OPTIMAL) {
             newStatus = 'risk';
             newColor = 'text-amber-500';
             if (modoInclusion) {
-                newMessage = `⚠️ Riesgo de truncado: Generar 3 versiones con tanto contenido (${count.toLocaleString()}) puede agotar el espacio de respuesta.`;
+                newMessage = `⚠️ Riesgo de truncado: Generar 3 versiones con tanto contenido (${count.toLocaleString()}) puede agotar el espacio de respuesta. 💡 Tip Pro: Usa ChatGPT o Gemini para resumir tus temas antes de subirlos.`;
             } else {
-                newMessage = `⚠️ Material muy extenso (${count.toLocaleString()}). Hipatia procesará todo el contenido, pero la generación podría demorarse.`;
+                newMessage = `⚠️ Material muy extenso (${count.toLocaleString()}). Hipatia procesará todo el contenido, pero la generación podría demorarse. 💡 Tip Pro: Usa ChatGPT o Gemini para resumir tus temas antes de subirlos.`;
             }
         }
 
