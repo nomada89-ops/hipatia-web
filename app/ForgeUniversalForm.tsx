@@ -721,13 +721,13 @@ const ForgeUniversalForm: React.FC<ForgeUniversalFormProps> = ({ onBack, userTok
                                     <textarea
                                         value={instrucciones}
                                         onChange={(e) => setInstrucciones(e.target.value)}
-                                        placeholder="Ej: Revolución Francesa, céntrate en las causas económicas. Omitir la etapa del Terror. Preguntas de desarrollo corto."
+                                        placeholder="¿No tienes apuntes a mano? No te preocupes. Hipatia es experta en el currículo oficial. Solo escribe el tema y ella hará el resto."
                                         rows={3}
                                         className="w-full p-3 bg-slate-50 border-2 border-transparent rounded-lg focus:border-violet-500 focus:bg-white outline-none transition-all font-medium text-sm text-slate-700 shadow-sm resize-none"
                                     />
                                     <div className="flex items-center gap-1.5 text-[10px] text-slate-400 pl-1">
                                         <HelpCircle size={12} />
-                                        <span>Este texto define el examen si no hay archivo de temario.</span>
+                                        <span>Indica el tema o instrucciones. Si no subes apuntes, Hipatia usará su base de datos oficial.</span>
                                     </div>
                                 </div>
                             </div>

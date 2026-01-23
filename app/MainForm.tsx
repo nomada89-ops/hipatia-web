@@ -640,8 +640,11 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                             {/* SECTION 1: CONTEXTO (RÚBRICA & REFERENCIAS) */}
                             <div className="space-y-4">
                                 <div className="flex items-center gap-2 mb-2">
-                                    <div className="bg-indigo-50 p-2 rounded-lg text-indigo-600"><Shield size={16} /></div>
-                                    <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest">Contexto de la Evaluación</h3>
+                                    <div className="bg-indigo-50/50 p-2 rounded-lg text-indigo-600"><Shield size={16} /></div>
+                                    <div className="flex flex-col">
+                                        <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest">Contexto de la Evaluación</h3>
+                                        <p className="text-[10px] text-slate-400 mt-1 font-medium">Tú eliges: puedes subir tu propio material para un examen 100% fiel a tus clases, o dejar que Hipatia use su base de datos experta para sorprenderte.</p>
+                                    </div>
                                 </div>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
