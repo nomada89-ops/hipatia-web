@@ -49,6 +49,44 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
     const [message, setMessage] = useState('');
     const [loadingMsg, setLoadingMsg] = useState('Iniciando...');
 
+    // --- GUARDIÁN DE CAPACIDAD (Configuración Auditor) ---
+    // Límite Bloqueo bajado a 80k para reservar espacio OCR de imágenes
+    const LIMITS = { OPTIMAL: 50000, RISK: 80000 };
+
+    // Estado del Guardián
+    const [capacityState, setCapacityState] = useState({
+        charCount: 0,
+        status: 'optimal' as 'optimal' | 'risk' | 'blocked',
+        color: 'text-emerald-500',
+        message: ''
+    });
+
+    // Efecto para calcular capacidad en tiempo real (Rúbrica + Referencias)
+    useEffect(() => {
+        const count = (guiaCorreccion?.length || 0) + (materialReferenciaTexto?.length || 0);
+
+        let newStatus: 'optimal' | 'risk' | 'blocked' = 'optimal';
+        let newColor = 'text-emerald-500';
+        let newMessage = '';
+
+        if (count > LIMITS.RISK) {
+            newStatus = 'blocked';
+            newColor = 'text-rose-500';
+            newMessage = `❌ Capacidad Excedida (${count.toLocaleString()} car). El texto (Rúbrica + Referencia) es demasiado largo. 💡 Tip Pro: Usa ChatGPT o Gemini para resumir tus temas antes de subirlos.`;
+        } else if (count > LIMITS.OPTIMAL) {
+            newStatus = 'risk';
+            newColor = 'text-amber-500';
+            newMessage = `⚠️ Material muy extenso (${count.toLocaleString()}). Hipatia procesará todo, pero podría demorarse. 💡 Tip Pro: Usa ChatGPT o Gemini para resumir tus temas antes de subirlos.`;
+        }
+
+        setCapacityState({
+            charCount: count,
+            status: newStatus,
+            color: newColor,
+            message: newMessage
+        });
+    }, [guiaCorreccion, materialReferenciaTexto]);
+
     const rubricaInputRef = useRef<HTMLInputElement>(null);
     const refInputRef = useRef<HTMLInputElement>(null);
     const componentRef = useRef<HTMLDivElement>(null);
@@ -675,6 +713,24 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                                             </div>
                                         )}
                                     </div>
+
+                                    {/* Capacity Indicator & Warning */}
+                                    <div className="flex flex-col gap-2 mt-2">
+                                        <div className={`text-right text-[10px] font-mono font-bold transition-colors ${capacityState.color}`}>
+                                            {capacityState.charCount > 0 && (
+                                                <span>
+                                                    {capacityState.charCount.toLocaleString()} / {LIMITS.RISK.toLocaleString()} caracteres
+                                                </span>
+                                            )}
+                                        </div>
+
+                                        {capacityState.message && (
+                                            <div className={`p-3 rounded-xl border ${capacityState.status === 'blocked' ? 'bg-rose-50 border-rose-100 text-rose-700' : 'bg-amber-50 border-amber-100 text-amber-700'} text-xs font-medium flex items-center gap-2 animate-in slide-in-from-top-2`}>
+                                                <AlertCircle size={16} className="shrink-0" />
+                                                <span>{capacityState.message}</span>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
 
@@ -782,9 +838,9 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                             {/* ACTION BUTTON */}
                             <button
                                 type="submit"
-                                disabled={status === 'sending' || examenArchivos.length === 0 || !legalAccepted}
+                                disabled={status === 'sending' || examenArchivos.length === 0 || !legalAccepted || capacityState.status === 'blocked'}
                                 className={`w-full py-4 text-lg font-black text-white rounded-xl shadow-lg transition-all transform hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 
-                                    ${status === 'sending' || !legalAccepted
+                                    ${status === 'sending' || !legalAccepted || capacityState.status === 'blocked'
                                         ? 'bg-slate-300 cursor-not-allowed shadow-none'
                                         : 'bg-gradient-to-br from-indigo-600 via-indigo-700 to-violet-700 shadow-indigo-200'}`}
                             >
