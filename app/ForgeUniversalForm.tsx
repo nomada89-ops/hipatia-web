@@ -71,8 +71,8 @@ const ForgeUniversalForm: React.FC<ForgeUniversalFormProps> = ({ onBack, userTok
 
     // --- GUARDIÁN DE CAPACIDAD (Configuración) ---
     const LIMITS = {
-        SIMPLE: { OPTIMAL: 20000, RISK: 35000 },
-        DUA: { OPTIMAL: 15000, RISK: 25000 } // Más restrictivo por el triple output
+        SIMPLE: { OPTIMAL: 50000, RISK: 100000 },
+        DUA: { OPTIMAL: 30000, RISK: 60000 } // Más restrictivo por el triple output
     };
 
     // Estado del Guardián
@@ -94,11 +94,15 @@ const ForgeUniversalForm: React.FC<ForgeUniversalFormProps> = ({ onBack, userTok
         if (count > limits.RISK) {
             newStatus = 'blocked';
             newColor = 'text-rose-500';
-            newMessage = `❌ Capacidad Excedida: El texto es demasiado largo (${count.toLocaleString()} caract). Por favor, reduce el temario para garantizar la calidad. (Límite: ${limits.RISK.toLocaleString()})`;
+            newMessage = `❌ Capacidad Excedida: El texto es demasiado largo (${count.toLocaleString()} caract). Por favor, reduce el temario. (Límite: ${limits.RISK.toLocaleString()})`;
         } else if (count > limits.OPTIMAL) {
             newStatus = 'risk';
             newColor = 'text-amber-500';
-            newMessage = `⚠️ Contenido extenso: Has introducido mucho material (${count.toLocaleString()}). Hipatia intentará procesarlo, pero podría resumir partes.`;
+            if (modoInclusion) {
+                newMessage = `⚠️ Riesgo de truncado: Generar 3 versiones con tanto contenido (${count.toLocaleString()}) puede agotar el espacio de respuesta.`;
+            } else {
+                newMessage = `⚠️ Material muy extenso (${count.toLocaleString()}). Hipatia procesará todo el contenido, pero la generación podría demorarse.`;
+            }
         }
 
         setCapacityState({
