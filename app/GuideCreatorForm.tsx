@@ -41,6 +41,7 @@ export default function GuideCreatorForm({ userToken, onBack }: GuideCreatorForm
     const [guideData, setGuideData] = useState<GuideCriterion[]>([]);
     const [htmlContent, setHtmlContent] = useState<string>('');
     const [loadingMsg, setLoadingMsg] = useState('Iniciando el Arquitecto de Guías...');
+    const [errorMessage, setErrorMessage] = useState('');
     const [isDragOverExamen, setIsDragOverExamen] = useState(false);
     const [isDragOverApuntes, setIsDragOverApuntes] = useState(false);
     const [isDragOverCriterios, setIsDragOverCriterios] = useState(false);
@@ -115,6 +116,7 @@ export default function GuideCreatorForm({ userToken, onBack }: GuideCreatorForm
         } catch (error) {
             console.error(error);
             setStatus('error');
+            setErrorMessage('Lo sentimos, Hipatia no ha podido generar un resultado de calidad. No se han descontado créditos de su cuenta. Por favor, inténtelo de nuevo o póngase en contacto con nosotros.');
         }
     };
 
@@ -602,6 +604,9 @@ export default function GuideCreatorForm({ userToken, onBack }: GuideCreatorForm
                                     {processingFile ? <Loader2 className="animate-spin" /> : <Shield size={20} />}
                                     {processingFile ? 'Procesando archivo...' : 'Generar Guía Maestra'}
                                 </button>
+                                {status === 'error' && (
+                                    <p className="text-center text-xs font-bold text-rose-500 mt-3 animate-pulse">{errorMessage}</p>
+                                )}
                             </div>
                         </form>
                     </div>

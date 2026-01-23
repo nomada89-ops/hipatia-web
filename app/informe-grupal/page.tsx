@@ -134,7 +134,7 @@ export default function GroupReportPage() {
         } catch (error) {
             console.error(error);
             setStatus('error');
-            setErrorMsg('No se pudo generar el informe. Verifica el ID del grupo e inténtalo de nuevo.');
+            setErrorMsg('Lo sentimos, Hipatia no ha podido generar un resultado de calidad. No se han descontado créditos de su cuenta. Por favor, inténtelo de nuevo o póngase en contacto con nosotros.');
         }
     };
 
