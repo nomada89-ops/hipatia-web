@@ -59,13 +59,7 @@ const ForgeUniversalForm: React.FC<ForgeUniversalFormProps> = ({ onBack, userTok
     const [status, setStatus] = useState<'idle' | 'generating' | 'success' | 'error'>('idle');
     const [message, setMessage] = useState('');
 
-    // Resultado
-    const [examHtml, setExamHtml] = useState<string | null>(null);
-    const [solucionarioHtml, setSolucionarioHtml] = useState<string | null>(null);
-    const [guiaData, setGuiaData] = useState<any>(null); // Para persistencia
-    const [isDyslexic, setIsDyslexic] = useState(false);
-
-    // Nuevos estados para Modo Inclusión DUA Refinado
+    // Nuevos estados para Modo Inclusión DUA Refinado (Moved Up for Scope)
     const [modoInclusion, setModoInclusion] = useState(false);
     const [stdData, setStdData] = useState<{ html: string; solucionario: string | null } | null>(null);
     const [acneaeData, setAcneaeData] = useState<{ html: string; solucionario: string | null } | null>(null);
@@ -74,6 +68,54 @@ const ForgeUniversalForm: React.FC<ForgeUniversalFormProps> = ({ onBack, userTok
     const [pedagogicalData, setPedagogicalData] = useState<string | null>(null);
     const [activeVersion, setActiveVersion] = useState<'estandar' | 'acneae' | 'acs'>('estandar');
     const [viewMode, setViewMode] = useState<'examen' | 'solucionario'>('examen');
+
+    // --- GUARDIÁN DE CAPACIDAD (Configuración) ---
+    const LIMITS = {
+        SIMPLE: { OPTIMAL: 20000, RISK: 35000 },
+        DUA: { OPTIMAL: 15000, RISK: 25000 } // Más restrictivo por el triple output
+    };
+
+    // Estado del Guardián
+    const [capacityState, setCapacityState] = useState({
+        charCount: 0,
+        status: 'optimal' as 'optimal' | 'risk' | 'blocked',
+        color: 'text-emerald-500',
+        message: ''
+    });
+
+    // Efecto para calcular capacidad en tiempo real
+    useEffect(() => {
+        const count = temarioText.length;
+        const limits = modoInclusion ? LIMITS.DUA : LIMITS.SIMPLE;
+        let newStatus: 'optimal' | 'risk' | 'blocked' = 'optimal';
+        let newColor = 'text-emerald-500';
+        let newMessage = '';
+
+        if (count > limits.RISK) {
+            newStatus = 'blocked';
+            newColor = 'text-rose-500';
+            newMessage = `❌ Capacidad Excedida: El texto es demasiado largo (${count.toLocaleString()} caract). Por favor, reduce el temario para garantizar la calidad. (Límite: ${limits.RISK.toLocaleString()})`;
+        } else if (count > limits.OPTIMAL) {
+            newStatus = 'risk';
+            newColor = 'text-amber-500';
+            newMessage = `⚠️ Contenido extenso: Has introducido mucho material (${count.toLocaleString()}). Hipatia intentará procesarlo, pero podría resumir partes.`;
+        }
+
+        setCapacityState({
+            charCount: count,
+            status: newStatus,
+            color: newColor,
+            message: newMessage
+        });
+    }, [temarioText, modoInclusion]);
+
+    // Resultado
+    const [examHtml, setExamHtml] = useState<string | null>(null);
+    const [solucionarioHtml, setSolucionarioHtml] = useState<string | null>(null);
+    const [guiaData, setGuiaData] = useState<any>(null); // Para persistencia
+    const [isDyslexic, setIsDyslexic] = useState(false);
+
+
 
     // Refs
     const temarioInputRef = useRef<HTMLInputElement>(null);
@@ -705,13 +747,21 @@ const ForgeUniversalForm: React.FC<ForgeUniversalFormProps> = ({ onBack, userTok
                                 </div>
                             </div>
 
+                            {/* Capacity Warning Message */}
+                            {capacityState.message && (
+                                <div className={`p-3 rounded-xl border ${capacityState.status === 'blocked' ? 'bg-rose-50 border-rose-100 text-rose-700' : 'bg-amber-50 border-amber-100 text-amber-700'} text-xs font-medium flex items-center gap-2 animate-in slide-in-from-bottom-2`}>
+                                    <AlertCircle size={16} className="shrink-0" />
+                                    <span>{capacityState.message}</span>
+                                </div>
+                            )}
+
                             {/* ACTION BUTTON */}
                             <div className="pt-2">
                                 <button
                                     type="submit"
-                                    disabled={isGenerating || !instrucciones.trim()}
+                                    disabled={isGenerating || !instrucciones.trim() || capacityState.status === 'blocked'}
                                     className={`w-full py-4 rounded-xl font-black text-sm uppercase tracking-widest transition-all shadow-lg flex items-center justify-center gap-3
-                                    ${isGenerating
+                                    ${isGenerating || capacityState.status === 'blocked'
                                             ? 'bg-slate-100 text-slate-400 cursor-not-allowed shadow-none'
                                             : modoInclusion
                                                 ? 'bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white hover:shadow-fuchsia-200 hover:shadow-xl hover:scale-[1.01]'
