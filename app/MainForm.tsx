@@ -307,7 +307,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
             }
         } catch (error) {
             setStatus('error');
-            setMessage('Error conectando con el servidor.');
+            setMessage('Lo sentimos, Hipatia no ha podido generar un resultado de calidad. No se han descontado créditos de su cuenta. Por favor, inténtelo de nuevo o póngase en contacto con nosotros.');
         }
     };
 

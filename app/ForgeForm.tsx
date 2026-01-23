@@ -55,7 +55,7 @@ export default function ForgeForm({ onBack, userToken }: ForgeFormProps) {
 
         } catch (error: any) {
             console.error("Error en generación:", error);
-            alert(`Error al generar el examen: ${error.message}`);
+            alert('Lo sentimos, Hipatia no ha podido generar un resultado de calidad. No se han descontado créditos de su cuenta. Por favor, inténtelo de nuevo o póngase en contacto con nosotros.');
         } finally {
             setLoading(false);
         }

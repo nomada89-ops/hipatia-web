@@ -196,7 +196,7 @@ const ForgeUniversalForm: React.FC<ForgeUniversalFormProps> = ({ onBack, userTok
         } catch (error) {
             console.error('Generation invalid:', error);
             setStatus('error');
-            setMessage('Hubo un error al generar el examen. Revisa tu conexión.');
+            setMessage('Lo sentimos, Hipatia no ha podido generar un resultado de calidad. No se han descontado créditos de su cuenta. Por favor, inténtelo de nuevo o póngase en contacto con nosotros.');
         } finally {
             setIsGenerating(false);
         }
