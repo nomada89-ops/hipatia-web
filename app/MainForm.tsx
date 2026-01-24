@@ -51,7 +51,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
 
     // --- GUARDIÁN DE CAPACIDAD (Configuración Auditor) ---
     // Límite Bloqueo bajado a 80k para reservar espacio OCR de imágenes
-    const LIMITS = { OPTIMAL: 50000, RISK: 80000 };
+    const LIMITS = { OPTIMAL: 100000, RISK: 150000 };
 
     // Estado del Guardián
     const [capacityState, setCapacityState] = useState({
