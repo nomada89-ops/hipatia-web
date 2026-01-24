@@ -1,4 +1,4 @@
-﻿import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useReactToPrint } from 'react-to-print';
 import { useExamContext } from './ExamContext';
 import { Upload, Send, CheckCircle, AlertCircle, Loader2, FileDown, Bold, Italic, List, FileText, X, Eye, ChevronRight, Zap, ArrowLeft, Shield } from 'lucide-react';
@@ -9,8 +9,8 @@ import * as pdfjsLib from 'pdfjs-dist/build/pdf';
 import mammoth from 'mammoth';
 import { optimizeExamImage } from './optimizeImage';
 import { DemoReport } from './components/DemoReport';
-// import { useSecureOCR } from './hooks/useSecureOCR'; // Removed for locked version
-// import ProcessingStatus from './components/ProcessingStatus'; // Removed for locked version
+import { useSecureOCR } from './hooks/useSecureOCR';
+import ProcessingStatus from './components/ProcessingStatus';
 import LegalLockOverlay from './components/LegalLockOverlay';
 
 // ... (existing imports)
@@ -20,16 +20,9 @@ interface MainFormProps {
     userToken: string;
 }
 
-const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
-    // Removed useSecureOCR hook call for locked version
-    const [isProcessing, setIsProcessing] = useState(false);
-    const [progress, setProgress] = useState(0);
-    const [statusText, setStatusText] = useState("");
+const MainFormSecure: React.FC<MainFormProps> = ({ onBack, userToken }) => {
+    const { processFile, isProcessing, progress, statusText } = useSecureOCR();
     const [anonymizedTexts, setAnonymizedTexts] = useState<string[]>([]);
-
-    const processFile = async (file: File) => {
-        return { text: "", originalName: file.name, fileId: "", isAnonymized: false };
-    };
 
     // ... (existing state)
     // Contexto para datos globales (opcional, pero útil si se quiere persistir al cambiar de pestaña)
@@ -645,12 +638,10 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
         );
     }
 
-    // Locked Module Logic - No Bypass
-
-
+    // THIS IS THE SECURE VERSION - NO LEGAL LOCK
     return (
         <div className="flex-1 h-full bg-slate-50 flex flex-col font-sans overflow-hidden relative">
-            <LegalLockOverlay />
+            <ProcessingStatus isVisible={isProcessing} status={statusText} progress={progress} />
             {/* Top Navigation */}
             <div className="bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between z-10 shadow-sm shrink-0">
                 <div className="flex items-center gap-3">
@@ -659,7 +650,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                     </button>
                     <div>
                         <h1 className="text-lg font-bold text-slate-900 tracking-tight flex items-center gap-2">
-                            <span>HIPAT<span className="text-indigo-600">IA</span></span> <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600">Corrector</span>
+                            <span>HIPAT<span className="text-indigo-600">IA</span></span> <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600">Corrector (SECURE)</span>
                         </h1>
                     </div>
                 </div>
@@ -796,113 +787,143 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                                         </select>
                                     </div>
                                 </div>
+
+                                {/* GROUP SELECTOR - Reverting to text input if API fails, but keeping dynamic for now if stable */}
+                                <div className="space-y-2">
+                                    <label className="text-xs font-bold text-slate-500 uppercase tracking-widest pl-1">Grupo (Opcional)</label>
+                                    <input
+                                        type="text"
+                                        value={idGrupo}
+                                        onChange={(e) => setIdGrupo(e.target.value)}
+                                        placeholder="Ej: 2BHCS"
+                                        className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-indigo-500 focus:bg-white focus:shadow-md outline-none transition-all font-bold text-base text-slate-700 shadow-sm"
+                                    />
+                                </div>
                             </div>
+                            <hr className="border-slate-100" />
 
                             {/* SECTION 3: EVIDENCIAS */}
-                            <div className="space-y-3">
-                                <label className="text-xs font-bold text-slate-500 uppercase tracking-widest pl-1">Imágenes del examen o ejercicio</label>
+                            <div className="space-y-4">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <div className="bg-indigo-50/50 p-2 rounded-lg text-indigo-600"><FileText size={16} /></div>
+                                    <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest">Evidencias del Examen</h3>
+                                </div>
+
+                                {/* Drag & Drop Area */}
                                 <div
                                     onDragOver={handleDragOver}
                                     onDragLeave={handleDragLeave}
                                     onDrop={handleDrop}
-                                    className={`relative group h-32 border-2 border-dashed rounded-xl flex flex-col items-center justify-center transition-all duration-300 cursor-pointer
-                                        ${isDragOver ? 'border-indigo-600 bg-indigo-50' : 'border-slate-200 hover:border-indigo-400 hover:bg-slate-50'}`}
+                                    className={`relative border-2 border-dashed rounded-2xl p-8 flex flex-col items-center justify-center text-center transition-all cursor-pointer min-h-[200px]
+                                    ${isDragOver ? 'border-indigo-500 bg-indigo-50/50 scale-[1.02]' : 'border-slate-200 hover:border-indigo-400 hover:bg-slate-50'}`}
                                 >
                                     <input
-                                        type="file" multiple className="absolute inset-0 opacity-0 cursor-pointer"
-                                        onChange={handleFileSelect} accept="image/*,application/pdf"
+                                        type="file"
+                                        multiple
+                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                        onChange={handleFileSelect}
+                                        accept="image/*,.pdf"
                                     />
-                                    <div className="bg-white p-2 rounded-full shadow-sm mb-2 group-hover:scale-110 transition-transform">
-                                        <Upload className={`h-5 w-5 ${isDragOver ? 'text-indigo-600' : 'text-slate-400 group-hover:text-indigo-500'}`} />
+                                    <div className="w-16 h-16 bg-white rounded-full shadow-lg flex items-center justify-center mb-4 text-indigo-600">
+                                        {isOptimizing ? <Loader2 className="animate-spin" size={32} /> : <Upload size={32} />}
                                     </div>
-                                    <p className="text-xs font-bold text-slate-600">
-                                        {isDragOver ? 'Suelte aquí' : isOptimizing ? 'Optimizando...' : 'Arrastre las hojas'}
-                                    </p>
-                                    <p className="text-[9px] text-slate-400 mt-1 text-center scale-90">
-                                        Tip: Usa buena luz y evita fotos borrosas
-                                    </p>
+                                    <h3 className="text-lg font-bold text-slate-700">
+                                        {isOptimizing ? "Optimizando imágenes..." : "Arrastra las fotos del examen aquí"}
+                                    </h3>
+                                    <p className="text-slate-400 mt-2 font-medium">o haz clic para explorar archivos</p>
                                 </div>
 
+                                {/* File List */}
                                 {examenArchivos.length > 0 && (
-                                    <div className="flex flex-wrap gap-2 mt-3 animate-in slide-in-from-top-2">
-                                        {examenArchivos.map((file, idx) => (
-                                            <div key={idx} className="pl-3 pr-2 py-1.5 bg-indigo-50 border border-indigo-100 rounded-lg flex items-center gap-3">
-                                                <span className="text-[10px] font-bold text-indigo-700 truncate max-w-[120px]">{file.name}</span>
-                                                <button type="button" onClick={() => removeFile(idx)} className="text-indigo-400 hover:text-rose-500 transition-colors"><X className="h-3 w-3" /></button>
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+                                        {examenArchivos.map((file, index) => (
+                                            <div key={index} className="relative group aspect-[3/4] bg-slate-100 rounded-xl overflow-hidden border border-slate-200">
+                                                {file.type.startsWith('image/') ? (
+                                                    <img src={URL.createObjectURL(file)} alt={`Página ${index + 1}`} className="w-full h-full object-cover" />
+                                                ) : (
+                                                    <div className="w-full h-full flex items-center justify-center text-slate-400 flex-col gap-2">
+                                                        <FileText size={32} />
+                                                        <span className="text-xs font-bold">PDF</span>
+                                                    </div>
+                                                )}
+                                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                                                    <button type="button" onClick={() => removeFile(index)} className="p-2 bg-rose-500 text-white rounded-full hover:bg-rose-600 transition-transform hover:scale-110">
+                                                        <X size={16} />
+                                                    </button>
+                                                    <button type="button" onClick={() => { setViewerStartingIndex(index); setIsViewerOpen(true); }} className="p-2 bg-white text-slate-900 rounded-full hover:bg-slate-100 transition-transform hover:scale-110">
+                                                        <Eye size={16} />
+                                                    </button>
+                                                </div>
+                                                <div className="absolute bottom-2 left-2 bg-black/60 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                                                    Pág {index + 1}
+                                                </div>
                                             </div>
                                         ))}
                                     </div>
                                 )}
                             </div>
 
-                            {/* GROUP ID OPTIONAL */}
-                            <div className="space-y-4 pt-2 pb-4">
-                                <div className="space-y-2">
-                                    <label className="text-xs font-bold text-slate-500 uppercase tracking-widest pl-1">Grupo / Identificador de sesión</label>
-                                    <input
-                                        type="text"
-                                        value={idGrupo}
-                                        onChange={(e) => setIdGrupo(e.target.value)}
-                                        placeholder="Ej: 2BHCS-Tema1 o 2BHCS-Parte1"
-                                        className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-indigo-500 focus:bg-white focus:shadow-md outline-none transition-all font-bold text-base text-slate-700 shadow-sm"
-                                    />
-                                    <p className="text-[10px] text-slate-400 pl-1 font-medium">
-                                        Usa un nombre único si quieres generar un informe grupal específico para esta tanda de exámenes
-                                    </p>
-                                </div>
-                            </div>
-
-                            {/* Legal Checkbox */}
-                            <div className="flex items-start gap-3 p-3 bg-slate-50 rounded-lg border border-slate-100">
-                                <div className="flex bg-white rounded-md border border-slate-200 p-0.5 mt-0.5">
-                                    <input
-                                        type="checkbox"
-                                        id="legal-consent"
-                                        checked={legalAccepted}
-                                        onChange={(e) => setLegalAccepted(e.target.checked)}
-                                        className="w-4 h-4 text-indigo-600 rounded bg-white border-slate-300 focus:ring-indigo-500 focus:ring-offset-0 cursor-pointer"
-                                    />
-                                </div>
-                                <label htmlFor="legal-consent" className="text-xs text-slate-500 font-medium leading-relaxed cursor-pointer select-none">
-                                    Certifico que soy el propietario legítimo de los materiales subidos y acepto el tratamiento de datos para fines de evaluación académica según la <a href="/legal?tab=privacidad" target="_blank" className="text-indigo-600 hover:underline font-bold">Política de Privacidad</a> y el <a href="/legal?tab=aviso-legal" target="_blank" className="text-indigo-600 hover:underline font-bold">Aviso Legal</a>, incluyendo la anonimización de datos de menores.
+                            {/* LEGAL CHECK */}
+                            <div className="flex items-start gap-3 bg-slate-50 p-4 rounded-xl border border-slate-100">
+                                <input
+                                    type="checkbox"
+                                    id="legal"
+                                    checked={legalAccepted}
+                                    onChange={(e) => setLegalAccepted(e.target.checked)}
+                                    className="mt-1 w-4 h-4 text-indigo-600 rounded focus:ring-indigo-500 border-gray-300"
+                                />
+                                <label htmlFor="legal" className="text-xs text-slate-500 leading-relaxed cursor-pointer select-none">
+                                    Certifico que soy el docente responsable de esta evaluación. Hipatia actúa como encargado de tratamiento de datos bajo mis instrucciones, no almacenando información personal de alumnos más allá de la sesión técnica. <a href="#" className="underline hover:text-indigo-600 font-bold">Ver cláusula DPA.</a>
                                 </label>
                             </div>
 
-                            {/* ACTION BUTTON */}
+                            {/* SUBMIT BUTTON */}
                             <button
                                 type="submit"
-                                disabled={status === 'sending' || examenArchivos.length === 0 || !legalAccepted}
-                                className={`w-full py-4 text-lg font-black text-white rounded-xl shadow-lg transition-all transform hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 
-                                    ${status === 'sending' || !legalAccepted
-                                        ? 'bg-slate-300 cursor-not-allowed shadow-none'
-                                        : 'bg-gradient-to-br from-indigo-600 via-indigo-700 to-violet-700 shadow-indigo-200'}`}
+                                disabled={status === 'sending' || isProcessing}
+                                className={`w-full py-5 rounded-2xl font-black text-lg shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all flex items-center justify-center gap-3 relative overflow-hidden
+                                ${status === 'sending' || isProcessing || !legalAccepted
+                                        ? 'bg-slate-200 text-slate-400 cursor-not-allowed shadow-none hover:translate-y-0'
+                                        : 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-indigo-200'}`}
                             >
                                 {status === 'sending' ? (
                                     <>
-                                        <Loader2 className="animate-spin" size={20} />
-                                        <span className="animate-pulse text-sm">{loadingMsg}</span>
+                                        <Loader2 className="animate-spin" />
+                                        <span>Procesando solicitud...</span>
+                                    </>
+                                ) : isProcessing ? (
+                                    <>
+                                        <Loader2 className="animate-spin" />
+                                        <span>Analizando Documentos...</span>
                                     </>
                                 ) : (
                                     <>
-                                        <span>INICIAR CORRECCIÓN</span>
+                                        <span>INICIAR AUDITORÍA</span>
                                         <ChevronRight size={20} className="opacity-60" />
                                     </>
                                 )}
                             </button>
 
+                            {/* ERROR MESSAGE */}
                             {status === 'error' && (
-                                <div className="p-4 bg-rose-50 border border-rose-100 rounded-xl flex items-center gap-3 animate-in shake">
-                                    <AlertCircle className="h-5 w-5 text-rose-500 flex-shrink-0" />
-                                    <p className="text-sm font-bold text-rose-700">{message}</p>
+                                <div className="p-4 bg-rose-50 text-rose-600 rounded-xl text-sm font-bold text-center border border-rose-100 animate-in fade-in slide-in-from-bottom-2">
+                                    {message}
                                 </div>
                             )}
 
                         </form>
                     </div>
+
+                    {/* Footer */}
+                    <p className="text-center text-slate-400 text-xs font-medium">
+                        Potenciado por Hipatia Teacher Core v4.1 • <span className="text-indigo-400 font-bold">UCLM Audit Compliant</span>
+                    </p>
                 </div>
             </main>
+
+            <SheetViewer files={examenArchivos} isOpen={isViewerOpen} onClose={() => setIsViewerOpen(false)} />
         </div>
     );
 };
 
-export default MainForm;
+export default MainFormSecure;

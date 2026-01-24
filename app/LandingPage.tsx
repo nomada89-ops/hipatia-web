@@ -3,6 +3,7 @@ import { Search, Zap, Users, ChevronRight, Lock, CheckCircle, Shield, Award, Bar
 import { TeacherProfileModal } from "./components/TeacherProfileModal";
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
+import MainFormSecure from "./MainFormSecure";
 
 interface LandingPageProps {
     onLogin: (token: string) => void;
@@ -465,5 +466,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
     );
 };
 
+
+// If the user selects auditor, the PARENT (page.tsx) decides what to render.
+// I need to check page.tsx.
 export default LandingPage;
 

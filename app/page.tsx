@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import MainForm from './MainForm';
+import MainFormSecure from './MainFormSecure';
 import LandingPage from './LandingPage';
 import ForgeForm from './ForgeForm';
 import ForgeUniversalForm from './ForgeUniversalForm';
@@ -74,7 +75,11 @@ export default function ExamCorrectionPage() {
                 </div>
             ) : activeModule === 'auditor' ? (
                 <div className="h-screen bg-gray-50 overflow-hidden flex flex-col">
-                    <MainForm onBack={() => setActiveModule('landing')} userToken={userToken} />
+                    {['test_01', 'rafa', 'admin'].some(t => userToken.toLowerCase().includes(t)) ? (
+                        <MainFormSecure onBack={() => setActiveModule('landing')} userToken={userToken} />
+                    ) : (
+                        <MainForm onBack={() => setActiveModule('landing')} userToken={userToken} />
+                    )}
                 </div>
             ) : activeModule === 'forge-universal' ? (
                 <div className="h-screen bg-gray-50 overflow-hidden flex flex-col">
