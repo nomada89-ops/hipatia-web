@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { ArrowLeft, CheckCircle, Upload, Zap, Eye, Printer, Loader2, BookOpen, AlertCircle, HelpCircle } from 'lucide-react';
+import { ArrowLeft, CheckCircle, Upload, Zap, Eye, Printer, Loader2, BookOpen, AlertCircle, HelpCircle, X } from 'lucide-react';
 import { processFileText } from './utils';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
@@ -121,6 +121,33 @@ const ForgeUniversalForm: React.FC<ForgeUniversalFormProps> = ({ onBack, userTok
         } finally {
             setIsExtractingModelo(false);
         }
+    };
+
+    // --- ELIMINAR ARCHIVOS ---
+    const removeTemarioFile = async (e: React.MouseEvent, indexToRemove: number) => {
+        e.stopPropagation();
+        setIsExtractingTemario(true);
+        try {
+            const newFiles = temarioFiles.filter((_, index) => index !== indexToRemove);
+            setTemarioFiles(newFiles);
+
+            let combinedText = "";
+            for (const file of newFiles) {
+                const text = await processFileText(file);
+                combinedText += `\n\n--- INICIO ARCHIVO: ${file.name} ---\n${text}\n--- FIN ARCHIVO: ${file.name} ---\n`;
+            }
+            setTemarioText(combinedText);
+        } catch (error) {
+            console.error('Error removing file:', error);
+        } finally {
+            setIsExtractingTemario(false);
+        }
+    };
+
+    const removeModeloFile = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        setModeloText('');
+        setModeloFile(null);
     };
 
     // --- ENVÍO AL WEBHOOK ---
@@ -591,10 +618,17 @@ const ForgeUniversalForm: React.FC<ForgeUniversalFormProps> = ({ onBack, userTok
                                         ) : temarioFiles.length > 0 ? (
                                             <div className="flex flex-col items-center gap-2 text-center w-full">
                                                 <div className="bg-white p-1.5 rounded-full shadow-sm text-emerald-500"><CheckCircle size={20} /></div>
-                                                <div>
+                                                <div className="w-full">
                                                     <p className="text-xs font-bold text-slate-700">Temario Procesado</p>
-                                                    <p className="text-[10px] text-slate-500 font-bold">{temarioFiles.length} archivos subidos</p>
-                                                    {temarioFiles.length === 1 && <p className="text-[10px] text-slate-400 truncate max-w-[200px] mx-auto">{temarioFiles[0].name}</p>}
+                                                    <p className="text-[10px] text-slate-500 font-bold mb-1">{temarioFiles.length} archivos subidos</p>
+                                                    <div className="flex flex-wrap gap-1 justify-center max-w-[200px] mx-auto">
+                                                        {temarioFiles.map((f, i) => (
+                                                            <span key={i} className="text-[9px] bg-white border border-emerald-100 pl-2 pr-1 py-0.5 rounded text-slate-500 shadow-sm flex items-center gap-1">
+                                                                <span className="truncate max-w-[80px]">{f.name}</span>
+                                                                <button onClick={(e) => removeTemarioFile(e, i)} className="text-slate-400 hover:text-rose-500 transition-colors"><X size={10} /></button>
+                                                            </span>
+                                                        ))}
+                                                    </div>
                                                     <p className="text-[9px] text-emerald-600 font-mono mt-1">{(temarioText.length / 1000).toFixed(1)}k caracteres totales</p>
                                                 </div>
                                             </div>
@@ -623,9 +657,12 @@ const ForgeUniversalForm: React.FC<ForgeUniversalFormProps> = ({ onBack, userTok
                                         ) : modeloText ? (
                                             <div className="flex flex-col items-center gap-2 text-center w-full">
                                                 <div className="bg-white p-1.5 rounded-full shadow-sm text-emerald-500"><CheckCircle size={20} /></div>
-                                                <div>
-                                                    <p className="text-xs font-bold text-slate-700">Modelo Aplicado</p>
-                                                    <p className="text-[10px] text-slate-400 truncate max-w-[200px] mx-auto">{modeloFile?.name}</p>
+                                                <div className="flex items-center gap-2">
+                                                    <div>
+                                                        <p className="text-xs font-bold text-slate-700">Modelo Aplicado</p>
+                                                        <p className="text-[10px] text-slate-400 truncate max-w-[200px] mx-auto">{modeloFile?.name}</p>
+                                                    </div>
+                                                    <button onClick={removeModeloFile} className="p-1 bg-white border border-slate-100 rounded-full text-slate-400 hover:text-rose-500 shadow-sm transition-colors"><X size={14} /></button>
                                                 </div>
                                             </div>
                                         ) : (

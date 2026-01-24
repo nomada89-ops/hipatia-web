@@ -125,6 +125,32 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
             setExtractingRef(false);
         }
     };
+    // --- ELIMINAR ARCHIVOS ---
+    const removeRubricaFile = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        setGuiaCorreccion('');
+        setRubricaFile(null);
+    };
+
+    const removeRefFile = async (e: React.MouseEvent, indexToRemove: number) => {
+        e.stopPropagation();
+        setExtractingRef(true);
+        try {
+            const newFiles = materialReferenciaFiles.filter((_, index) => index !== indexToRemove);
+            setMaterialReferenciaFiles(newFiles);
+
+            let combinedText = '';
+            for (const file of newFiles) {
+                const text = await processFileText(file);
+                combinedText += `\n--- CONTENIDO DE: ${file.name} ---\n${text}\n`;
+            }
+            setMaterialReferenciaTexto(combinedText);
+        } catch (error) {
+            console.error('Error actualizando referencias:', error);
+        } finally {
+            setExtractingRef(false);
+        }
+    };
 
     // --- EFECTOS DE UI ---
     useEffect(() => {
@@ -626,12 +652,13 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                                         {extractingRubrica ? (
                                             <Loader2 className="h-5 w-5 text-indigo-500 animate-spin" />
                                         ) : guiaCorreccion ? (
-                                            <div className="flex items-center gap-3">
+                                            <div className="flex items-center gap-3 w-full pr-2">
                                                 <div className="bg-white p-1.5 rounded-full shadow-sm text-emerald-500"><CheckCircle size={16} /></div>
-                                                <div className="text-left">
+                                                <div className="text-left flex-1 min-w-0">
                                                     <p className="text-xs font-bold text-slate-700">Rúbrica OK</p>
-                                                    <p className="text-[9px] text-slate-400 truncate max-w-[150px]">{rubricaFile?.name || 'Texto'}</p>
+                                                    <p className="text-[9px] text-slate-400 truncate">{rubricaFile?.name || 'Texto'}</p>
                                                 </div>
+                                                <button onClick={removeRubricaFile} className="p-1 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-full transition-colors"><X size={16} /></button>
                                             </div>
                                         ) : (
                                             <div className="text-center">
@@ -664,8 +691,9 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                                                 </div>
                                                 <div className="flex flex-wrap gap-1 justify-center">
                                                     {materialReferenciaFiles.map((f, i) => (
-                                                        <span key={i} className="text-[9px] bg-white border border-emerald-100 px-2 py-0.5 rounded text-slate-500 truncate max-w-[120px] shadow-sm">
-                                                            {f.name}
+                                                        <span key={i} className="text-[9px] bg-white border border-emerald-100 pl-2 pr-1 py-0.5 rounded text-slate-500 shadow-sm flex items-center gap-1 group/tag">
+                                                            <span className="truncate max-w-[100px]">{f.name}</span>
+                                                            <button onClick={(e) => removeRefFile(e, i)} className="text-slate-400 hover:text-rose-500 transition-colors"><X size={12} /></button>
                                                         </span>
                                                     ))}
                                                 </div>
@@ -790,9 +818,9 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                             {/* ACTION BUTTON */}
                             <button
                                 type="submit"
-                                disabled={status === 'sending' || examenArchivos.length === 0 || !legalAccepted || capacityState.status === 'blocked'}
+                                disabled={status === 'sending' || examenArchivos.length === 0 || !legalAccepted}
                                 className={`w-full py-4 text-lg font-black text-white rounded-xl shadow-lg transition-all transform hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 
-                                    ${status === 'sending' || !legalAccepted || capacityState.status === 'blocked'
+                                    ${status === 'sending' || !legalAccepted
                                         ? 'bg-slate-300 cursor-not-allowed shadow-none'
                                         : 'bg-gradient-to-br from-indigo-600 via-indigo-700 to-violet-700 shadow-indigo-200'}`}
                             >
