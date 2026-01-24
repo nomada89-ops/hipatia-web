@@ -38,7 +38,7 @@ export default function FAQPage() {
                     </div>
                     <div className="space-y-8">
                         <FAQItem
-                            question="¿Quanto texto puede leer Hipatia? ¿Puedo subir un libro entero?"
+                            question="¿Cuánto texto puede leer Hipatia? ¿Puedo subir un libro entero?"
                             answer="SÍ. Gracias al nuevo motor Antigravity, hemos eliminado el límite de lectura tradicional. Ahora puedes subir libros completos, temarios de oposiciones o novelas de más de 300 páginas (hasta 500.000 caracteres) de una sola vez. Hipatia no 'resume' ni recorta; lee y analiza la totalidad del documento para crear exámenes globales que cubren inicio, nudo y desenlace."
                         />
                         <FAQItem
