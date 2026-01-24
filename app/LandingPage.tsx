@@ -1,5 +1,6 @@
 ﻿import React, { useState, useEffect, useRef } from "react";
-import { Search, Zap, Users, ChevronRight, Lock, CheckCircle, Shield, Award, BarChart3, Mail, BookOpen, LayoutGrid, MessageCircle, X, Send, ArrowRight, Play, ExternalLink } from "lucide-react";
+import { Search, Zap, Users, ChevronRight, Lock, CheckCircle, Shield, Award, BarChart3, Mail, BookOpen, LayoutGrid, MessageCircle, X, Send, ArrowRight, Play, ExternalLink, UserCog } from "lucide-react";
+import { TeacherProfileModal } from "./components/TeacherProfileModal";
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 
@@ -53,6 +54,11 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
     const [errorMessage, setErrorMessage] = useState("");
     const [balance, setBalance] = useState<string | null>(null);
     const [viewMode, setViewMode] = useState<"main" | "forge">("main");
+
+    // Perfil Docente State
+    const [isProfileOpen, setIsProfileOpen] = useState(false);
+    const [profileData, setProfileData] = useState<any>(null);
+
     // @ts-ignore
     const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : null;
 
@@ -81,6 +87,11 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
                             }
                             const formatted = Number(val).toFixed(2);
                             setBalance(`${formatted} €`);
+                        }
+
+                        // Extract Preferences
+                        if (data.preferencias) {
+                            setProfileData(data.preferencias);
                         }
                     } else {
                         setBalance("Error");
@@ -297,6 +308,11 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
                             <LayoutGrid size={14} className="inline mr-2" /> Menú
                         </button>
                     )}
+
+                    <button onClick={() => setIsProfileOpen(true)} className="px-4 py-2 bg-slate-100 text-slate-600 rounded-lg text-xs font-bold hover:bg-slate-200 transition-all uppercase tracking-widest flex items-center gap-2">
+                        <UserCog size={14} className="text-slate-500" /> Mi Perfil
+                    </button>
+
                     <div className="px-4 py-2 bg-emerald-50 text-emerald-700 rounded-lg text-xs font-bold border border-emerald-100 uppercase tracking-widest flex items-center gap-2">
                         <span className={`w-1.5 h-1.5 rounded-full bg-emerald-500 ${!balance ? 'animate-ping' : ''}`}></span>
                         Saldo: {balance || "..."}
