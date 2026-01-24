@@ -338,7 +338,8 @@ const MainFormSecure: React.FC<MainFormProps> = ({ onBack, userToken }) => {
             if (materialReferenciaTexto) {
                 formData.append('material_referencia', materialReferenciaTexto);
             }
-            formData.append('alumno_id', alumnoId);
+            // Mapeo a lo que espera el webhook nuevo (según solicitud)
+            formData.append('id_alumno_anonimo', alumnoId);
             formData.append('nivel_exigencia', nivelExigencia);
             if (idGrupo) formData.append('id_grupo', idGrupo);
 
@@ -346,7 +347,7 @@ const MainFormSecure: React.FC<MainFormProps> = ({ onBack, userToken }) => {
             // If we have anonymized text, we send that as the primary content
             if (anonymizedTexts.length > 0) {
                 const combinedEvaluatedText = anonymizedTexts.join('\n\n--- NUEVA PAGINA ---\n\n');
-                formData.append('examen_texto_completo', combinedEvaluatedText);
+                formData.append('texto_examen', combinedEvaluatedText);
                 formData.append('modo_seguro_lopd', 'true');
             }
 
