@@ -448,7 +448,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
             </main>
 
             <footer className="px-8 py-6 text-center text-slate-400 text-[10px] uppercase tracking-[0.3em] font-sans pb-10 flex flex-col gap-4">
-                <span className="font-bold">HIPATIA ACADEMIC ECOSYSTEM v4.0 ENGINEERED FOR EDUCATION</span>
+                <span className="font-bold">HIPATIA ACADEMIC ECOSYSTEM v4.1 - AUDITOR SPLIT</span>
                 <Link href="/legal?tab=privacidad" className="hover:text-indigo-500 transition-colors border-b border-transparent hover:border-indigo-500 w-fit mx-auto">
                     Aviso Legal y Privacidad
                 </Link>
