@@ -69,49 +69,7 @@ const ForgeUniversalForm: React.FC<ForgeUniversalFormProps> = ({ onBack, userTok
     const [activeVersion, setActiveVersion] = useState<'estandar' | 'acneae' | 'acs'>('estandar');
     const [viewMode, setViewMode] = useState<'examen' | 'solucionario'>('examen');
 
-    // --- GUARDIÁN DE CAPACIDAD (Configuración) ---
-    const LIMITS = {
-        SIMPLE: { OPTIMAL: 50000, RISK: 100000 },
-        DUA: { OPTIMAL: 30000, RISK: 60000 } // Más restrictivo por el triple output
-    };
 
-    // Estado del Guardián
-    const [capacityState, setCapacityState] = useState({
-        charCount: 0,
-        status: 'optimal' as 'optimal' | 'risk' | 'blocked',
-        color: 'text-emerald-500',
-        message: ''
-    });
-
-    // Efecto para calcular capacidad en tiempo real
-    useEffect(() => {
-        const count = temarioText.length;
-        const limits = modoInclusion ? LIMITS.DUA : LIMITS.SIMPLE;
-        let newStatus: 'optimal' | 'risk' | 'blocked' = 'optimal';
-        let newColor = 'text-emerald-500';
-        let newMessage = '';
-
-        if (count > limits.RISK) {
-            newStatus = 'blocked';
-            newColor = 'text-rose-500';
-            newMessage = `❌ Capacidad Excedida: El texto es demasiado largo (${count.toLocaleString()} caract). Por favor, reduce el temario. (Límite: ${limits.RISK.toLocaleString()}). 💡 Tip Pro: Usa ChatGPT o Gemini para resumir tus temas antes de subirlos.`;
-        } else if (count > limits.OPTIMAL) {
-            newStatus = 'risk';
-            newColor = 'text-amber-500';
-            if (modoInclusion) {
-                newMessage = `⚠️ Riesgo de truncado: Generar 3 versiones con tanto contenido (${count.toLocaleString()}) puede agotar el espacio de respuesta. 💡 Tip Pro: Usa ChatGPT o Gemini para resumir tus temas antes de subirlos.`;
-            } else {
-                newMessage = `⚠️ Material muy extenso (${count.toLocaleString()}). Hipatia procesará todo el contenido, pero la generación podría demorarse. 💡 Tip Pro: Usa ChatGPT o Gemini para resumir tus temas antes de subirlos.`;
-            }
-        }
-
-        setCapacityState({
-            charCount: count,
-            status: newStatus,
-            color: newColor,
-            message: newMessage
-        });
-    }, [temarioText, modoInclusion]);
 
     // Resultado
     const [examHtml, setExamHtml] = useState<string | null>(null);
@@ -643,7 +601,7 @@ const ForgeUniversalForm: React.FC<ForgeUniversalFormProps> = ({ onBack, userTok
                                         ) : (
                                             <div className="text-center space-y-1">
                                                 <Upload className="h-6 w-6 text-slate-300 mx-auto group-hover:text-violet-500 transition-colors" />
-                                                <p className="text-xs font-bold text-slate-600 group-hover:text-violet-600 transition-colors">Sube tus apuntes (Opcional)</p>
+                                                <p className="text-xs font-bold text-slate-600 group-hover:text-violet-600 transition-colors">Tus apuntes (Opcional). Si no los subes, Hipatia usará el currículo oficial.</p>
                                                 <p className="text-[9px] text-slate-400">Selecciona múltiples PDF, DOCX o TXT</p>
                                             </div>
                                         )}
@@ -751,21 +709,13 @@ const ForgeUniversalForm: React.FC<ForgeUniversalFormProps> = ({ onBack, userTok
                                 </div>
                             </div>
 
-                            {/* Capacity Warning Message */}
-                            {capacityState.message && (
-                                <div className={`p-3 rounded-xl border ${capacityState.status === 'blocked' ? 'bg-rose-50 border-rose-100 text-rose-700' : 'bg-amber-50 border-amber-100 text-amber-700'} text-xs font-medium flex items-center gap-2 animate-in slide-in-from-bottom-2`}>
-                                    <AlertCircle size={16} className="shrink-0" />
-                                    <span>{capacityState.message}</span>
-                                </div>
-                            )}
-
                             {/* ACTION BUTTON */}
                             <div className="pt-2">
                                 <button
                                     type="submit"
-                                    disabled={isGenerating || !instrucciones.trim() || capacityState.status === 'blocked'}
+                                    disabled={isGenerating || !instrucciones.trim()}
                                     className={`w-full py-4 rounded-xl font-black text-sm uppercase tracking-widest transition-all shadow-lg flex items-center justify-center gap-3
-                                    ${isGenerating || capacityState.status === 'blocked'
+                                    ${isGenerating
                                             ? 'bg-slate-100 text-slate-400 cursor-not-allowed shadow-none'
                                             : modoInclusion
                                                 ? 'bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white hover:shadow-fuchsia-200 hover:shadow-xl hover:scale-[1.01]'
