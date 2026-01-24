@@ -450,6 +450,12 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
                     Aviso Legal y Privacidad
                 </Link>
             </footer>
+            <TeacherProfileModal
+                isOpen={isProfileOpen}
+                onClose={() => setIsProfileOpen(false)}
+                userToken={userToken || localStorage.getItem('user_token') || ''}
+                initialData={profileData}
+            />
         </div>
     );
 };
