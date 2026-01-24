@@ -1,5 +1,5 @@
 ﻿import React, { useState, useEffect, useRef } from "react";
-import { Search, Zap, Users, ChevronRight, Lock, CheckCircle, Shield, Award, BarChart3, Mail, BookOpen, LayoutGrid, MessageCircle, X, Send, ArrowRight, Play, ExternalLink, UserCog } from "lucide-react";
+import { Search, Zap, Users, ChevronRight, Lock, CheckCircle, Shield, Award, BarChart3, Mail, BookOpen, LayoutGrid, MessageCircle, X, Send, ArrowRight, Play, ExternalLink, UserCog, HelpCircle } from "lucide-react";
 import { TeacherProfileModal } from "./components/TeacherProfileModal";
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
@@ -147,6 +147,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
                     </Link>
                     <div className="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-600">
                         <Link href="/blog" className="hover:text-indigo-600 transition-colors">Blog</Link>
+                        <Link href="/preguntas-frecuentes" className="hover:text-indigo-600 transition-colors">FAQ</Link>
                         <Link href="/contacto" className="hover:text-indigo-600 transition-colors">Contacto</Link>
                         <button onClick={() => document.getElementById('login-card')?.scrollIntoView({ behavior: 'smooth' })} className="px-5 py-2 bg-slate-900 text-white rounded-full hover:bg-slate-800 transition-all shadow-md active:scale-95">
                             Acceder
@@ -299,6 +300,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
                     </Link>
                     <nav className="hidden md:flex items-center gap-6 text-xs font-bold text-slate-500">
                         <Link href="/blog" className="hover:text-indigo-600 transition-colors uppercase tracking-widest flex items-center gap-1.5"><BookOpen size={14} /> Blog</Link>
+                        <Link href="/preguntas-frecuentes" className="hover:text-indigo-600 transition-colors uppercase tracking-widest flex items-center gap-1.5"><HelpCircle size={14} /> FAQ</Link>
                         <Link href="/contacto" className="hover:text-indigo-600 transition-colors uppercase tracking-widest flex items-center gap-1.5"><Mail size={14} /> Contacto</Link>
                     </nav>
                 </div>
@@ -448,6 +450,9 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
                 <span className="font-bold">HIPATIA ACADEMIC ECOSYSTEM v4.0 ENGINEERED FOR EDUCATION</span>
                 <Link href="/legal?tab=privacidad" className="hover:text-indigo-500 transition-colors border-b border-transparent hover:border-indigo-500 w-fit mx-auto">
                     Aviso Legal y Privacidad
+                </Link>
+                <Link href="/preguntas-frecuentes" className="hover:text-indigo-500 transition-colors border-b border-transparent hover:border-indigo-500 w-fit mx-auto">
+                    Preguntas Frecuentes
                 </Link>
             </footer>
             <TeacherProfileModal
