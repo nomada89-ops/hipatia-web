@@ -51,7 +51,9 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
 
     // --- GUARDIÁN DE CAPACIDAD (Configuración Auditor) ---
     // Límite Bloqueo bajado a 80k para reservar espacio OCR de imágenes
-    const LIMITS = { OPTIMAL: 100000, RISK: 150000 };
+    // --- GUARDIÁN DE CAPACIDAD (Configuración Auditor) ---
+    // Límite Bloqueo bajado a 80k para reservar espacio OCR de imágenes
+    const LIMITS = { OPTIMAL: 200000, RISK: 300000 };
 
     // Estado del Guardián
     const [capacityState, setCapacityState] = useState({
@@ -72,11 +74,15 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
         if (count > LIMITS.RISK) {
             newStatus = 'blocked';
             newColor = 'text-rose-500';
-            newMessage = `❌ Capacidad Excedida (${count.toLocaleString()} car). El texto (Rúbrica + Referencia) es demasiado largo. 💡 Tip Pro: Usa ChatGPT o Gemini para resumir tus temas antes de subirlos.`;
+            newMessage = `❌ Demasiada información. Por favor, selecciona solo los capítulos relevantes para este examen para asegurar la mejor nota.`;
         } else if (count > LIMITS.OPTIMAL) {
             newStatus = 'risk';
             newColor = 'text-amber-500';
-            newMessage = `⚠️ Material muy extenso (${count.toLocaleString()}). Hipatia procesará todo, pero podría demorarse. 💡 Tip Pro: Usa ChatGPT o Gemini para resumir tus temas antes de subirlos.`;
+            newMessage = `⚠️ Gran volumen de información. El análisis puede tardar hasta 1 minuto, pero Hipatia no se dejará ningún detalle.`;
+        } else if (count > 0) {
+            newStatus = 'optimal';
+            newColor = 'text-emerald-500';
+            newMessage = `✅ Material optimizado. Hipatia corregirá con máxima precisión.`;
         }
 
         setCapacityState({
@@ -643,7 +649,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                                     <div className="bg-indigo-50/50 p-2 rounded-lg text-indigo-600"><Shield size={16} /></div>
                                     <div className="flex flex-col">
                                         <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest">Contexto de la Evaluación</h3>
-                                        <p className="text-[10px] text-slate-400 mt-1 font-medium">Tú eliges: puedes subir tu propio material para un examen 100% fiel a tus clases, o dejar que Hipatia use su base de datos experta para sorprenderte.</p>
+                                        <p className="text-[10px] text-slate-400 mt-1 font-medium">✨ Hipatia ahora acepta hasta 200 páginas de texto. Puedes subir varios temas completos y tus hojas corregidas a mano; ella se encargará de encontrar lo importante sin que tú tengas que resumir nada.</p>
                                     </div>
                                 </div>
 
@@ -728,7 +734,10 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                                         </div>
 
                                         {capacityState.message && (
-                                            <div className={`p-3 rounded-xl border ${capacityState.status === 'blocked' ? 'bg-rose-50 border-rose-100 text-rose-700' : 'bg-amber-50 border-amber-100 text-amber-700'} text-xs font-medium flex items-center gap-2 animate-in slide-in-from-top-2`}>
+                                            <div className={`p-3 rounded-xl border ${capacityState.status === 'blocked' ? 'bg-rose-50 border-rose-100 text-rose-700' :
+                                                    capacityState.status === 'risk' ? 'bg-amber-50 border-amber-100 text-amber-700' :
+                                                        'bg-emerald-50 border-emerald-100 text-emerald-700'
+                                                } text-xs font-medium flex items-center gap-2 animate-in slide-in-from-top-2`}>
                                                 <AlertCircle size={16} className="shrink-0" />
                                                 <span>{capacityState.message}</span>
                                             </div>
