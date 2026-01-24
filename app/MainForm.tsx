@@ -49,49 +49,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
     const [message, setMessage] = useState('');
     const [loadingMsg, setLoadingMsg] = useState('Iniciando...');
 
-    // --- GUARDIÁN DE CAPACIDAD (Configuración Auditor) ---
-    // Límite Bloqueo bajado a 80k para reservar espacio OCR de imágenes
-    // --- GUARDIÁN DE CAPACIDAD (Configuración Auditor) ---
-    // Límite Bloqueo bajado a 80k para reservar espacio OCR de imágenes
-    const LIMITS = { OPTIMAL: 200000, RISK: 300000 };
 
-    // Estado del Guardián
-    const [capacityState, setCapacityState] = useState({
-        charCount: 0,
-        status: 'optimal' as 'optimal' | 'risk' | 'blocked',
-        color: 'text-emerald-500',
-        message: ''
-    });
-
-    // Efecto para calcular capacidad en tiempo real (Rúbrica + Referencias)
-    useEffect(() => {
-        const count = (guiaCorreccion?.length || 0) + (materialReferenciaTexto?.length || 0);
-
-        let newStatus: 'optimal' | 'risk' | 'blocked' = 'optimal';
-        let newColor = 'text-emerald-500';
-        let newMessage = '';
-
-        if (count > LIMITS.RISK) {
-            newStatus = 'blocked';
-            newColor = 'text-rose-500';
-            newMessage = `❌ Demasiada información. Por favor, selecciona solo los capítulos relevantes para este examen para asegurar la mejor nota.`;
-        } else if (count > LIMITS.OPTIMAL) {
-            newStatus = 'risk';
-            newColor = 'text-amber-500';
-            newMessage = `⚠️ Gran volumen de información. El análisis puede tardar hasta 1 minuto, pero Hipatia no se dejará ningún detalle.`;
-        } else if (count > 0) {
-            newStatus = 'optimal';
-            newColor = 'text-emerald-500';
-            newMessage = `✅ Material optimizado. Hipatia corregirá con máxima precisión.`;
-        }
-
-        setCapacityState({
-            charCount: count,
-            status: newStatus,
-            color: newColor,
-            message: newMessage
-        });
-    }, [guiaCorreccion, materialReferenciaTexto]);
 
     const rubricaInputRef = useRef<HTMLInputElement>(null);
     const refInputRef = useRef<HTMLInputElement>(null);
@@ -649,7 +607,7 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                                     <div className="bg-indigo-50/50 p-2 rounded-lg text-indigo-600"><Shield size={16} /></div>
                                     <div className="flex flex-col">
                                         <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest">Contexto de la Evaluación</h3>
-                                        <p className="text-[10px] text-slate-400 mt-1 font-medium">✨ Hipatia ahora acepta hasta 200 páginas de texto. Puedes subir varios temas completos y tus hojas corregidas a mano; ella se encargará de encontrar lo importante sin que tú tengas que resumir nada.</p>
+                                        <p className="text-[10px] text-slate-400 mt-1 font-medium">¿Sin apuntes? No pasa nada. Hipatia es experta en el currículo y sabrá corregir el examen con total precisión usando su base de conocimientos.</p>
                                     </div>
                                 </div>
 
@@ -723,26 +681,8 @@ const MainForm: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                                         )}
                                     </div>
 
-                                    {/* Capacity Indicator & Warning */}
-                                    <div className="flex flex-col gap-2 mt-2">
-                                        <div className={`text-right text-[10px] font-mono font-bold transition-colors ${capacityState.color}`}>
-                                            {capacityState.charCount > 0 && (
-                                                <span>
-                                                    {capacityState.charCount.toLocaleString()} / {LIMITS.RISK.toLocaleString()} caracteres
-                                                </span>
-                                            )}
-                                        </div>
-
-                                        {capacityState.message && (
-                                            <div className={`p-3 rounded-xl border ${capacityState.status === 'blocked' ? 'bg-rose-50 border-rose-100 text-rose-700' :
-                                                    capacityState.status === 'risk' ? 'bg-amber-50 border-amber-100 text-amber-700' :
-                                                        'bg-emerald-50 border-emerald-100 text-emerald-700'
-                                                } text-xs font-medium flex items-center gap-2 animate-in slide-in-from-top-2`}>
-                                                <AlertCircle size={16} className="shrink-0" />
-                                                <span>{capacityState.message}</span>
-                                            </div>
-                                        )}
-                                    </div>
+                                    {/* Capacity Warning Removed */}
+                                    <div className="flex flex-col gap-2 mt-2"></div>
                                 </div>
                             </div>
 
