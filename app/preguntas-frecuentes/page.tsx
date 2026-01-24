@@ -23,7 +23,7 @@ export default function FAQPage() {
                         <CheckCircle size={12} /> Actualizado 2026
                     </div>
                     <h2 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tight leading-tight">
-                        Todo lo que necesitas saber <br className="hidden md:block" /> sobre la <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600">nueva generación.</span>
+                        Preguntas Frecuentes <br className="hidden md:block" /> sobre <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600">Hipatia</span>
                     </h2>
                 </section>
 
