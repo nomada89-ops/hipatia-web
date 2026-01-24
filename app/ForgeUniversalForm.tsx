@@ -716,7 +716,7 @@ const ForgeUniversalForm: React.FC<ForgeUniversalFormProps> = ({ onBack, userTok
                                     <textarea
                                         value={instrucciones}
                                         onChange={(e) => setInstrucciones(e.target.value)}
-                                        placeholder="¿No tienes apuntes a mano? No te preocupes. Hipatia es experta en el currículo oficial. Solo escribe el tema y ella hará el resto."
+                                        placeholder="Describe el tema y cómo quieres que sea el examen. Hipatia necesita tu guía pedagógica: especifica qué puntos son imprescindibles, qué competencias evaluar y cualquier matiz importante para construir una prueba perfecta."
                                         rows={3}
                                         className="w-full p-3 bg-slate-50 border-2 border-transparent rounded-lg focus:border-violet-500 focus:bg-white outline-none transition-all font-medium text-sm text-slate-700 shadow-sm resize-none"
                                     />
