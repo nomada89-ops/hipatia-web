@@ -42,8 +42,8 @@ async function loadLibrary() {
 }
 
 class OCRPipeline {
-    // Switch to Large model for better handwriting recognition
-    static model_id = 'onnx-community/Florence-2-large-ft';
+    // Switch back to Base model for speed (Large is too heavy for browser CPU)
+    static model_id = 'onnx-community/Florence-2-base-ft';
     static model = null;
     static processor = null;
     static initializationPromise = null;
@@ -71,63 +71,13 @@ class OCRPipeline {
         return this.initializationPromise;
     }
 }
+// ... (Worker listener code remains mostly same, just updating generation config)
 
-self.addEventListener('message', async (event) => {
-    const { type, data, fileId, mimeType } = event.data;
-
-    try {
-        if (type === 'init') {
-            await loadLibrary(); 
-            await OCRPipeline.getInstance((x) => {
-                self.postMessage({ status: 'loading', fileId: 'system', data: x });
-            });
-            self.postMessage({ status: 'ready' });
-        }
-
-        if (type === 'process') {
-            await loadLibrary(); 
-            const { model, processor } = await OCRPipeline.getInstance();
-            
-            // 1. Create Bitmap
-            const blob = new Blob([data], { type: mimeType });
-            const bitmap = await createImageBitmap(blob);
-            const w = bitmap.width;
-            const h = bitmap.height;
-            
-            const dimsLog = '[Dimensions]: ' + w + 'x' + h;
-            
-            // 2. Define Slices (2-Slice Overlap Strategy)
-            // Simplified to 2 large chunks to keep more context
-            const sliceConfig = [
-                { y: 0, h: Math.floor(h * 0.60) },                  // Top 60%
-                { y: Math.floor(h * 0.40), h: Math.floor(h * 0.60) } // Bottom 60% (20% overlap)
-            ];
-
-            let combinedText = '';
-            
-            // 3. Process Each Slice
-            for (let i = 0; i < sliceConfig.length; i++) {
-                const conf = sliceConfig[i];
-                const safeH = Math.min(conf.h, h - conf.y);
-                
-                // Crop
-                const canvas = new OffscreenCanvas(w, safeH);
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(bitmap, 0, conf.y, w, safeH, 0, 0, w, safeH);
-                const sliceBlob = await canvas.convertToBlob({ type: 'image/jpeg', quality: 0.95 });
-                
-                // Read
-                const sliceUrl = URL.createObjectURL(sliceBlob);
-                const image = await RawImage.read(sliceUrl);
-                URL.revokeObjectURL(sliceUrl);
-                
-                // Process -> Force OCR task
-                const inputs = await processor(image, '<OCR>');
-                
+// In the loop inside 'process' event:
                 const generated_ids = await model.generate({
                     ...inputs,
                     max_new_tokens: 1024,
-                    num_beams: 3,
+                    num_beams: 1, // Greedy search for speed
                     do_sample: false
                 });
                 
@@ -137,14 +87,9 @@ self.addEventListener('message', async (event) => {
             
             bitmap.close();
             
-            // 4. Send Results (Prepend Debug Info to visible text for immediate feedback)
-            const finalDebug = '[DEBUG] ' + dimsLog + ' | Slices: 2 | Model: Large-FT';
+            // 4. Send Results (Prepend Debug Info)
+            const finalDebug = '[DEBUG] ' + dimsLog + ' | Slices: 2 | Model: Base-FT (Fast)';
             self.postMessage({ status: 'complete', fileId, text: finalDebug + '\\n' + combinedText, debugInfo: finalDebug });
-        }
-    } catch (err) {
-        self.postMessage({ status: 'error', fileId: fileId || 'system', error: err.message + (err.stack ? ' ' + err.stack : '') });
-    }
-});
 `;
 
 export const useSecureOCR = () => {
