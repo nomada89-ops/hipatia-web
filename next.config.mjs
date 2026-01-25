@@ -13,6 +13,10 @@ const nextConfig = {
     webpack: (config) => {
         config.resolve.alias.canvas = false;
         config.resolve.alias.html2canvas = 'html2canvas-pro';
+        // Transformers.js: Prevent bundling server-side binaries
+        config.resolve.alias['onnxruntime-node'] = false;
+        config.resolve.alias['sharp'] = false;
+
         // Transformers.js webpack config
         config.resolve.fallback = {
             ...config.resolve.fallback,
