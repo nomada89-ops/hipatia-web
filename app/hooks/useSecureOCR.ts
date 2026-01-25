@@ -16,8 +16,9 @@ export interface OCRResult {
 // We use ES Modules for the worker to import from CDN
 // WRITING WORKER CODE INLINE TO AVOID PATH ISSUES
 // We use ES Modules for the worker to import from CDN
+// WRITING WORKER CODE INLINE TO AVOID PATH ISSUES
+// We use ES Modules for the worker to import from CDN
 const WORKER_CODE = `
-// We use dynamic import to ensure we can catch loading errors
 let AutoProcessor, Florence2ForConditionalGeneration, RawImage, env;
 
 async function loadLibrary() {
@@ -36,27 +37,6 @@ async function loadLibrary() {
     } catch (err) {
         throw new Error("Failed to load Transformers.js library: " + err.message);
     }
-}
-
-// Helper to manually crop RawImage data
-function cropRawImage(rawImage, x, y, w, h) {
-    const channels = rawImage.channels;
-    const originalWidth = rawImage.width;
-    const newData = new Uint8ClampedArray(w * h * channels);
-    
-    for (let row = 0; row < h; row++) {
-        const srcRowStart = ((y + row) * originalWidth + x) * channels;
-        const srcRowEnd = srcRowStart + (w * channels);
-        
-        // Safety check to avoid out of bounds
-        if (srcRowStart >= rawImage.data.length) break;
-        
-        const targetRowStart = (row * w) * channels;
-        // Copy row
-        newData.set(rawImage.data.subarray(srcRowStart, srcRowEnd), targetRowStart);
-    }
-    
-    return new RawImage(newData, w, h, channels);
 }
 
 class OCRPipeline {
@@ -105,44 +85,50 @@ self.addEventListener('message', async (event) => {
             await loadLibrary(); 
             const { model, processor } = await OCRPipeline.getInstance();
             
-            // 1. Read Original Image
-            const originalImage = await RawImage.read(data);
-             // Log dimensions
-            const dimsLog = '[Dimensions]: ' + originalImage.width + 'x' + originalImage.height;
+            // 1. Create Bitmap for robust manipulation
+            // data is a Blob from the main thread
+            const bitmap = await createImageBitmap(data);
+            const w = bitmap.width;
+            const h = bitmap.height;
             
-            // 2. Define Slices (Tiling Strategy)
-            // We split height into 3 overlapping chunks to ensure we catch everything
-            // Slice 1: 0% - 40%
-            // Slice 2: 30% - 70%
-            // Slice 3: 60% - 100%
-            const h = originalImage.height;
-            const w = originalImage.width;
+            // Log dimensions
+            const dimsLog = '[Dimensions]: ' + w + 'x' + h;
             
+            // 2. Define Slices
             const sliceConfig = [
                 { y: 0, h: Math.floor(h * 0.45) },                // Top 45%
-                { y: Math.floor(h * 0.30), h: Math.floor(h * 0.40) }, // Middle 40% (overlaps top and bottom)
+                { y: Math.floor(h * 0.30), h: Math.floor(h * 0.40) }, // Middle 40%
                 { y: Math.floor(h * 0.55), h: Math.floor(h * 0.45) }  // Bottom 45%
             ];
 
             let combinedText = '';
             
-            // 3. Process Each Slice
+            // 3. Process Each Slice using OffscreenCanvas
             for (let i = 0; i < sliceConfig.length; i++) {
                 const conf = sliceConfig[i];
-                // Ensure we don't go out of bounds
                 const safeH = Math.min(conf.h, h - conf.y);
                 
-                // Crop
-                const chunkInfo = '[Slice ' + (i+1) + '] y:' + conf.y + ' h:' + safeH;
-                const crop = cropRawImage(originalImage, 0, conf.y, w, safeH);
+                // Use OffscreenCanvas to safely crop
+                const canvas = new OffscreenCanvas(w, safeH);
+                const ctx = canvas.getContext('2d');
+                
+                // Draw partial image
+                // source: sx, sy, sw, sh -> dest: dx, dy, dw, dh
+                ctx.drawImage(bitmap, 0, conf.y, w, safeH, 0, 0, w, safeH);
+                
+                // Get blob from canvas
+                const sliceBlob = await canvas.convertToBlob({ type: 'image/jpeg', quality: 0.95 });
+                
+                // Read into Transformers.js
+                const image = await RawImage.read(sliceBlob);
                 
                 // Process
-                const inputs = await processor(crop, '<OCR>');
+                const inputs = await processor(image, '<OCR>');
                 
                 const generated_ids = await model.generate({
                     ...inputs,
                     max_new_tokens: 1024,
-                    num_beams: 3, // Beam search for quality
+                    num_beams: 3,
                     do_sample: false
                 });
                 
@@ -150,8 +136,11 @@ self.addEventListener('message', async (event) => {
                 combinedText += chunkText + '\\n';
             }
             
+            // Clean up bitmap
+            bitmap.close();
+            
             // 4. Send Results
-            const debugMsg = dimsLog + ' || [Strategy]: 3-Slice Tiling || [Result Length]: ' + combinedText.length;
+            const debugMsg = dimsLog + ' || [Strategy]: Canvas Slicing || [Result Length]: ' + combinedText.length;
             self.postMessage({ status: 'complete', fileId, text: combinedText, debugInfo: debugMsg });
         }
     } catch (err) {
