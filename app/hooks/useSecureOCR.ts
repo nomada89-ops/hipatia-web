@@ -18,6 +18,8 @@ export interface OCRResult {
 // We use ES Modules for the worker to import from CDN
 // WRITING WORKER CODE INLINE TO AVOID PATH ISSUES
 // We use ES Modules for the worker to import from CDN
+// WRITING WORKER CODE INLINE TO AVOID PATH ISSUES
+// We use ES Modules for the worker to import from CDN
 const WORKER_CODE = `
 let AutoProcessor, Florence2ForConditionalGeneration, RawImage, env;
 
@@ -70,7 +72,7 @@ class OCRPipeline {
 }
 
 self.addEventListener('message', async (event) => {
-    const { type, data, fileId } = event.data;
+    const { type, data, fileId, mimeType } = event.data;
 
     try {
         if (type === 'init') {
@@ -86,8 +88,9 @@ self.addEventListener('message', async (event) => {
             const { model, processor } = await OCRPipeline.getInstance();
             
             // 1. Create Bitmap for robust manipulation
-            // data is a Blob from the main thread
-            const blob = new Blob([data]);
+            // data is an ArrayBuffer from the main thread
+            // We must use the correct mime type
+            const blob = new Blob([data], { type: mimeType });
             const bitmap = await createImageBitmap(blob);
             const w = bitmap.width;
             const h = bitmap.height;
@@ -292,9 +295,9 @@ export const useSecureOCR = () => {
             reader.onload = (e) => {
                 const imageData = e.target?.result;
                 addLog(`File read complete. Posting to worker... length: ${imageData?.toString().length}`);
-                worker.postMessage({ type: 'process', data: imageData, fileId });
+                worker.postMessage({ type: 'process', data: imageData, fileId, mimeType: file.type });
             };
-            reader.readAsDataURL(file);
+            reader.readAsArrayBuffer(file);
         });
     }, [isModelReady, statusText]);
 
