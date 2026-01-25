@@ -96,14 +96,15 @@ self.addEventListener('message', async (event) => {
             const dimsLog = '[Dimensions]: ' + image.width + 'x' + image.height;
 
             // Florence-2 phrase for pure OCR
-            // DEBUG: Switching to CAPTION to verify model "sight" vs resolution issues
-            const prompt = '<MORE_DETAILED_CAPTION>';
+            const prompt = '<OCR>';
             
             const inputs = await processor(image, prompt);
             
             const generated_ids = await model.generate({
                 ...inputs,
                 max_new_tokens: 1024,
+                num_beams: 3,
+                early_stopping: false,
             });
             
             const raw_text = processor.batch_decode(generated_ids, { skip_special_tokens: false })[0];
