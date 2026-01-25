@@ -25,7 +25,7 @@ interface MainFormProps {
 }
 
 const MainFormSecure: React.FC<MainFormProps> = ({ onBack, userToken }) => {
-    const { processFile, isProcessing, progress, statusText } = useSecureOCR();
+    const { processFile, isProcessing, progress, statusText, debugLogs } = useSecureOCR();
     const [anonymizedTexts, setAnonymizedTexts] = useState<string[]>([]);
     const [allMappings, setAllMappings] = useState<PIIMapping[]>([]);
 
@@ -1018,6 +1018,25 @@ const MainFormSecure: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                                     {message}
                                 </div>
                             )}
+
+                            {/* DEBUG CONSOLE - ONLY FOR TROUBLESHOOTING */}
+                            <div className="mt-4 p-4 bg-slate-100 rounded-xl border border-slate-200">
+                                <details className="text-xs text-slate-500">
+                                    <summary className="cursor-pointer font-bold mb-2 flex items-center justify-between">
+                                        <span>Console Logs (Local OCR)</span>
+                                        <span className="bg-slate-200 px-2 py-0.5 rounded-full text-[10px]">{debugLogs?.length || 0} event(s)</span>
+                                    </summary>
+                                    <div className="bg-slate-900 text-emerald-400 p-3 rounded-lg font-mono h-48 overflow-y-auto">
+                                        {debugLogs && debugLogs.length > 0 ? (
+                                            debugLogs.map((log, i) => (
+                                                <div key={i} className="border-b border-white/5 pb-0.5 mb-0.5 whitespace-pre-wrap">{log}</div>
+                                            ))
+                                        ) : (
+                                            <span className="text-slate-500 italic">No logs generated yet...</span>
+                                        )}
+                                    </div>
+                                </details>
+                            </div>
 
                         </form>
                     </div>

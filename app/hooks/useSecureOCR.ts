@@ -64,15 +64,23 @@ export const useSecureOCR = () => {
     const [progress, setProgress] = useState(0);
     const [statusText, setStatusText] = useState('');
     const [isModelReady, setIsModelReady] = useState(false);
+    const [logs, setLogs] = useState<string[]>([]);
     const workerRef = useRef<Worker | null>(null);
+
+    const addLog = useCallback((msg: string) => {
+        setLogs(prev => [...prev, `${new Date().toISOString().split('T')[1]} - ${msg}`]);
+        console.log(`[SecureOCR] ${msg}`);
+    }, []);
 
     useEffect(() => {
         if (!workerRef.current) {
             try {
+                addLog("Creating worker blob...");
                 // Create Blob URL for the worker code
                 const blob = new Blob([WORKER_CODE], { type: 'application/javascript' });
                 const url = URL.createObjectURL(blob);
 
+                addLog("Initializing Worker (module)...");
                 // Initialize Worker with Module type support
                 workerRef.current = new Worker(url, { type: 'module' });
 
@@ -83,25 +91,32 @@ export const useSecureOCR = () => {
                             const p = Math.round(data.progress || 0);
                             setProgress(p * 0.3);
                             setStatusText(`Descargando modelo: ${p}%`);
+                            if (p % 10 === 0) addLog(`Model download: ${p}%`);
                         } else if (data.status === 'initiate') {
+                            addLog(`Initiating model: ${data.file}`);
                             setStatusText(`Iniciando: ${data.file}...`);
                         }
                     } else if (status === 'ready') {
+                        addLog("Worker reported: READY");
                         console.log("Blob Worker Ready");
                         setIsModelReady(true);
                     } else if (status === 'error') {
+                        addLog(`Worker reported ERROR: ${data.error}`);
                         console.error("Worker sent error:", data);
                         setStatusText(`Error inicialización: ${data.error}`);
                     }
                 };
 
                 workerRef.current.onerror = (err) => {
+                    addLog("Worker Global Error (onerror triggered)");
                     console.error("Worker Global Error:", err);
                     setStatusText("Bloqueo de seguridad o Error de Red en Worker (Blob).");
                 };
 
+                addLog("Sending 'init' message to worker...");
                 workerRef.current.postMessage({ type: 'init' });
             } catch (err) {
+                addLog(`Setup Error: ${err}`);
                 console.error("Setup Error:", err);
                 setStatusText("Error creando el Worker local.");
             }
@@ -140,9 +155,13 @@ export const useSecureOCR = () => {
 
             const handleMessage = (e: MessageEvent) => {
                 const { status, fileId: returnedId, text, error } = e.data;
+                // Log all worker messages for debugging
+                // addLog(`Worker msg: ${status} for ${returnedId || 'system'}`);
+
                 if (returnedId !== fileId && returnedId !== 'system') return;
 
                 if (status === 'complete') {
+                    addLog(`Processing complete for ${fileId}`);
                     clearTimeout(timeoutId);
                     worker.removeEventListener('message', handleMessage);
 
@@ -161,9 +180,11 @@ export const useSecureOCR = () => {
                             mappings
                         });
                     } catch (err) {
+                        addLog(`Anonymization error: ${err}`);
                         reject(err);
                     }
                 } else if (status === 'error') {
+                    addLog(`Worker reported error: ${error}`);
                     clearTimeout(timeoutId);
                     worker.removeEventListener('message', handleMessage);
                     setIsProcessing(false);
@@ -175,6 +196,7 @@ export const useSecureOCR = () => {
 
             reader.onload = (e) => {
                 const imageData = e.target?.result;
+                addLog(`File read complete. Posting to worker... length: ${imageData?.toString().length}`);
                 worker.postMessage({ type: 'process', data: imageData, fileId });
             };
             reader.readAsDataURL(file);
@@ -186,5 +208,5 @@ export const useSecureOCR = () => {
         workerRef.current = null;
     }, []);
 
-    return { processFile, terminateWorker, isProcessing, progress, statusText };
+    return { processFile, terminateWorker, isProcessing, progress, statusText, debugLogs: logs };
 };
