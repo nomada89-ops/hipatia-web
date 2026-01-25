@@ -41,19 +41,31 @@ class OCRPipeline {
     static model_id = 'onnx-community/Florence-2-base-ft';
     static model = null;
     static processor = null;
+    static initializationPromise = null;
 
     static async getInstance(progress_callback = null) {
         if (!AutoProcessor) await loadLibrary();
 
-        if (this.model === null) {
-            this.model = await Florence2ForConditionalGeneration.from_pretrained(this.model_id, {
-                dtype: 'fp32', 
-                device: 'wasm',
-                progress_callback
-            });
-            this.processor = await AutoProcessor.from_pretrained(this.model_id);
+        // Use a singleton promise to prevent race conditions during initialization
+        if (this.initializationPromise) {
+            return this.initializationPromise;
         }
-        return { model: this.model, processor: this.processor };
+
+        this.initializationPromise = (async () => {
+            if (this.model === null) {
+                // Initialize model and processor sequentially
+                this.model = await Florence2ForConditionalGeneration.from_pretrained(this.model_id, {
+                    dtype: 'fp32', 
+                    device: 'wasm',
+                    progress_callback
+                });
+                
+                this.processor = await AutoProcessor.from_pretrained(this.model_id);
+            }
+            return { model: this.model, processor: this.processor };
+        })();
+
+        return this.initializationPromise;
     }
 }
 
@@ -63,7 +75,8 @@ self.addEventListener('message', async (event) => {
     // ERROR TRAP
     try {
         if (type === 'init') {
-            await loadLibrary(); // Ensure libs are loaded first
+            await loadLibrary(); 
+            // We pass a progress callback only for the 'init' phase to show model download
             await OCRPipeline.getInstance((x) => {
                 self.postMessage({ status: 'loading', fileId: 'system', data: x });
             });
@@ -71,7 +84,8 @@ self.addEventListener('message', async (event) => {
         }
 
         if (type === 'process') {
-            await loadLibrary(); // Ensure libs are loaded
+            await loadLibrary(); 
+            // Ensure we get the fully initialized instance by awaiting the singleton
             const { model, processor } = await OCRPipeline.getInstance();
             
             // RawImage helper to read the blob/base64
