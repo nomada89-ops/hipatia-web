@@ -112,7 +112,7 @@ self.addEventListener('message', async (event) => {
             // We prepend a special debug marker line to the text if it's very short, to help diagnosis
             let finalText = cleanText;
             if (cleanText.length < 5) {
-                 finalText = `[DEBUG_RAW_OUTPUT]: ${ raw_text } || [CLEAN]: ${ cleanText } `;
+                 finalText = '[DEBUG_RAW_OUTPUT]: ' + raw_text + ' || [CLEAN]: ' + cleanText;
             }
 
             self.postMessage({ status: 'complete', fileId, text: finalText });
