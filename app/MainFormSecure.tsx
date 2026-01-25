@@ -365,12 +365,17 @@ const MainFormSecure: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                 formData.append('modo_seguro_lopd', 'true');
             }
 
-            // We still append the files, just in case the server wants to store the evidences
-            // even if it processes the text. Or we could choose NOT to send them if strict zero-trust.
-            // For now, let's keep sending them but the server uses 'examen_texto_completo' if present.
+            // STRICT PRIVACY: Do NOT send raw files.
+            // Only send the text content extracted locally.
+            /* 
             examenArchivos.forEach((file, index) => {
                 formData.append(`hoja_${index}`, file);
             });
+            */
+            // If no text was extracted (e.g. empty files), we should probably block submission or warn.
+            if (anonymizedTexts.length === 0) {
+                throw new Error("No se ha podido extraer texto de los archivos. Asegúrese de que son legibles.");
+            }
 
             const response = await fetch(process.env.NEXT_PUBLIC_WEBHOOK_AUDITOR || 'https://n8n.protocolohipatia.com/webhook-test/evaluacion-examen', {
                 method: 'POST',
