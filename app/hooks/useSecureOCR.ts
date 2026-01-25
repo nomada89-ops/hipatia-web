@@ -20,8 +20,9 @@ export const useSecureOCR = () => {
     // Initialize Worker on Mount
     useEffect(() => {
         if (!workerRef.current) {
-            // Use static worker from public folder force-loaded
-            workerRef.current = new Worker('/ocr-worker.js');
+            // Use static worker from public folder with Module type
+            // This is required to use 'import' in the worker script from CDN
+            workerRef.current = new Worker('/ocr-worker.js', { type: 'module' });
 
             workerRef.current.onmessage = (e) => {
                 const { status, data } = e.data;
@@ -45,11 +46,12 @@ export const useSecureOCR = () => {
 
             workerRef.current.onerror = (err) => {
                 console.error("OCR Worker Global Error:", err);
-                setStatusText("Error fatal en el motor OCR (Worker).");
+                // Try to extract useful info
+                const msg = err instanceof ErrorEvent ? err.message : "Error desconocido (Revisa consola y CSP)";
+                setStatusText(`Error fatal en Worker: ${msg}`);
             };
 
             // Trigger init
-            // Note: browser might blocking cross-origin if CDN script fails, handled by onerror above
             workerRef.current.postMessage({ type: 'init' });
         }
 
@@ -62,16 +64,10 @@ export const useSecureOCR = () => {
     const processFile = useCallback(async (file: File): Promise<OCRResult> => {
         setIsProcessing(true);
 
-        // UX Logic:
-        // If the model is ready, we show "Analyzing".
-        // If NOT ready, we assume it's still downloading (statusText set by 'loading' event).
-        // So we only overwrite statusText if ready.
         if (isModelReady) {
             setStatusText('Analizando escritura manual (TrOCR)...');
             setProgress(30);
         } else {
-            // It's still downloading, do not overwrite statusText
-            // But ensure we have proper state
             if (statusText === '') setStatusText('Esperando al motor OCR...');
         }
 
@@ -85,17 +81,14 @@ export const useSecureOCR = () => {
             const fileId = `${file.name}_${Date.now()}`;
             const reader = new FileReader();
 
-            // Define message handler for this specific transaction
             const handleMessage = (e: MessageEvent) => {
                 const { status, fileId: returnedId, text, error } = e.data;
 
-                // Filter by fileId to avoid race conditions if multiple files
                 if (returnedId !== fileId && returnedId !== 'system') return;
 
                 if (status === 'complete') {
                     worker.removeEventListener('message', handleMessage);
 
-                    // Post-Process: Anonymization
                     setProgress(80);
                     setStatusText('Anonimizando datos sensibles...');
 
@@ -126,18 +119,17 @@ export const useSecureOCR = () => {
 
             worker.addEventListener('message', handleMessage);
 
-            // Read and send
             reader.onload = (e) => {
                 const imageData = e.target?.result;
                 worker.postMessage({
                     type: 'process',
-                    data: imageData, // Data URL
+                    data: imageData,
                     fileId
                 });
             };
             reader.readAsDataURL(file);
         });
-    }, [isModelReady, statusText]); // Add dependencies
+    }, [isModelReady, statusText]);
 
     const terminateWorker = useCallback(async () => {
         workerRef.current?.terminate();

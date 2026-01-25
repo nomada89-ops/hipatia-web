@@ -1,15 +1,10 @@
 
-// Import Transformers.js from CDN to avoid build/bundling issues
-importScripts('https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2/dist/transformers.min.js');
+// Using ES Modules - Standard for Transformers.js V2+
+import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2/dist/transformers.min.js';
 
-// Access the global transformers object
-const { env, pipeline } = self.transformers;
-
-// Config
+// Skip local checks
 env.allowLocalModels = false;
 env.useBrowserCache = true;
-// Limit threads to avoided hanging on some browsers?
-// env.backends.onnx.wasm.numThreads = 1; 
 
 // Singleton
 class OCRPipeline {
@@ -31,6 +26,7 @@ self.addEventListener('message', async (event) => {
     if (type === 'init') {
         try {
             await OCRPipeline.getInstance((x) => {
+                // Relay progress
                 self.postMessage({
                     status: 'loading',
                     fileId: 'system',
@@ -45,14 +41,8 @@ self.addEventListener('message', async (event) => {
 
     if (type === 'process') {
         try {
-            // Ensure instance is ready (awaiting singleton)
             const classifier = await OCRPipeline.getInstance();
-
-            // Run inference
-            // Data is expected to be a Data URL or Blob
             const output = await classifier(data);
-
-            // Output format for image-to-text is [{ generated_text: "..." }]
             const text = output[0]?.generated_text || "";
 
             self.postMessage({
