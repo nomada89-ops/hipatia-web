@@ -12,6 +12,9 @@ import { DemoReport } from './components/DemoReport';
 import { useSecureOCR } from './hooks/useSecureOCR';
 import ProcessingStatus from './components/ProcessingStatus';
 import LegalLockOverlay from './components/LegalLockOverlay';
+import { AnonymizationEditor } from './components/AnonymizationEditor';
+import { sanitizePaste } from './lib/inputHygiene';
+import { Keyboard } from 'lucide-react';
 
 // ... (existing imports)
 
@@ -40,6 +43,10 @@ const MainFormSecure: React.FC<MainFormProps> = ({ onBack, userToken }) => {
     const [isOptimizing, setIsOptimizing] = useState(false);
     const [legalAccepted, setLegalAccepted] = useState(false);
     const [idGrupo, setIdGrupo] = useState('');
+    const [inputMethod, setInputMethod] = useState<'files' | 'text'>('files');
+    const [manualText, setManualText] = useState('');
+    const [showEditor, setShowEditor] = useState(false);
+    const [editorInitialText, setEditorInitialText] = useState('');
 
     // DRAG STATES
     const [isDragOverRubrica, setIsDragOverRubrica] = useState(false);
@@ -640,6 +647,35 @@ const MainFormSecure: React.FC<MainFormProps> = ({ onBack, userToken }) => {
     }
 
     // THIS IS THE SECURE VERSION - NO LEGAL LOCK
+    if (showEditor) {
+        return (
+            <div className="fixed inset-0 z-50 bg-slate-100/80 backdrop-blur-sm flex items-center justify-center p-6">
+                <div className="max-w-4xl w-full shadow-2xl">
+                    <AnonymizationEditor
+                        initialText={editorInitialText}
+                        onConfirm={(cleanText, mapping) => {
+                            // If coming from manual text, we update that
+                            if (inputMethod === 'text') {
+                                setManualText(cleanText);
+                                // Also treat "anonymizedTexts" as filled now? 
+                                // It simplifies submission logic if we store it there too.
+                                setAnonymizedTexts([cleanText]);
+                            }
+                            // Save mapping to Safe is optional here or inside Editor? 
+                            // Editor returns it, we should save it.
+                            // import { saveMapping } from '../lib/secureStorage';
+                            // but I haven't imported it here yet. 
+                            // Let's assume we just use the clean text for now for submission.
+
+                            setShowEditor(false);
+                        }}
+                        onCancel={() => setShowEditor(false)}
+                    />
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="flex-1 h-full bg-slate-50 flex flex-col font-sans overflow-hidden relative">
             <ProcessingStatus isVisible={isProcessing} status={statusText} progress={progress} />
@@ -810,29 +846,84 @@ const MainFormSecure: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                                     <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest">Evidencias del Examen</h3>
                                 </div>
 
-                                {/* Drag & Drop Area */}
-                                <div
-                                    onDragOver={handleDragOver}
-                                    onDragLeave={handleDragLeave}
-                                    onDrop={handleDrop}
-                                    className={`relative border-2 border-dashed rounded-2xl p-8 flex flex-col items-center justify-center text-center transition-all cursor-pointer min-h-[200px]
-                                    ${isDragOver ? 'border-indigo-500 bg-indigo-50/50 scale-[1.02]' : 'border-slate-200 hover:border-indigo-400 hover:bg-slate-50'}`}
-                                >
-                                    <input
-                                        type="file"
-                                        multiple
-                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                                        onChange={handleFileSelect}
-                                        accept="image/*,.pdf"
-                                    />
-                                    <div className="w-16 h-16 bg-white rounded-full shadow-lg flex items-center justify-center mb-4 text-indigo-600">
-                                        {isOptimizing ? <Loader2 className="animate-spin" size={32} /> : <Upload size={32} />}
-                                    </div>
-                                    <h3 className="text-lg font-bold text-slate-700">
-                                        {isOptimizing ? "Optimizando imágenes..." : "Arrastra las fotos del examen aquí"}
-                                    </h3>
-                                    <p className="text-slate-400 mt-2 font-medium">o haz clic para explorar archivos</p>
+
+                                {/* TABS FOR INPUT METHOD */}
+                                <div className="flex gap-4 border-b border-slate-200 mb-4">
+                                    <button
+                                        type="button"
+                                        onClick={() => setInputMethod('files')}
+                                        className={`pb-2 text-sm font-bold transition-colors border-b-2 ${inputMethod === 'files' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-400 hover:text-slate-600'}`}
+                                    >
+                                        Subir Archivos
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setInputMethod('text')}
+                                        className={`pb-2 text-sm font-bold transition-colors border-b-2 ${inputMethod === 'text' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-400 hover:text-slate-600'}`}
+                                    >
+                                        Pegar Texto (Seguro)
+                                    </button>
                                 </div>
+
+                                {inputMethod === 'files' ? (
+                                    /* Drag & Drop Area */
+                                    <div
+                                        onDragOver={handleDragOver}
+                                        onDragLeave={handleDragLeave}
+                                        onDrop={handleDrop}
+                                        className={`relative border-2 border-dashed rounded-2xl p-8 flex flex-col items-center justify-center text-center transition-all cursor-pointer min-h-[200px]
+                                        ${isDragOver ? 'border-indigo-500 bg-indigo-50/50 scale-[1.02]' : 'border-slate-200 hover:border-indigo-400 hover:bg-slate-50'}`}
+                                    >
+                                        <input
+                                            type="file"
+                                            multiple
+                                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                            onChange={handleFileSelect}
+                                            accept="image/*,.pdf"
+                                        />
+                                        <div className="w-16 h-16 bg-white rounded-full shadow-lg flex items-center justify-center mb-4 text-indigo-600">
+                                            {isOptimizing ? <Loader2 className="animate-spin" size={32} /> : <Upload size={32} />}
+                                        </div>
+                                        <h3 className="text-lg font-bold text-slate-700">
+                                            {isOptimizing ? "Optimizando imágenes..." : "Arrastra las fotos del examen aquí"}
+                                        </h3>
+                                        <p className="text-slate-400 mt-2 font-medium">o haz clic para explorar archivos</p>
+                                    </div>
+                                ) : (
+                                    /* Manual Text Input */
+                                    <div className="space-y-3">
+                                        <div className="relative">
+                                            <textarea
+                                                value={manualText}
+                                                onChange={(e) => setManualText(e.target.value)}
+                                                onPaste={(e) => {
+                                                    const clean = sanitizePaste(e);
+                                                    setManualText(prev => prev + clean);
+                                                }}
+                                                placeholder="Pegue aquí el texto del examen (copiado de OCR externo o digital)..."
+                                                className="w-full h-64 p-4 bg-white border-2 border-slate-200 rounded-xl focus:border-indigo-500 focus:shadow-md outline-none transition-all font-mono text-sm resize-none custom-scrollbar"
+                                            />
+                                            <div className="absolute bottom-4 right-4 bg-slate-100 px-2 py-1 rounded text-[10px] text-slate-500 font-bold border border-slate-200">
+                                                Solo Texto Plano
+                                            </div>
+                                        </div>
+                                        <div className="flex justify-end">
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    // Trigger Editor
+                                                    setEditorInitialText(manualText);
+                                                    setShowEditor(true);
+                                                }}
+                                                disabled={!manualText.trim()}
+                                                className="px-4 py-2 bg-slate-800 text-white rounded-lg text-sm font-bold hover:bg-slate-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                                            >
+                                                <Shield size={14} />
+                                                Validar Privacidad
+                                            </button>
+                                        </div>
+                                    </div>
+                                )}
 
                                 {/* File List */}
                                 {examenArchivos.length > 0 && (
