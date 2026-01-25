@@ -14,6 +14,7 @@ import ProcessingStatus from './components/ProcessingStatus';
 import LegalLockOverlay from './components/LegalLockOverlay';
 import { AnonymizationEditor } from './components/AnonymizationEditor';
 import { sanitizePaste } from './lib/inputHygiene';
+import { restoreIdentities, PIIMapping } from './lib/anonymizer';
 import { Keyboard } from 'lucide-react';
 
 // ... (existing imports)
@@ -26,6 +27,7 @@ interface MainFormProps {
 const MainFormSecure: React.FC<MainFormProps> = ({ onBack, userToken }) => {
     const { processFile, isProcessing, progress, statusText } = useSecureOCR();
     const [anonymizedTexts, setAnonymizedTexts] = useState<string[]>([]);
+    const [allMappings, setAllMappings] = useState<PIIMapping[]>([]);
 
     // ... (existing state)
     // Contexto para datos globales (opcional, pero útil si se quiere persistir al cambiar de pestaña)
@@ -301,19 +303,24 @@ const MainFormSecure: React.FC<MainFormProps> = ({ onBack, userToken }) => {
         // But we block the submit button via 'isProcessing' if we wanted, or just show the overlay.
 
         const newTexts: string[] = [];
+        const newMappings: PIIMapping[] = [];
 
         for (const file of optimizedFiles) {
             try {
-                // Returns { text, originalName, fileId, isAnonymized }
+                // Returns { text, originalName, fileId, isAnonymized, mappings }
                 const result = await processFile(file);
                 newTexts.push(result.text);
+                if (result.mappings) {
+                    newMappings.push(...result.mappings);
+                }
             } catch (err) {
                 console.error("Failed to process file for OCR:", file.name, err);
-                newTexts.push(""); // Push empty string to keep index alignment? Or handle error gracefully
+                newTexts.push("");
             }
         }
 
         setAnonymizedTexts(prev => [...prev, ...newTexts]);
+        setAllMappings(prev => [...prev, ...newMappings]);
     };
 
     const removeFile = (indexToRemove: number) => {
@@ -379,7 +386,9 @@ const MainFormSecure: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                 const numericGrade = data.nota ?? data.score ?? data.grade ?? null;
                 setJsonGrade(numericGrade !== null ? Number(numericGrade) : null);
 
-                setOriginalReport(reportHtml);
+                // BOOMERANG LOGIC: RESTORE IDENTITIES
+                const restoredReport = restoreIdentities(reportHtml, allMappings);
+                setOriginalReport(restoredReport);
             } else {
                 throw new Error(`Error: ${response.status}`);
             }
@@ -660,6 +669,8 @@ const MainFormSecure: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                                 // Also treat "anonymizedTexts" as filled now? 
                                 // It simplifies submission logic if we store it there too.
                                 setAnonymizedTexts([cleanText]);
+                                // @ts-ignore
+                                setAllMappings(prev => [...prev, ...mapping]);
                             }
                             // Save mapping to Safe is optional here or inside Editor? 
                             // Editor returns it, we should save it.

@@ -8,6 +8,7 @@ export interface OCRResult {
     originalName: string;
     text: string;
     isAnonymized: boolean;
+    mappings?: any[]; // PIIMapping[]
 }
 
 export const useSecureOCR = () => {
@@ -90,7 +91,8 @@ export const useSecureOCR = () => {
                             fileId,
                             originalName: file.name,
                             text: cleanText,
-                            isAnonymized: mappings.length > 0
+                            isAnonymized: mappings.length > 0,
+                            mappings
                         });
                     } catch (err) {
                         reject(err);
