@@ -13,18 +13,29 @@ export interface OCRResult {
 // WRITING WORKER CODE INLINE TO AVOID PATH ISSUES
 // We use ES Modules for the worker to import from CDN
 const WORKER_CODE = `
-import { AutoProcessor, Florence2ForConditionalGeneration, RawImage, env } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2/dist/transformers.min.js'; 
+// We use dynamic import to ensure we can catch loading errors
+let AutoProcessor, Florence2ForConditionalGeneration, RawImage, env;
 
-// HACK: Florence-2 requires v3 features. If v2.17.2 fails, we should try a v3 alpha, 
-// but for stability let's try the latest v3 alpha explicit import if the v2 one doesn't have it.
-// Actually, Florence-2 is ONLY in v3. Let's start with the v3 alpha CDN.
-import { AutoProcessor as V3Proc, Florence2ForConditionalGeneration as V3Model, RawImage as V3Image, env as V3Env } 
-    from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@3.0.0-alpha.19/dist/transformers.min.js';
+async function loadLibrary() {
+    try {
+        // Try to import from the official Hugging Face package (v3)
+        // Using a specific recent version to ensure stability
+        const module = await import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.2.4/dist/transformers.min.js');
+        AutoProcessor = module.AutoProcessor;
+        Florence2ForConditionalGeneration = module.Florence2ForConditionalGeneration;
+        RawImage = module.RawImage;
+        env = module.env;
 
-// Setup Environment
-V3Env.allowLocalModels = false;
-V3Env.useBrowserCache = true;
-// V3Env.backends.onnx.wasm.numThreads = 1; // Optional: throttle if needed
+        // Setup Environment
+        env.allowLocalModels = false;
+        env.useBrowserCache = true;
+        // env.backends.onnx.wasm.numThreads = 1; 
+        
+        return true;
+    } catch (err) {
+        throw new Error("Failed to load Transformers.js library: " + err.message);
+    }
+}
 
 class OCRPipeline {
     static model_id = 'onnx-community/Florence-2-base-ft';
@@ -32,13 +43,15 @@ class OCRPipeline {
     static processor = null;
 
     static async getInstance(progress_callback = null) {
+        if (!AutoProcessor) await loadLibrary();
+
         if (this.model === null) {
-            this.model = await V3Model.from_pretrained(this.model_id, {
-                dtype: 'fp32', // q8 is default for some, but let's be safe or rely on auto
+            this.model = await Florence2ForConditionalGeneration.from_pretrained(this.model_id, {
+                dtype: 'fp32', 
                 device: 'wasm',
                 progress_callback
             });
-            this.processor = await V3Proc.from_pretrained(this.model_id);
+            this.processor = await AutoProcessor.from_pretrained(this.model_id);
         }
         return { model: this.model, processor: this.processor };
     }
@@ -47,25 +60,24 @@ class OCRPipeline {
 self.addEventListener('message', async (event) => {
     const { type, data, fileId } = event.data;
 
-    if (type === 'init') {
-        try {
+    // ERROR TRAP
+    try {
+        if (type === 'init') {
+            await loadLibrary(); // Ensure libs are loaded first
             await OCRPipeline.getInstance((x) => {
                 self.postMessage({ status: 'loading', fileId: 'system', data: x });
             });
             self.postMessage({ status: 'ready' });
-        } catch (err) {
-            self.postMessage({ status: 'error', error: err.message });
         }
-    }
 
-    if (type === 'process') {
-        try {
+        if (type === 'process') {
+            await loadLibrary(); // Ensure libs are loaded
             const { model, processor } = await OCRPipeline.getInstance();
             
-            // 'data' is a dataURL (base64). RawImage.read() handles it perfectly in v3.
-            const image = await V3Image.read(data);
+            // RawImage helper to read the blob/base64
+            const image = await RawImage.read(data);
             
-            // Florence-2 prompt for OCR
+            // Florence-2 phrase for pure OCR
             const prompt = '<OCR>';
             
             const inputs = await processor(image, prompt);
@@ -77,19 +89,14 @@ self.addEventListener('message', async (event) => {
             
             const generated_text = processor.batch_decode(generated_ids, { skip_special_tokens: false })[0];
             
-            // Florence-2 often returns the prompt + result or special tags.
-            // Post-processing might be needed, but usually <OCR> returns the text directly or wrapped.
-            // Let's clean it up slightly if needed. 
-            // The output usually contains '</s>' etc. 'skip_special_tokens: false' keeps tags which might be useful for parsing 
-            // but for raw text we might want true or manual cleanup.
-            // Let's try skip_special_tokens: true first for cleaner text.
+            // Cleanup tags if needed, but Florence <OCR> usually output includes matches. 
+            // We strip the special tokens for the final text.
+            const cleanText = processor.batch_decode(generated_ids, { skip_special_tokens: true })[0];
             
-            const cleanerHost = processor.batch_decode(generated_ids, { skip_special_tokens: true })[0];
-            
-            self.postMessage({ status: 'complete', fileId, text: cleanerHost });
-        } catch (err) {
-            self.postMessage({ status: 'error', fileId, error: err.message });
+            self.postMessage({ status: 'complete', fileId, text: cleanText });
         }
+    } catch (err) {
+        self.postMessage({ status: 'error', fileId: fileId || 'system', error: err.message + (err.stack ? ' ' + err.stack : '') });
     }
 });
 `;
