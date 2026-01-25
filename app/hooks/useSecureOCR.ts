@@ -126,7 +126,7 @@ self.addEventListener('message', async (event) => {
                 const generated_ids = await model.generate({
                     ...inputs,
                     max_new_tokens: 1024,
-                    num_beams: 1, // Greedy search for speed
+                    num_beams: 2, // Compromise: Better than greedy, faster than 3
                     do_sample: false
                 });
                 
@@ -137,7 +137,7 @@ self.addEventListener('message', async (event) => {
             bitmap.close();
             
             // 4. Send Results (Prepend Debug Info)
-            const finalDebug = '[DEBUG] ' + dimsLog + ' | Slices: 2 | Model: Base-FT (Fast)';
+            const finalDebug = '[DEBUG] ' + dimsLog + ' | Slices: 2 | Model: Large-FT (Accurate)';
             self.postMessage({ status: 'complete', fileId, text: finalDebug + '\\n' + combinedText, debugInfo: finalDebug });
         }
     } catch (err) {
