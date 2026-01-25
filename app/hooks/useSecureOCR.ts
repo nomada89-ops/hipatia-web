@@ -12,63 +12,63 @@ export interface OCRResult {
 
 // WRITING WORKER CODE INLINE TO AVOID PATH ISSUES
 // We use ES Modules for the worker to import from CDN
-// WRITING WORKER CODE INLINE TO AVOID PATH ISSUES
-// We use ES Modules for the worker to import from CDN
-// WRITING WORKER CODE INLINE TO AVOID PATH ISSUES
-// We use ES Modules for the worker to import from CDN
-// WRITING WORKER CODE INLINE TO AVOID PATH ISSUES
-// We use ES Modules for the worker to import from CDN
-// WRITING WORKER CODE INLINE TO AVOID PATH ISSUES
-// We use ES Modules for the worker to import from CDN
 const WORKER_CODE = `
-let AutoProcessor, Florence2ForConditionalGeneration, RawImage, env;
+import { createWorker } from 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.esm.min.js';
 
-async function loadLibrary() {
-    try {
-        const module = await import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.2.4/dist/transformers.min.js');
-        AutoProcessor = module.AutoProcessor;
-        Florence2ForConditionalGeneration = module.Florence2ForConditionalGeneration;
-        RawImage = module.RawImage;
-        env = module.env;
-
-        // Setup Environment
-        env.allowLocalModels = false;
-        env.useBrowserCache = true;
+// Image Pre-processing Logic
+async function preprocessImage(imageBlob) {
+    const bitmap = await createImageBitmap(imageBlob);
+    const width = bitmap.width;
+    const height = bitmap.height;
+    
+    const canvas = new OffscreenCanvas(width, height);
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(bitmap, 0, 0);
+    
+    // Get raw pixel data
+    const imageData = ctx.getImageData(0, 0, width, height);
+    const data = imageData.data;
+    
+    // Binarization (Thresholding) algorithm
+    // Turns image into pure Black & White to help Tesseract see strokes
+    const threshold = 160; // Slightly high to catch faint pencil
+    
+    for (let i = 0; i < data.length; i += 4) {
+        const r = data[i];
+        const g = data[i + 1];
+        const b = data[i + 2];
         
-        return true;
-    } catch (err) {
-        throw new Error("Failed to load Transformers.js library: " + err.message);
+        // Grayscale (Luminosity method)
+        const gray = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+        
+        // Threshold
+        const val = (gray < threshold) ? 0 : 255;
+        
+        data[i] = val;     // R
+        data[i + 1] = val; // G
+        data[i + 2] = val; // B
+        // Alpha (data[i+3]) remains 255
     }
+    
+    // Write back
+    ctx.putImageData(imageData, 0, 0);
+    
+    // Return processed blob
+    return canvas.convertToBlob({ type: 'image/jpeg', quality: 0.9 });
 }
 
-class OCRPipeline {
-    // Switch back to Base model for speed
-    static model_id = 'onnx-community/Florence-2-base-ft';
-    static model = null;
-    static processor = null;
-    static initializationPromise = null;
+class OCREngine {
+    static instance = null;
 
-    static async getInstance(progress_callback = null) {
-        if (!AutoProcessor) await loadLibrary();
-
-        if (this.initializationPromise) {
-            return this.initializationPromise;
+    static async getInstance(progressLogger) {
+        if (!this.instance) {
+            this.instance = await createWorker('spa', 1, {
+               logger: m => {
+                   if (progressLogger) progressLogger(m);
+               }
+            });
         }
-
-        this.initializationPromise = (async () => {
-            if (this.model === null) {
-                this.model = await Florence2ForConditionalGeneration.from_pretrained(this.model_id, {
-                    dtype: 'q8', 
-                    device: 'wasm',
-                    progress_callback
-                });
-                
-                this.processor = await AutoProcessor.from_pretrained(this.model_id);
-            }
-            return { model: this.model, processor: this.processor };
-        })();
-
-        return this.initializationPromise;
+        return this.instance;
     }
 }
 
@@ -77,68 +77,45 @@ self.addEventListener('message', async (event) => {
 
     try {
         if (type === 'init') {
-            await loadLibrary(); 
-            await OCRPipeline.getInstance((x) => {
-                self.postMessage({ status: 'loading', fileId: 'system', data: x });
+            await OCREngine.getInstance((msg) => {
+                self.postMessage({ 
+                    status: 'loading', 
+                    fileId: 'system', 
+                    data: { status: msg.status, progress: msg.progress * 100 } 
+                });
             });
             self.postMessage({ status: 'ready' });
         }
 
         if (type === 'process') {
-            await loadLibrary(); 
-            const { model, processor } = await OCRPipeline.getInstance();
-            
-            // 1. Create Bitmap
-            const blob = new Blob([data], { type: mimeType });
-            const bitmap = await createImageBitmap(blob);
-            const w = bitmap.width;
-            const h = bitmap.height;
-            
-            const dimsLog = '[Dimensions]: ' + w + 'x' + h;
-            
-            // 2. Define Slices (2-Slice Overlap Strategy)
-            const sliceConfig = [
-                { y: 0, h: Math.floor(h * 0.60) },                  // Top 60%
-                { y: Math.floor(h * 0.40), h: Math.floor(h * 0.60) } // Bottom 60% (20% overlap)
-            ];
-
-            let combinedText = '';
-            
-            // 3. Process Each Slice
-            for (let i = 0; i < sliceConfig.length; i++) {
-                const conf = sliceConfig[i];
-                const safeH = Math.min(conf.h, h - conf.y);
-                
-                // Crop
-                const canvas = new OffscreenCanvas(w, safeH);
-                const ctx = canvas.getContext('2d');
-                ctx.drawImage(bitmap, 0, conf.y, w, safeH, 0, 0, w, safeH);
-                const sliceBlob = await canvas.convertToBlob({ type: 'image/jpeg', quality: 0.95 });
-                
-                // Read
-                const sliceUrl = URL.createObjectURL(sliceBlob);
-                const image = await RawImage.read(sliceUrl);
-                URL.revokeObjectURL(sliceUrl);
-                
-                // Process -> Force OCR task
-                const inputs = await processor(image, '<OCR>');
-                
-                const generated_ids = await model.generate({
-                    ...inputs,
-                    max_new_tokens: 1024,
-                    num_beams: 2, // Compromise: Better than greedy, faster than 3
-                    do_sample: false
+            const worker = await OCREngine.getInstance((msg) => {
+                 self.postMessage({ 
+                    status: 'loading', 
+                    fileId: fileId, 
+                    data: { status: msg.status, progress: msg.progress * 100 } 
                 });
-                
-                const chunkText = processor.batch_decode(generated_ids, { skip_special_tokens: true })[0];
-                combinedText += chunkText + '\\n';
-            }
+            });
+
+            // 1. Reconstruct Blob
+            const originalBlob = new Blob([data], { type: mimeType });
             
-            bitmap.close();
+            // 2. Pre-process (Clean image)
+            // We strip shadows and color to give Tesseract the best chance
+            const cleanBlob = await preprocessImage(originalBlob);
             
-            // 4. Send Results (Prepend Debug Info)
-            const finalDebug = '[DEBUG] ' + dimsLog + ' | Slices: 2 | Model: Large-FT (Accurate)';
-            self.postMessage({ status: 'complete', fileId, text: finalDebug + '\\n' + combinedText, debugInfo: finalDebug });
+            // Convert to URL for Tesseract
+            const cleanUrl = URL.createObjectURL(cleanBlob);
+
+            // 3. Recognize
+            const { data: { text } } = await worker.recognize(cleanUrl);
+            
+            URL.revokeObjectURL(cleanUrl);
+            
+            // Debug Log
+            const preview = text.slice(0, 100).replace(/\\n/g, ' ');
+            const logMsg = '[Tesseract v5] + [B&W Filter] Length: ' + text.length + '. Preview: ' + preview;
+
+            self.postMessage({ status: 'complete', fileId, text, debugInfo: logMsg });
         }
     } catch (err) {
         self.postMessage({ status: 'error', fileId: fileId || 'system', error: err.message + (err.stack ? ' ' + err.stack : '') });
