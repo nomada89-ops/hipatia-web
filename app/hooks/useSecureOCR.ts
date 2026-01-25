@@ -54,8 +54,9 @@ class OCRPipeline {
         this.initializationPromise = (async () => {
             if (this.model === null) {
                 // Initialize model and processor sequentially
+                // Use 'q8' for better WASM compatibility and stability
                 this.model = await Florence2ForConditionalGeneration.from_pretrained(this.model_id, {
-                    dtype: 'fp32', 
+                    dtype: 'q8', 
                     device: 'wasm',
                     progress_callback
                 });
@@ -101,13 +102,20 @@ self.addEventListener('message', async (event) => {
                 max_new_tokens: 1024,
             });
             
-            const generated_text = processor.batch_decode(generated_ids, { skip_special_tokens: false })[0];
+            const raw_text = processor.batch_decode(generated_ids, { skip_special_tokens: false })[0];
             
             // Cleanup tags if needed, but Florence <OCR> usually output includes matches. 
             // We strip the special tokens for the final text.
             const cleanText = processor.batch_decode(generated_ids, { skip_special_tokens: true })[0];
             
-            self.postMessage({ status: 'complete', fileId, text: cleanText });
+            // Log raw output for debugging
+            // We prepend a special debug marker line to the text if it's very short, to help diagnosis
+            let finalText = cleanText;
+            if (cleanText.length < 5) {
+                 finalText = `[DEBUG_RAW_OUTPUT]: ${ raw_text } || [CLEAN]: ${ cleanText } `;
+            }
+
+            self.postMessage({ status: 'complete', fileId, text: finalText });
         }
     } catch (err) {
         self.postMessage({ status: 'error', fileId: fileId || 'system', error: err.message + (err.stack ? ' ' + err.stack : '') });
