@@ -93,7 +93,7 @@ self.addEventListener('message', async (event) => {
             const image = await RawImage.read(data);
             
             // Log dimensions to check if we are receiving the full image
-            const dimsLog = `[Dimensions]: ${ image.width }x${ image.height }`;
+            const dimsLog = '[Dimensions]: ' + image.width + 'x' + image.height;
 
             // Florence-2 phrase for pure OCR
             // DEBUG: Switching to CAPTION to verify model "sight" vs resolution issues
@@ -115,7 +115,7 @@ self.addEventListener('message', async (event) => {
             // Log raw output for debugging
             let finalText = cleanText;
             // Always log debug info including dimensions and raw output
-            finalText = `[DEBUG_INFO]: ${ dimsLog } || [RAW]: ${ raw_text } || [CLEAN]: ${ cleanText } `;
+            finalText = '[DEBUG_INFO]: ' + dimsLog + ' || [RAW]: ' + raw_text + ' || [CLEAN]: ' + cleanText;
 
             self.postMessage({ status: 'complete', fileId, text: finalText });
         }
