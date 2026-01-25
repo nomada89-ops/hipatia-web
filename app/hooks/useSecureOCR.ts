@@ -7,8 +7,57 @@ export interface OCRResult {
     originalName: string;
     text: string;
     isAnonymized: boolean;
-    mappings?: any[]; // PIIMapping[]
+    mappings?: any[];
 }
+
+// WRITING WORKER CODE INLINE TO AVOID PATH ISSUES
+// We use ES Modules for the worker to import from CDN
+const WORKER_CODE = `
+import { pipeline, env } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2/dist/transformers.min.js';
+
+// Config
+env.allowLocalModels = false;
+env.useBrowserCache = true;
+
+class OCRPipeline {
+    static task = 'image-to-text';
+    static model = 'Xenova/trocr-small-handwritten';
+    static instance = null;
+
+    static async getInstance(progress_callback = null) {
+        if (this.instance === null) {
+            this.instance = await pipeline(this.task, this.model, { progress_callback });
+        }
+        return this.instance;
+    }
+}
+
+self.addEventListener('message', async (event) => {
+    const { type, data, fileId } = event.data;
+
+    if (type === 'init') {
+        try {
+            await OCRPipeline.getInstance((x) => {
+                self.postMessage({ status: 'loading', fileId: 'system', data: x });
+            });
+            self.postMessage({ status: 'ready' });
+        } catch (err) {
+            self.postMessage({ status: 'error', error: err.message });
+        }
+    }
+
+    if (type === 'process') {
+        try {
+            const classifier = await OCRPipeline.getInstance();
+            const output = await classifier(data);
+            const text = output[0]?.generated_text || "";
+            self.postMessage({ status: 'complete', fileId, text });
+        } catch (err) {
+            self.postMessage({ status: 'error', fileId, error: err.message });
+        }
+    }
+});
+`;
 
 export const useSecureOCR = () => {
     const [isProcessing, setIsProcessing] = useState(false);
@@ -17,42 +66,45 @@ export const useSecureOCR = () => {
     const [isModelReady, setIsModelReady] = useState(false);
     const workerRef = useRef<Worker | null>(null);
 
-    // Initialize Worker on Mount
     useEffect(() => {
         if (!workerRef.current) {
-            // Use static worker from public folder with Module type
-            // This is required to use 'import' in the worker script from CDN
-            workerRef.current = new Worker('/ocr-worker.js', { type: 'module' });
+            try {
+                // Create Blob URL for the worker code
+                const blob = new Blob([WORKER_CODE], { type: 'application/javascript' });
+                const url = URL.createObjectURL(blob);
 
-            workerRef.current.onmessage = (e) => {
-                const { status, data } = e.data;
-                if (status === 'loading') {
-                    // Update model load progress
-                    if (data.status === 'progress') {
-                        // Map 0-100 of model loading to 0-30% of total bar
-                        setProgress(Math.round(data.progress || 0) * 0.3);
-                        setStatusText(`Descargando modelo neuronal... ${Math.round(data.progress || 0)}%`);
-                    } else if (data.status === 'initiate') {
-                        setStatusText(`Iniciando descarga: ${data.file}...`);
+                // Initialize Worker with Module type support
+                workerRef.current = new Worker(url, { type: 'module' });
+
+                workerRef.current.onmessage = (e) => {
+                    const { status, data } = e.data;
+                    if (status === 'loading') {
+                        if (data.status === 'progress') {
+                            const p = Math.round(data.progress || 0);
+                            setProgress(p * 0.3);
+                            setStatusText(`Descargando modelo: ${p}%`);
+                        } else if (data.status === 'initiate') {
+                            setStatusText(`Iniciando: ${data.file}...`);
+                        }
+                    } else if (status === 'ready') {
+                        console.log("Blob Worker Ready");
+                        setIsModelReady(true);
+                    } else if (status === 'error') {
+                        console.error("Worker sent error:", data);
+                        setStatusText(`Error inicialización: ${data.error}`);
                     }
-                } else if (status === 'ready') {
-                    console.log("OCR Worker Ready");
-                    setIsModelReady(true);
-                } else if (status === 'error') {
-                    // If init fails
-                    setStatusText(`Error de inicialización: ${data.error || 'Desconocido'}`);
-                }
-            };
+                };
 
-            workerRef.current.onerror = (err) => {
-                console.error("OCR Worker Global Error:", err);
-                // Try to extract useful info
-                const msg = err instanceof ErrorEvent ? err.message : "Error desconocido (Revisa consola y CSP)";
-                setStatusText(`Error fatal en Worker: ${msg}`);
-            };
+                workerRef.current.onerror = (err) => {
+                    console.error("Worker Global Error:", err);
+                    setStatusText("Bloqueo de seguridad o Error de Red en Worker (Blob).");
+                };
 
-            // Trigger init
-            workerRef.current.postMessage({ type: 'init' });
+                workerRef.current.postMessage({ type: 'init' });
+            } catch (err) {
+                console.error("Setup Error:", err);
+                setStatusText("Error creando el Worker local.");
+            }
         }
 
         return () => {
@@ -63,43 +115,44 @@ export const useSecureOCR = () => {
 
     const processFile = useCallback(async (file: File): Promise<OCRResult> => {
         setIsProcessing(true);
-
         if (isModelReady) {
-            setStatusText('Analizando escritura manual (TrOCR)...');
+            setStatusText('Analizando imagen (IA Local)...');
             setProgress(30);
         } else {
-            if (statusText === '') setStatusText('Esperando al motor OCR...');
+            if (statusText === '') setStatusText('Conectando con Motor IA...');
         }
 
         return new Promise((resolve, reject) => {
             const worker = workerRef.current;
             if (!worker) {
-                reject(new Error("Worker not initialized"));
+                reject(new Error("Worker failed"));
                 return;
             }
 
             const fileId = `${file.name}_${Date.now()}`;
             const reader = new FileReader();
 
+            // Timeout safety (2 minutes max for slow networks)
+            const timeoutId = setTimeout(() => {
+                worker.removeEventListener('message', handleMessage);
+                reject(new Error("Timeout: El modelo tarda demasiado en responder."));
+            }, 120000);
+
             const handleMessage = (e: MessageEvent) => {
                 const { status, fileId: returnedId, text, error } = e.data;
-
                 if (returnedId !== fileId && returnedId !== 'system') return;
 
                 if (status === 'complete') {
+                    clearTimeout(timeoutId);
                     worker.removeEventListener('message', handleMessage);
 
                     setProgress(80);
-                    setStatusText('Anonimizando datos sensibles...');
-
+                    setStatusText('Anonimizando...');
                     try {
                         const { cleanText, mappings } = anonymizeText(text);
                         saveMapping(fileId, mappings);
-
                         setProgress(100);
-                        setStatusText('Completado.');
                         setIsProcessing(false);
-
                         resolve({
                             fileId,
                             originalName: file.name,
@@ -111,6 +164,7 @@ export const useSecureOCR = () => {
                         reject(err);
                     }
                 } else if (status === 'error') {
+                    clearTimeout(timeoutId);
                     worker.removeEventListener('message', handleMessage);
                     setIsProcessing(false);
                     reject(new Error(error));
@@ -121,11 +175,7 @@ export const useSecureOCR = () => {
 
             reader.onload = (e) => {
                 const imageData = e.target?.result;
-                worker.postMessage({
-                    type: 'process',
-                    data: imageData,
-                    fileId
-                });
+                worker.postMessage({ type: 'process', data: imageData, fileId });
             };
             reader.readAsDataURL(file);
         });
@@ -136,11 +186,5 @@ export const useSecureOCR = () => {
         workerRef.current = null;
     }, []);
 
-    return {
-        processFile,
-        terminateWorker,
-        isProcessing,
-        progress,
-        statusText
-    };
+    return { processFile, terminateWorker, isProcessing, progress, statusText };
 };
