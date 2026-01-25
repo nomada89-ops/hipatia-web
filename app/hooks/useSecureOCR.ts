@@ -92,8 +92,12 @@ self.addEventListener('message', async (event) => {
             // RawImage helper to read the blob/base64
             const image = await RawImage.read(data);
             
+            // Log dimensions to check if we are receiving the full image
+            const dimsLog = `[Dimensions]: ${ image.width }x${ image.height }`;
+
             // Florence-2 phrase for pure OCR
-            const prompt = '<OCR>';
+            // DEBUG: Switching to CAPTION to verify model "sight" vs resolution issues
+            const prompt = '<MORE_DETAILED_CAPTION>';
             
             const inputs = await processor(image, prompt);
             
@@ -109,11 +113,9 @@ self.addEventListener('message', async (event) => {
             const cleanText = processor.batch_decode(generated_ids, { skip_special_tokens: true })[0];
             
             // Log raw output for debugging
-            // We prepend a special debug marker line to the text if it's very short, to help diagnosis
             let finalText = cleanText;
-            if (cleanText.length < 5) {
-                 finalText = '[DEBUG_RAW_OUTPUT]: ' + raw_text + ' || [CLEAN]: ' + cleanText;
-            }
+            // Always log debug info including dimensions and raw output
+            finalText = `[DEBUG_INFO]: ${ dimsLog } || [RAW]: ${ raw_text } || [CLEAN]: ${ cleanText } `;
 
             self.postMessage({ status: 'complete', fileId, text: finalText });
         }
