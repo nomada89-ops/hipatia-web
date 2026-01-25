@@ -372,7 +372,7 @@ const MainFormSecure: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                 formData.append(`hoja_${index}`, file);
             });
 
-            const response = await fetch(process.env.NEXT_PUBLIC_WEBHOOK_AUDITOR || 'https://n8n-n8n.ehqtcd.easypanel.host/webhook/evaluacion-examen', {
+            const response = await fetch(process.env.NEXT_PUBLIC_WEBHOOK_AUDITOR || 'https://n8n.protocolohipatia.com/webhook-test/evaluacion-examen', {
                 method: 'POST',
                 body: formData,
             });
