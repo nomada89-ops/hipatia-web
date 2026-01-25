@@ -14,12 +14,13 @@ export const useSecureOCR = () => {
     const [isProcessing, setIsProcessing] = useState(false);
     const [progress, setProgress] = useState(0);
     const [statusText, setStatusText] = useState('');
+    const [isModelReady, setIsModelReady] = useState(false);
     const workerRef = useRef<Worker | null>(null);
 
     // Initialize Worker on Mount
     useEffect(() => {
         if (!workerRef.current) {
-            // Use static worker from public folder to avoid bundling issues
+            // Use static worker from public folder force-loaded
             workerRef.current = new Worker('/ocr-worker.js');
 
             workerRef.current.onmessage = (e) => {
@@ -29,16 +30,26 @@ export const useSecureOCR = () => {
                     if (data.status === 'progress') {
                         // Map 0-100 of model loading to 0-30% of total bar
                         setProgress(Math.round(data.progress || 0) * 0.3);
-                        setStatusText(`Cargando modelo neuronal... ${Math.round(data.progress || 0)}%`);
+                        setStatusText(`Descargando modelo neuronal... ${Math.round(data.progress || 0)}%`);
                     } else if (data.status === 'initiate') {
-                        setStatusText(`Descargando ${data.file}...`);
+                        setStatusText(`Iniciando descarga: ${data.file}...`);
                     }
                 } else if (status === 'ready') {
                     console.log("OCR Worker Ready");
+                    setIsModelReady(true);
+                } else if (status === 'error') {
+                    // If init fails
+                    setStatusText(`Error de inicialización: ${data.error || 'Desconocido'}`);
                 }
             };
 
+            workerRef.current.onerror = (err) => {
+                console.error("OCR Worker Global Error:", err);
+                setStatusText("Error fatal en el motor OCR (Worker).");
+            };
+
             // Trigger init
+            // Note: browser might blocking cross-origin if CDN script fails, handled by onerror above
             workerRef.current.postMessage({ type: 'init' });
         }
 
@@ -50,9 +61,19 @@ export const useSecureOCR = () => {
 
     const processFile = useCallback(async (file: File): Promise<OCRResult> => {
         setIsProcessing(true);
-        setStatusText('Analizando escritura manual (TrOCR)...');
-        // Ensure progress starts after model load zone
-        setProgress(30);
+
+        // UX Logic:
+        // If the model is ready, we show "Analyzing".
+        // If NOT ready, we assume it's still downloading (statusText set by 'loading' event).
+        // So we only overwrite statusText if ready.
+        if (isModelReady) {
+            setStatusText('Analizando escritura manual (TrOCR)...');
+            setProgress(30);
+        } else {
+            // It's still downloading, do not overwrite statusText
+            // But ensure we have proper state
+            if (statusText === '') setStatusText('Esperando al motor OCR...');
+        }
 
         return new Promise((resolve, reject) => {
             const worker = workerRef.current;
@@ -116,7 +137,7 @@ export const useSecureOCR = () => {
             };
             reader.readAsDataURL(file);
         });
-    }, []);
+    }, [isModelReady, statusText]); // Add dependencies
 
     const terminateWorker = useCallback(async () => {
         workerRef.current?.terminate();

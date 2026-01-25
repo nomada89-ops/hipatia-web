@@ -1,10 +1,15 @@
 
 // Import Transformers.js from CDN to avoid build/bundling issues
-importScripts('https://cdn.jsdelivr.net/npm/@xenova/transformers@2.14.0/dist/transformers.min.js');
+importScripts('https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.2/dist/transformers.min.js');
+
+// Access the global transformers object
+const { env, pipeline } = self.transformers;
 
 // Config
-self.env.allowLocalModels = false;
-self.env.useBrowserCache = true;
+env.allowLocalModels = false;
+env.useBrowserCache = true;
+// Limit threads to avoided hanging on some browsers?
+// env.backends.onnx.wasm.numThreads = 1; 
 
 // Singleton
 class OCRPipeline {
@@ -14,8 +19,6 @@ class OCRPipeline {
 
     static async getInstance(progress_callback = null) {
         if (this.instance === null) {
-            // Use the global 'transformers' object provided by the script
-            const { pipeline } = self.transformers;
             this.instance = await pipeline(this.task, this.model, { progress_callback });
         }
         return this.instance;
@@ -36,14 +39,20 @@ self.addEventListener('message', async (event) => {
             });
             self.postMessage({ status: 'ready' });
         } catch (err) {
-            self.postMessage({ status: 'error', error: err.message });
+            self.postMessage({ status: 'error', error: `Init Error: ${err.message}` });
         }
     }
 
     if (type === 'process') {
         try {
+            // Ensure instance is ready (awaiting singleton)
             const classifier = await OCRPipeline.getInstance();
+
+            // Run inference
+            // Data is expected to be a Data URL or Blob
             const output = await classifier(data);
+
+            // Output format for image-to-text is [{ generated_text: "..." }]
             const text = output[0]?.generated_text || "";
 
             self.postMessage({
@@ -56,7 +65,7 @@ self.addEventListener('message', async (event) => {
             self.postMessage({
                 status: 'error',
                 fileId,
-                error: err.message
+                error: `Process Error: ${err.message}`
             });
         }
     }
