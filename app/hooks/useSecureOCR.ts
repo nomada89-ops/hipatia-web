@@ -1,5 +1,5 @@
-import { useState, useCallback, useRef } from 'react';
-import { createWorker } from 'tesseract.js';
+import { useState, useCallback, useRef, useEffect } from 'react';
+// import { createWorker } from 'tesseract.js'; // REMOVED
 import { anonymizeText } from '../lib/anonymizer';
 import { saveMapping } from '../lib/secureStorage';
 
@@ -14,66 +14,112 @@ export const useSecureOCR = () => {
     const [isProcessing, setIsProcessing] = useState(false);
     const [progress, setProgress] = useState(0);
     const [statusText, setStatusText] = useState('');
-    const workerRef = useRef<Tesseract.Worker | null>(null);
+    const workerRef = useRef<Worker | null>(null);
+
+    // Initialize Worker on Mount
+    useEffect(() => {
+        if (!workerRef.current) {
+            // Webpack magic for worker loading
+            workerRef.current = new Worker(new URL('../workers/ocr.worker.ts', import.meta.url));
+
+            workerRef.current.onmessage = (e) => {
+                const { status, data } = e.data;
+                if (status === 'loading') {
+                    // Update model load progress
+                    if (data.status === 'progress') {
+                        // Map 0-100 of model loading to 0-30% of total bar
+                        setProgress(Math.round(data.progress || 0) * 0.3);
+                        setStatusText(`Cargando modelo neuronal... ${Math.round(data.progress || 0)}%`);
+                    } else if (data.status === 'initiate') {
+                        setStatusText(`Descargando ${data.file}...`);
+                    }
+                } else if (status === 'ready') {
+                    console.log("OCR Worker Ready");
+                }
+            };
+
+            // Trigger init
+            workerRef.current.postMessage({ type: 'init' });
+        }
+
+        return () => {
+            workerRef.current?.terminate();
+            workerRef.current = null;
+        };
+    }, []);
 
     const processFile = useCallback(async (file: File): Promise<OCRResult> => {
         setIsProcessing(true);
-        setProgress(0);
-        setStatusText('Inicializando motor OCR local...');
+        setStatusText('Analizando escritura manual (TrOCR)...');
+        // Ensure progress starts after model load zone
+        setProgress(30);
 
-        try {
-            if (!workerRef.current) {
-                workerRef.current = await createWorker('spa'); // Spanish language
+        return new Promise((resolve, reject) => {
+            const worker = workerRef.current;
+            if (!worker) {
+                reject(new Error("Worker not initialized"));
+                return;
             }
 
-            const worker = workerRef.current;
-
-            // Update progress based on Tesseract events might be tricky without a logger callback
-            // For now, we simulate steps or use the logger if we reconstruct the worker
-            // But re-using worker is faster.
-
-            setStatusText('Escaneando documento... (Tesseract.js)');
-            const { data: { text } } = await worker.recognize(file);
-
-            setProgress(50);
-            setStatusText('Buscando y anonimizando datos personales...');
-
-            // Artificial delay to let user see the status change (optional, but good UX)
-            await new Promise(r => setTimeout(r, 500));
-
-            const { cleanText, mappings } = anonymizeText(text);
-
-            // Save the mapping to the "Safe"
-            // We use the file name + timestamp as a crude ID, or just file name if unique enough in context
             const fileId = `${file.name}_${Date.now()}`;
-            saveMapping(fileId, mappings);
+            const reader = new FileReader();
 
-            setProgress(100);
-            setStatusText('Procesamiento completado.');
+            // Define message handler for this specific transaction
+            const handleMessage = (e: MessageEvent) => {
+                const { status, fileId: returnedId, text, error } = e.data;
 
-            return {
-                fileId,
-                originalName: file.name,
-                text: cleanText,
-                isAnonymized: mappings.length > 0
+                // Filter by fileId to avoid race conditions if multiple files
+                if (returnedId !== fileId && returnedId !== 'system') return;
+
+                if (status === 'complete') {
+                    worker.removeEventListener('message', handleMessage);
+
+                    // Post-Process: Anonymization
+                    setProgress(80);
+                    setStatusText('Anonimizando datos sensibles...');
+
+                    try {
+                        const { cleanText, mappings } = anonymizeText(text);
+                        saveMapping(fileId, mappings);
+
+                        setProgress(100);
+                        setStatusText('Completado.');
+                        setIsProcessing(false);
+
+                        resolve({
+                            fileId,
+                            originalName: file.name,
+                            text: cleanText,
+                            isAnonymized: mappings.length > 0
+                        });
+                    } catch (err) {
+                        reject(err);
+                    }
+                } else if (status === 'error') {
+                    worker.removeEventListener('message', handleMessage);
+                    setIsProcessing(false);
+                    reject(new Error(error));
+                }
             };
 
-        } catch (error) {
-            console.error('OCR Error:', error);
-            setStatusText('Error en el procesamiento OCR.');
-            throw error;
-        } finally {
-            setIsProcessing(false);
-            // We don't terminate the worker immediately to allow faster subsequent scans?
-            // Or we can terminate to save memory. For now, let's keep it open, but we need to handle cleanup.
-        }
+            worker.addEventListener('message', handleMessage);
+
+            // Read and send
+            reader.onload = (e) => {
+                const imageData = e.target?.result;
+                worker.postMessage({
+                    type: 'process',
+                    data: imageData, // Data URL
+                    fileId
+                });
+            };
+            reader.readAsDataURL(file);
+        });
     }, []);
 
     const terminateWorker = useCallback(async () => {
-        if (workerRef.current) {
-            await workerRef.current.terminate();
-            workerRef.current = null;
-        }
+        workerRef.current?.terminate();
+        workerRef.current = null;
     }, []);
 
     return {
