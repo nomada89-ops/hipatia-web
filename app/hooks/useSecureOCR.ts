@@ -124,7 +124,10 @@ self.addEventListener('message', async (event) => {
                 const sliceBlob = await canvas.convertToBlob({ type: 'image/jpeg', quality: 0.95 });
                 
                 // Read into Transformers.js
-                const image = await RawImage.read(sliceBlob);
+                // Workaround: RawImage.read sometimes fails with Blob objects in workers
+                const sliceUrl = URL.createObjectURL(sliceBlob);
+                const image = await RawImage.read(sliceUrl);
+                URL.revokeObjectURL(sliceUrl);
                 
                 // Process
                 const inputs = await processor(image, '<OCR>');
