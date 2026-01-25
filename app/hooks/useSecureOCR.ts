@@ -1,5 +1,4 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
-// import { createWorker } from 'tesseract.js'; // REMOVED
 import { anonymizeText } from '../lib/anonymizer';
 import { saveMapping } from '../lib/secureStorage';
 
@@ -20,8 +19,8 @@ export const useSecureOCR = () => {
     // Initialize Worker on Mount
     useEffect(() => {
         if (!workerRef.current) {
-            // Webpack magic for worker loading
-            workerRef.current = new Worker(new URL('../workers/ocr.worker.ts', import.meta.url));
+            // Use static worker from public folder to avoid bundling issues
+            workerRef.current = new Worker('/ocr-worker.js');
 
             workerRef.current.onmessage = (e) => {
                 const { status, data } = e.data;
