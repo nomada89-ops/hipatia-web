@@ -14,23 +14,78 @@ export interface OCRResult {
 // We use ES Modules for the worker to import from CDN
 // WRITING WORKER CODE INLINE TO AVOID PATH ISSUES
 // We use ES Modules for the worker to import from CDN
+// WRITING WORKER CODE INLINE TO AVOID PATH ISSUES
+// We use ES Modules for the worker to import from CDN
 const WORKER_CODE = `
-import { createWorker } from 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.esm.min.js';
+// We use dynamic import to ensure we can catch loading errors
+let AutoProcessor, Florence2ForConditionalGeneration, RawImage, env;
 
-class OCREngine {
-    static instance = null;
+async function loadLibrary() {
+    try {
+        const module = await import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.2.4/dist/transformers.min.js');
+        AutoProcessor = module.AutoProcessor;
+        Florence2ForConditionalGeneration = module.Florence2ForConditionalGeneration;
+        RawImage = module.RawImage;
+        env = module.env;
 
-    static async getInstance(progressLogger) {
-        if (!this.instance) {
-            // Create worker with Spanish language
-            // Logger captures detailed progress (downloading, recognizing coefficients, etc)
-            this.instance = await createWorker('spa', 1, {
-               logger: m => {
-                   if (progressLogger) progressLogger(m);
-               }
-            });
+        // Setup Environment
+        env.allowLocalModels = false;
+        env.useBrowserCache = true;
+        
+        return true;
+    } catch (err) {
+        throw new Error("Failed to load Transformers.js library: " + err.message);
+    }
+}
+
+// Helper to manually crop RawImage data
+function cropRawImage(rawImage, x, y, w, h) {
+    const channels = rawImage.channels;
+    const originalWidth = rawImage.width;
+    const newData = new Uint8ClampedArray(w * h * channels);
+    
+    for (let row = 0; row < h; row++) {
+        const srcRowStart = ((y + row) * originalWidth + x) * channels;
+        const srcRowEnd = srcRowStart + (w * channels);
+        
+        // Safety check to avoid out of bounds
+        if (srcRowStart >= rawImage.data.length) break;
+        
+        const targetRowStart = (row * w) * channels;
+        // Copy row
+        newData.set(rawImage.data.subarray(srcRowStart, srcRowEnd), targetRowStart);
+    }
+    
+    return new RawImage(newData, w, h, channels);
+}
+
+class OCRPipeline {
+    static model_id = 'onnx-community/Florence-2-base-ft';
+    static model = null;
+    static processor = null;
+    static initializationPromise = null;
+
+    static async getInstance(progress_callback = null) {
+        if (!AutoProcessor) await loadLibrary();
+
+        if (this.initializationPromise) {
+            return this.initializationPromise;
         }
-        return this.instance;
+
+        this.initializationPromise = (async () => {
+            if (this.model === null) {
+                this.model = await Florence2ForConditionalGeneration.from_pretrained(this.model_id, {
+                    dtype: 'q8', 
+                    device: 'wasm',
+                    progress_callback
+                });
+                
+                this.processor = await AutoProcessor.from_pretrained(this.model_id);
+            }
+            return { model: this.model, processor: this.processor };
+        })();
+
+        return this.initializationPromise;
     }
 }
 
@@ -39,42 +94,65 @@ self.addEventListener('message', async (event) => {
 
     try {
         if (type === 'init') {
-            // Initialize the engine and report status
-            await OCREngine.getInstance((msg) => {
-                // Tesseract status messages: "loading tesseract core", "initializing api", "recognizing text"
-                self.postMessage({ 
-                    status: 'loading', 
-                    fileId: 'system', 
-                    data: { 
-                        status: msg.status, 
-                        progress: msg.progress * 100 
-                    } 
-                });
+            await loadLibrary(); 
+            await OCRPipeline.getInstance((x) => {
+                self.postMessage({ status: 'loading', fileId: 'system', data: x });
             });
             self.postMessage({ status: 'ready' });
         }
 
         if (type === 'process') {
-            const worker = await OCREngine.getInstance((msg) => {
-                 self.postMessage({ 
-                    status: 'loading', 
-                    fileId: fileId, 
-                    data: { 
-                        status: msg.status, 
-                        progress: msg.progress * 100 
-                    } 
-                });
-            });
-
-            // Run recognition
-            // data is the image Blob or URL
-            const { data: { text } } = await worker.recognize(data);
+            await loadLibrary(); 
+            const { model, processor } = await OCRPipeline.getInstance();
             
-            // Simple validation log
-            const preview = text.slice(0, 100).replace(/\\n/g, ' ');
-            const logMsg = '[Tesseract] Extracted ' + text.length + ' chars. Preview: ' + preview + '...';
+            // 1. Read Original Image
+            const originalImage = await RawImage.read(data);
+             // Log dimensions
+            const dimsLog = '[Dimensions]: ' + originalImage.width + 'x' + originalImage.height;
+            
+            // 2. Define Slices (Tiling Strategy)
+            // We split height into 3 overlapping chunks to ensure we catch everything
+            // Slice 1: 0% - 40%
+            // Slice 2: 30% - 70%
+            // Slice 3: 60% - 100%
+            const h = originalImage.height;
+            const w = originalImage.width;
+            
+            const sliceConfig = [
+                { y: 0, h: Math.floor(h * 0.45) },                // Top 45%
+                { y: Math.floor(h * 0.30), h: Math.floor(h * 0.40) }, // Middle 40% (overlaps top and bottom)
+                { y: Math.floor(h * 0.55), h: Math.floor(h * 0.45) }  // Bottom 45%
+            ];
 
-            self.postMessage({ status: 'complete', fileId, text, debugInfo: logMsg });
+            let combinedText = '';
+            
+            // 3. Process Each Slice
+            for (let i = 0; i < sliceConfig.length; i++) {
+                const conf = sliceConfig[i];
+                // Ensure we don't go out of bounds
+                const safeH = Math.min(conf.h, h - conf.y);
+                
+                // Crop
+                const chunkInfo = '[Slice ' + (i+1) + '] y:' + conf.y + ' h:' + safeH;
+                const crop = cropRawImage(originalImage, 0, conf.y, w, safeH);
+                
+                // Process
+                const inputs = await processor(crop, '<OCR>');
+                
+                const generated_ids = await model.generate({
+                    ...inputs,
+                    max_new_tokens: 1024,
+                    num_beams: 3, // Beam search for quality
+                    do_sample: false
+                });
+                
+                const chunkText = processor.batch_decode(generated_ids, { skip_special_tokens: true })[0];
+                combinedText += chunkText + '\\n';
+            }
+            
+            // 4. Send Results
+            const debugMsg = dimsLog + ' || [Strategy]: 3-Slice Tiling || [Result Length]: ' + combinedText.length;
+            self.postMessage({ status: 'complete', fileId, text: combinedText, debugInfo: debugMsg });
         }
     } catch (err) {
         self.postMessage({ status: 'error', fileId: fileId || 'system', error: err.message + (err.stack ? ' ' + err.stack : '') });
