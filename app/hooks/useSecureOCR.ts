@@ -12,113 +12,69 @@ export interface OCRResult {
 
 // WRITING WORKER CODE INLINE TO AVOID PATH ISSUES
 // We use ES Modules for the worker to import from CDN
+// WRITING WORKER CODE INLINE TO AVOID PATH ISSUES
+// We use ES Modules for the worker to import from CDN
 const WORKER_CODE = `
-// We use dynamic import to ensure we can catch loading errors
-let AutoProcessor, Florence2ForConditionalGeneration, RawImage, env;
+import { createWorker } from 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.esm.min.js';
 
-async function loadLibrary() {
-    try {
-        // Try to import from the official Hugging Face package (v3)
-        // Using a specific recent version to ensure stability
-        const module = await import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.2.4/dist/transformers.min.js');
-        AutoProcessor = module.AutoProcessor;
-        Florence2ForConditionalGeneration = module.Florence2ForConditionalGeneration;
-        RawImage = module.RawImage;
-        env = module.env;
+class OCREngine {
+    static instance = null;
 
-        // Setup Environment
-        env.allowLocalModels = false;
-        env.useBrowserCache = true;
-        // env.backends.onnx.wasm.numThreads = 1; 
-        
-        return true;
-    } catch (err) {
-        throw new Error("Failed to load Transformers.js library: " + err.message);
-    }
-}
-
-class OCRPipeline {
-    static model_id = 'onnx-community/Florence-2-base-ft';
-    static model = null;
-    static processor = null;
-    static initializationPromise = null;
-
-    static async getInstance(progress_callback = null) {
-        if (!AutoProcessor) await loadLibrary();
-
-        // Use a singleton promise to prevent race conditions during initialization
-        if (this.initializationPromise) {
-            return this.initializationPromise;
+    static async getInstance(progressLogger) {
+        if (!this.instance) {
+            // Create worker with Spanish language
+            // Logger captures detailed progress (downloading, recognizing coefficients, etc)
+            this.instance = await createWorker('spa', 1, {
+               logger: m => {
+                   if (progressLogger) progressLogger(m);
+               }
+            });
         }
-
-        this.initializationPromise = (async () => {
-            if (this.model === null) {
-                // Initialize model and processor sequentially
-                // Use 'q8' for better WASM compatibility and stability
-                this.model = await Florence2ForConditionalGeneration.from_pretrained(this.model_id, {
-                    dtype: 'q8', 
-                    device: 'wasm',
-                    progress_callback
-                });
-                
-                this.processor = await AutoProcessor.from_pretrained(this.model_id);
-            }
-            return { model: this.model, processor: this.processor };
-        })();
-
-        return this.initializationPromise;
+        return this.instance;
     }
 }
 
 self.addEventListener('message', async (event) => {
     const { type, data, fileId } = event.data;
 
-    // ERROR TRAP
     try {
         if (type === 'init') {
-            await loadLibrary(); 
-            // We pass a progress callback only for the 'init' phase to show model download
-            await OCRPipeline.getInstance((x) => {
-                self.postMessage({ status: 'loading', fileId: 'system', data: x });
+            // Initialize the engine and report status
+            await OCREngine.getInstance((msg) => {
+                // Tesseract status messages: "loading tesseract core", "initializing api", "recognizing text"
+                self.postMessage({ 
+                    status: 'loading', 
+                    fileId: 'system', 
+                    data: { 
+                        status: msg.status, 
+                        progress: msg.progress * 100 
+                    } 
+                });
             });
             self.postMessage({ status: 'ready' });
         }
 
         if (type === 'process') {
-            await loadLibrary(); 
-            // Ensure we get the fully initialized instance by awaiting the singleton
-            const { model, processor } = await OCRPipeline.getInstance();
-            
-            // RawImage helper to read the blob/base64
-            const image = await RawImage.read(data);
-            
-            // Log dimensions to check if we are receiving the full image
-            const dimsLog = '[Dimensions]: ' + image.width + 'x' + image.height;
-
-            // Florence-2 phrase for pure OCR
-            const prompt = '<OCR>';
-            
-            const inputs = await processor(image, prompt);
-            
-            const generated_ids = await model.generate({
-                ...inputs,
-                max_new_tokens: 1024,
-                num_beams: 3,
-                early_stopping: false,
+            const worker = await OCREngine.getInstance((msg) => {
+                 self.postMessage({ 
+                    status: 'loading', 
+                    fileId: fileId, 
+                    data: { 
+                        status: msg.status, 
+                        progress: msg.progress * 100 
+                    } 
+                });
             });
-            
-            const raw_text = processor.batch_decode(generated_ids, { skip_special_tokens: false })[0];
-            
-            // Cleanup tags if needed, but Florence <OCR> usually output includes matches. 
-            // We strip the special tokens for the final text.
-            const cleanText = processor.batch_decode(generated_ids, { skip_special_tokens: true })[0];
-            
-            // Log raw output for debugging
-            let finalText = cleanText;
-            // Always log debug info including dimensions and raw output
-            finalText = '[DEBUG_INFO]: ' + dimsLog + ' || [RAW]: ' + raw_text + ' || [CLEAN]: ' + cleanText;
 
-            self.postMessage({ status: 'complete', fileId, text: finalText });
+            // Run recognition
+            // data is the image Blob or URL
+            const { data: { text } } = await worker.recognize(data);
+            
+            // Simple validation log
+            const preview = text.slice(0, 100).replace(/\\n/g, ' ');
+            const logMsg = '[Tesseract] Extracted ' + text.length + ' chars. Preview: ' + preview + '...';
+
+            self.postMessage({ status: 'complete', fileId, text, debugInfo: logMsg });
         }
     } catch (err) {
         self.postMessage({ status: 'error', fileId: fileId || 'system', error: err.message + (err.stack ? ' ' + err.stack : '') });
