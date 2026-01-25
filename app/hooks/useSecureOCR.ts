@@ -87,7 +87,8 @@ self.addEventListener('message', async (event) => {
             
             // 1. Create Bitmap for robust manipulation
             // data is a Blob from the main thread
-            const bitmap = await createImageBitmap(data);
+            const blob = new Blob([data]);
+            const bitmap = await createImageBitmap(blob);
             const w = bitmap.width;
             const h = bitmap.height;
             
