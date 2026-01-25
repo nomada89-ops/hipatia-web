@@ -162,6 +162,9 @@ export const useSecureOCR = () => {
 
                 if (status === 'complete') {
                     addLog(`Processing complete for ${fileId}`);
+                    // Log the first 100 chars of the text to see if it's empty or garbage
+                    addLog(`[DEBUG-TEXT] First 100 chars: "${text.substring(0, 100).replace(/\n/g, ' ')}..." (Length: ${text.length})`);
+
                     clearTimeout(timeoutId);
                     worker.removeEventListener('message', handleMessage);
 
@@ -169,6 +172,7 @@ export const useSecureOCR = () => {
                     setStatusText('Anonimizando...');
                     try {
                         const { cleanText, mappings } = anonymizeText(text);
+                        addLog(`Anonymization finished. Found ${mappings.length} items.`);
                         saveMapping(fileId, mappings);
                         setProgress(100);
                         setIsProcessing(false);
