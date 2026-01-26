@@ -341,9 +341,14 @@ const MainFormSecure: React.FC<MainFormProps> = ({ onBack, userToken }) => {
             setMessage('Configura la rúbrica o referencia primero.');
             return;
         }
-        if (examenArchivos.length === 0) {
+        if (inputMethod === 'files' && examenArchivos.length === 0) {
             setStatus('error');
             setMessage('Adjunta al menos una hoja del examen.');
+            return;
+        }
+        if (inputMethod === 'text' && !manualText.trim()) {
+            setStatus('error');
+            setMessage('Pega el texto del examen para continuar.');
             return;
         }
 
@@ -363,21 +368,25 @@ const MainFormSecure: React.FC<MainFormProps> = ({ onBack, userToken }) => {
             formData.append('nivel_exigencia', nivelExigencia);
             if (idGrupo) formData.append('id_grupo', idGrupo);
 
-            // ANONYMIZATION MODULE INTEGRATION
-            // If we have anonymized text, we send that as the primary content
-            if (anonymizedTexts.length > 0) {
-                const combinedEvaluatedText = anonymizedTexts.join('\n\n--- NUEVA PAGINA ---\n\n');
-                formData.append('texto_examen', combinedEvaluatedText);
+            // CONDITIONAL LOGIC BASED ON INPUT METHOD
+            if (inputMethod === 'text') {
+                formData.append('metodo_entrada', 'texto');
+                formData.append('texto_examen', manualText);
                 formData.append('modo_seguro_lopd', 'true');
+            } else {
+                // FILES MODE
+                formData.append('metodo_entrada', 'imagen');
+
+                // Append files as 'hoja_N'
+                examenArchivos.forEach((file, index) => {
+                    formData.append(`hoja_${index}`, file);
+                });
             }
 
-
-            // STRICT PRIVACY: Do NOT send raw files.
-            // Only send the text content extracted locally.
-
-            examenArchivos.forEach((file, index) => {
-                formData.append(`hoja_${index}`, file);
-            });
+            // OLD LOGIC REMOVED/ADAPTED
+            /*
+            if (anonymizedTexts.length > 0) { ... }
+            */
 
             // If no text was extracted (e.g. empty files), we should probably block submission or warn.
             // if (anonymizedTexts.length === 0) {
