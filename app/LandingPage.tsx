@@ -1,5 +1,5 @@
 ﻿import React, { useState, useEffect, useRef } from "react";
-import { Search, Zap, Users, ChevronRight, Lock, CheckCircle, Shield, Award, BarChart3, Mail, BookOpen, LayoutGrid, MessageCircle, X, Send, ArrowRight, Play, ExternalLink, UserCog, HelpCircle } from "lucide-react";
+import { Search, Zap, Users, ChevronRight, Lock, CheckCircle, Shield, Award, BarChart3, Mail, BookOpen, LayoutGrid, MessageCircle, X, Send, ArrowRight, Play, ExternalLink, UserCog, HelpCircle, Eye, EyeOff } from "lucide-react";
 import { TeacherProfileModal } from "./components/TeacherProfileModal";
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
@@ -55,6 +55,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
     const [errorMessage, setErrorMessage] = useState("");
     const [balance, setBalance] = useState<string | null>(null);
     const [viewMode, setViewMode] = useState<"main" | "forge">("main");
+
+    const [showToken, setShowToken] = useState(false);
 
     // Perfil Docente State
     const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -203,16 +205,23 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
                             </div>
 
                             <form onSubmit={handleLogin} className="space-y-6">
-                                <div className="space-y-2">
+                                <div className="space-y-2 relative">
                                     <input
-                                        type="text"
+                                        type={showToken ? "text" : "password"}
                                         autoFocus
-                                        className={`w-full h-16 px-6 bg-slate-50/50 border-2 rounded-2xl outline-none transition-all text-center text-xl font-bold tracking-[0.2em] focus:bg-white
+                                        className={`w-full h-16 px-6 bg-slate-50/50 border-2 rounded-2xl outline-none transition-all text-center text-xl font-bold tracking-[0.2em] focus:bg-white pr-12
                                             ${errorMessage ? "border-rose-400 focus:border-rose-500 text-rose-600" : "border-slate-100 focus:border-indigo-500 text-slate-800"}`}
                                         placeholder="TOKEN_ID"
                                         value={tokenInput}
                                         onChange={(e) => { setTokenInput(e.target.value); setErrorMessage(""); }}
                                     />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowToken(!showToken)}
+                                        className="absolute right-4 top-1/2 -translate-y-[60%] text-slate-400 hover:text-indigo-600 transition-colors p-2"
+                                    >
+                                        {showToken ? <EyeOff size={20} /> : <Eye size={20} />}
+                                    </button>
                                     {errorMessage && <p className="text-rose-500 text-xs font-bold text-center animate-bounce">{errorMessage}</p>}
                                 </div>
                                 <button

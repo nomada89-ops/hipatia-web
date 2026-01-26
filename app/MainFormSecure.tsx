@@ -22,9 +22,10 @@ import { Keyboard } from 'lucide-react';
 interface MainFormProps {
     onBack: () => void;
     userToken: string;
+    allowFileUploads?: boolean;
 }
 
-const MainFormSecure: React.FC<MainFormProps> = ({ onBack, userToken }) => {
+const MainFormSecure: React.FC<MainFormProps> = ({ onBack, userToken, allowFileUploads = false }) => {
     // const { processFile, isProcessing, progress, statusText, debugLogs } = useSecureOCR();
     // MOCK STATES FOR LEGACY UI COMPATIBILITY
     const isProcessing = false;
@@ -49,7 +50,9 @@ const MainFormSecure: React.FC<MainFormProps> = ({ onBack, userToken }) => {
     const [isOptimizing, setIsOptimizing] = useState(false);
     const [legalAccepted, setLegalAccepted] = useState(false);
     const [idGrupo, setIdGrupo] = useState('');
-    const [inputMethod, setInputMethod] = useState<'files' | 'text'>('files');
+
+    // FORCE TEXT MODE IF UPLOADS NOT ALLOWED
+    const [inputMethod, setInputMethod] = useState<'files' | 'text'>(allowFileUploads ? 'files' : 'text');
     const [manualText, setManualText] = useState('');
     const [showEditor, setShowEditor] = useState(false);
     const [editorInitialText, setEditorInitialText] = useState('');
@@ -840,7 +843,6 @@ const MainFormSecure: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                                             onChange={(e) => setAlumnoId(e.target.value)}
                                             placeholder="Ej: ALU-2024-X"
                                             className="w-full p-4 bg-slate-50 border-2 border-slate-100 rounded-xl focus:border-indigo-500 focus:bg-white focus:shadow-md outline-none transition-all font-bold text-base text-slate-700 shadow-sm"
-                                            required
                                         />
                                     </div>
                                     <div className="space-y-2">
@@ -879,23 +881,30 @@ const MainFormSecure: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                                 </div>
 
 
-                                {/* TABS FOR INPUT METHOD */}
-                                <div className="flex gap-4 border-b border-slate-200 mb-4">
-                                    <button
-                                        type="button"
-                                        onClick={() => setInputMethod('files')}
-                                        className={`pb-2 text-sm font-bold transition-colors border-b-2 ${inputMethod === 'files' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-400 hover:text-slate-600'}`}
-                                    >
-                                        Subir Archivos
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => setInputMethod('text')}
-                                        className={`pb-2 text-sm font-bold transition-colors border-b-2 ${inputMethod === 'text' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-400 hover:text-slate-600'}`}
-                                    >
-                                        Pegar Texto (Seguro)
-                                    </button>
-                                </div>
+                                {/* TABS FOR INPUT METHOD - ONLY IF ALLOWED */}
+                                {allowFileUploads ? (
+                                    <div className="flex gap-4 border-b border-slate-200 mb-4">
+                                        <button
+                                            type="button"
+                                            onClick={() => setInputMethod('files')}
+                                            className={`pb-2 text-sm font-bold transition-colors border-b-2 ${inputMethod === 'files' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-400 hover:text-slate-600'}`}
+                                        >
+                                            Subir Archivos
+                                        </button>
+                                        <button
+                                            type="button"
+                                            onClick={() => setInputMethod('text')}
+                                            className={`pb-2 text-sm font-bold transition-colors border-b-2 ${inputMethod === 'text' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-400 hover:text-slate-600'}`}
+                                        >
+                                            Pegar Texto (Seguro)
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div className="mb-4 flex items-center gap-2 text-slate-500 bg-slate-100 p-3 rounded-lg border border-slate-200">
+                                        <Lock size={14} />
+                                        <span className="text-xs font-bold">Modo Texto Seguro (Archivos desactivados para su perfil)</span>
+                                    </div>
+                                )}
 
                                 {inputMethod === 'files' ? (
                                     /* Drag & Drop Area */
