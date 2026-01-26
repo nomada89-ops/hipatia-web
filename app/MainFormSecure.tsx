@@ -397,7 +397,7 @@ const MainFormSecure: React.FC<MainFormProps> = ({ onBack, userToken, allowFileU
             //    throw new Error("No se ha podido extraer texto de los archivos. Asegúrese de que son legibles.");
             // }
 
-            const response = await fetch(process.env.NEXT_PUBLIC_WEBHOOK_AUDITOR || 'https://n8n.protocolohipatia.com/webhook-test/evaluacion-examen', {
+            const response = await fetch(process.env.NEXT_PUBLIC_WEBHOOK_AUDITOR || 'https://n8n.protocolohipatia.com/webhook/evaluacion-examen', {
                 method: 'POST',
                 body: formData,
             });
