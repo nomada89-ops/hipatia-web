@@ -9,7 +9,7 @@ import * as pdfjsLib from 'pdfjs-dist/build/pdf';
 import mammoth from 'mammoth';
 import { optimizeExamImage } from './optimizeImage';
 import { DemoReport } from './components/DemoReport';
-import { useSecureOCR } from './hooks/useSecureOCR';
+// import { useSecureOCR } from './hooks/useSecureOCR';
 import ProcessingStatus from './components/ProcessingStatus';
 import LegalLockOverlay from './components/LegalLockOverlay';
 import { AnonymizationEditor } from './components/AnonymizationEditor';
@@ -25,7 +25,11 @@ interface MainFormProps {
 }
 
 const MainFormSecure: React.FC<MainFormProps> = ({ onBack, userToken }) => {
-    const { processFile, isProcessing, progress, statusText, debugLogs } = useSecureOCR();
+    // const { processFile, isProcessing, progress, statusText, debugLogs } = useSecureOCR();
+    // MOCK STATES FOR LEGACY UI COMPATIBILITY
+    const isProcessing = false;
+    const progress = 0;
+    const statusText = "";
     const [anonymizedTexts, setAnonymizedTexts] = useState<string[]>([]);
     const [allMappings, setAllMappings] = useState<PIIMapping[]>([]);
 
@@ -302,6 +306,7 @@ const MainFormSecure: React.FC<MainFormProps> = ({ onBack, userToken }) => {
         // We do this AFTER adding the files so the user sees them in the UI immediately
         // But we block the submit button via 'isProcessing' if we wanted, or just show the overlay.
 
+        /* 
         const newTexts: string[] = [];
         const newMappings: PIIMapping[] = [];
 
@@ -321,6 +326,7 @@ const MainFormSecure: React.FC<MainFormProps> = ({ onBack, userToken }) => {
 
         setAnonymizedTexts(prev => [...prev, ...newTexts]);
         setAllMappings(prev => [...prev, ...newMappings]);
+        */
     };
 
     const removeFile = (indexToRemove: number) => {
@@ -365,17 +371,18 @@ const MainFormSecure: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                 formData.append('modo_seguro_lopd', 'true');
             }
 
+
             // STRICT PRIVACY: Do NOT send raw files.
             // Only send the text content extracted locally.
-            /* 
+
             examenArchivos.forEach((file, index) => {
                 formData.append(`hoja_${index}`, file);
             });
-            */
+
             // If no text was extracted (e.g. empty files), we should probably block submission or warn.
-            if (anonymizedTexts.length === 0) {
-                throw new Error("No se ha podido extraer texto de los archivos. Asegúrese de que son legibles.");
-            }
+            // if (anonymizedTexts.length === 0) {
+            //    throw new Error("No se ha podido extraer texto de los archivos. Asegúrese de que son legibles.");
+            // }
 
             const response = await fetch(process.env.NEXT_PUBLIC_WEBHOOK_AUDITOR || 'https://n8n.protocolohipatia.com/webhook-test/evaluacion-examen', {
                 method: 'POST',
@@ -1019,24 +1026,9 @@ const MainFormSecure: React.FC<MainFormProps> = ({ onBack, userToken }) => {
                                 </div>
                             )}
 
-                            {/* DEBUG CONSOLE - ONLY FOR TROUBLESHOOTING */}
-                            <div className="mt-4 p-4 bg-slate-100 rounded-xl border border-slate-200">
-                                <details className="text-xs text-slate-500">
-                                    <summary className="cursor-pointer font-bold mb-2 flex items-center justify-between">
-                                        <span>Console Logs (Local OCR)</span>
-                                        <span className="bg-slate-200 px-2 py-0.5 rounded-full text-[10px]">{debugLogs?.length || 0} event(s)</span>
-                                    </summary>
-                                    <div className="bg-slate-900 text-emerald-400 p-3 rounded-lg font-mono h-48 overflow-y-auto">
-                                        {debugLogs && debugLogs.length > 0 ? (
-                                            debugLogs.map((log, i) => (
-                                                <div key={i} className="border-b border-white/5 pb-0.5 mb-0.5 whitespace-pre-wrap">{log}</div>
-                                            ))
-                                        ) : (
-                                            <span className="text-slate-500 italic">No logs generated yet...</span>
-                                        )}
-                                    </div>
-                                </details>
-                            </div>
+                            {/* DEBUG CONSOLE - ONLY FOR TROUBLESHOOTING */
+                                /* Removed after reverting local OCR */
+                            }
 
                         </form>
                     </div>
