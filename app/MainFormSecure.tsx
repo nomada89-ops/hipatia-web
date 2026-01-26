@@ -379,6 +379,7 @@ const MainFormSecure: React.FC<MainFormProps> = ({ onBack, userToken, allowFileU
             } else {
                 // FILES MODE
                 formData.append('metodo_entrada', 'imagen');
+                formData.append('modo_seguro_lopd', 'false');
 
                 // Append files as 'hoja_N'
                 examenArchivos.forEach((file, index) => {
