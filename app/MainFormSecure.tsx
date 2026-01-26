@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useReactToPrint } from 'react-to-print';
 import { useExamContext } from './ExamContext';
-import { Upload, Send, CheckCircle, AlertCircle, Loader2, FileDown, Bold, Italic, List, FileText, X, Eye, ChevronRight, Zap, ArrowLeft, Shield } from 'lucide-react';
+import { Upload, Send, CheckCircle, AlertCircle, Loader2, FileDown, Bold, Italic, List, FileText, X, Eye, ChevronRight, Zap, ArrowLeft, Shield, Lock } from 'lucide-react';
 import { SheetViewer } from './SheetViewer';
 import { GradeBreakdown } from './GradeBreakdown';
 // @ts-ignore
