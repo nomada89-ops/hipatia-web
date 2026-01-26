@@ -11,9 +11,9 @@ export interface OCRResult {
 }
 
 // WRITING WORKER CODE INLINE TO AVOID PATH ISSUES
-// We use ES Modules for the worker to import from CDN
+// We use Classic Worker (importScripts) to avoid Module blocking in some browsers
 const WORKER_CODE = `
-import { createWorker } from 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.esm.min.js';
+importScripts('https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js');
 
 // Image Pre-processing Logic
 async function preprocessImage(imageBlob) {
@@ -62,7 +62,8 @@ class OCREngine {
 
     static async getInstance(progressLogger) {
         if (!this.instance) {
-            this.instance = await createWorker('spa', 1, {
+             // @ts-ignore - Tesseract is global via importScripts
+            this.instance = await Tesseract.createWorker('spa', 1, {
                logger: m => {
                    if (progressLogger) progressLogger(m);
                }
@@ -144,9 +145,9 @@ export const useSecureOCR = () => {
                 const blob = new Blob([WORKER_CODE], { type: 'application/javascript' });
                 const url = URL.createObjectURL(blob);
 
-                addLog("Initializing Worker (module)...");
-                // Initialize Worker with Module type support
-                workerRef.current = new Worker(url, { type: 'module' });
+                addLog("Initializing Worker (classic)...");
+                // Initialize Worker without Module type to allow importScripts
+                workerRef.current = new Worker(url);
 
                 workerRef.current.onmessage = (e) => {
                     const { status, data } = e.data;
