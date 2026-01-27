@@ -17,6 +17,7 @@ export default function ForgeForm({ onBack, userToken }: ForgeFormProps) {
         user_token: userToken,
         unidades: '',
         conceptos: '',
+        instrucciones_profesor: '',
         modo_dislexia: false,
     });
     const [isDyslexic, setIsDyslexic] = useState(false);
@@ -260,6 +261,18 @@ export default function ForgeForm({ onBack, userToken }: ForgeFormProps) {
                                     placeholder="Lista de conceptos separados por comas..."
                                     value={formData.conceptos}
                                     onChange={(e) => setFormData({ ...formData, conceptos: e.target.value })}
+                                />
+                            </div>
+
+                            <div>
+                                <label className="flex items-center gap-2 text-[10px] font-black text-slate-400 mb-2 uppercase tracking-widest">
+                                    <FileText size={14} className="text-indigo-500" /> Tema del Examen / Instrucciones Adicionales
+                                </label>
+                                <textarea
+                                    className="w-full p-4 bg-slate-50 border-2 border-transparent rounded-xl focus:border-indigo-500 focus:bg-white outline-none transition-all h-28 resize-none text-slate-700 font-medium text-sm placeholder:text-slate-300 shadow-inner"
+                                    placeholder="Escribe aquí las instrucciones específicas para el examen..."
+                                    value={formData.instrucciones_profesor}
+                                    onChange={(e) => setFormData({ ...formData, instrucciones_profesor: e.target.value })}
                                 />
                             </div>
 
