@@ -1,0 +1,8 @@
+
+fastapi==0.100.0
+uvicorn==0.23.0
+keyring==24.3.0
+lxml==4.9.3
+pysqlcipher3-binary; sys_platform == 'linux'
+# Note: On Windows, getting sqlcipher depends on pre-compiled binaries 
+# or manual build. For now leaving generic sqlite3 usage in code as fallback.

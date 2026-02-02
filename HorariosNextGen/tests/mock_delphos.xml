@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<centro>
+  <datos>
+    <!-- Grupos (5) -->
+    <listasal seq="GRUPOS">
+      <listasal seq="GRUPOS_1">
+        <salida dato="CLAVE">G001</salida>
+        <salida dato="NOMBRE">1ESO-A</salida>
+      </listasal>
+      <listasal seq="GRUPOS_2">
+        <salida dato="CLAVE">G002</salida>
+        <salida dato="NOMBRE">1ESO-B</salida>
+      </listasal>
+      <listasal seq="GRUPOS_3">
+        <salida dato="CLAVE">G003</salida>
+        <salida dato="NOMBRE">2ESO-A</salida>
+      </listasal>
+      <listasal seq="GRUPOS_4">
+        <salida dato="CLAVE">G004</salida>
+        <salida dato="NOMBRE">2BACH-C</salida>
+      </listasal>
+      <listasal seq="GRUPOS_5">
+        <salida dato="CLAVE">G005</salida>
+        <salida dato="NOMBRE">1DAM</salida>
+      </listasal>
+    </listasal>
+
+    <!-- Docentes (10) -->
+    <listasal seq="DOCENTES">
+      <listasal seq="DOCENTES_1">
+        <salida dato="CLAVE">D001</salida>
+        <salida dato="NOMBRE">GARCIA PEREZ, JUAN</salida> <!-- Real Name 1 -->
+      </listasal>
+      <listasal seq="DOCENTES_2">
+        <salida dato="CLAVE">D002</salida>
+        <salida dato="NOMBRE">LOPEZ LOPEZ, ANA</salida>
+      </listasal>
+      <listasal seq="DOCENTES_3">
+        <salida dato="CLAVE">D003</salida>
+        <salida dato="NOMBRE">MARTINEZ, PEDRO</salida>
+      </listasal>
+      <listasal seq="DOCENTES_4">
+        <salida dato="CLAVE">D004</salida>
+        <salida dato="NOMBRE">SANCHEZ, MARIA</salida>
+      </listasal>
+      <listasal seq="DOCENTES_5">
+        <salida dato="CLAVE">D005</salida>
+        <salida dato="NOMBRE">FERNANDEZ, LUIS</salida>
+      </listasal>
+      <listasal seq="DOCENTES_6">
+        <salida dato="CLAVE">D006</salida>
+        <salida dato="NOMBRE">GONZALEZ, ELENA</salida>
+      </listasal>
+      <listasal seq="DOCENTES_7">
+        <salida dato="CLAVE">D007</salida>
+        <salida dato="NOMBRE">RUIZ, CARLOS</salida>
+      </listasal>
+      <listasal seq="DOCENTES_8">
+        <salida dato="CLAVE">D008</salida>
+        <salida dato="NOMBRE">JIMENEZ, SOFIA</salida>
+      </listasal>
+      <listasal seq="DOCENTES_9">
+        <salida dato="CLAVE">D009</salida>
+        <salida dato="NOMBRE">MORENO, DAVID</salida>
+      </listasal>
+      <listasal seq="DOCENTES_10">
+        <salida dato="CLAVE">D010</salida>
+        <salida dato="NOMBRE">ALVAREZ, LUCIA</salida>
+      </listasal>
+    </listasal>
+
+    <!-- Materias (Example subset) -->
+    <listasal seq="MATERIAS">
+      <listasal seq="MATERIAS_1">
+        <salida dato="CLAVE">M001</salida>
+        <salida dato="NOMBRE">MATEMATICAS</salida>
+        <salida dato="ABREVIATURA">MAT</salida>
+      </listasal>
+      <listasal seq="MATERIAS_2">
+        <salida dato="CLAVE">M002</salida>
+        <salida dato="NOMBRE">LENGUA CASTELLANA</salida>
+        <salida dato="ABREVIATURA">LCL</salida>
+      </listasal>
+       <listasal seq="MATERIAS_3">
+        <salida dato="CLAVE">M003</salida>
+        <salida dato="NOMBRE">GUARDIA DE RECREO</salida>
+        <salida dato="ABREVIATURA">G.REC</salida>
+      </listasal>
+    </listasal>
+
+    <!-- Horarios (Sesiones sample linking D001 to G001) -->
+    <listasal seq="HORARIOS">
+       <listasal seq="HORARIOS_1">
+          <!-- Session linking Teacher D001 to Group G001 and Subject M001 -->
+          <!-- Note: Delphos format details might vary, assuming TRAMO structure or similar -->
+          <salida dato="CLAVE_DOCENTE">D001</salida> <!-- Link to Teacher -->
+          <salida dato="CLAVE_GRUPO">G001</salida>   <!-- Link to Group -->
+          <salida dato="CLAVE_MATERIA">M001</salida> <!-- Link to Subject -->
+          <salida dato="DIA">1</salida> <!-- Lunes -->
+          <salida dato="TRAMO">08:00-08:55</salida>
+       </listasal>
+    </listasal>
+  </datos>
+</centro>

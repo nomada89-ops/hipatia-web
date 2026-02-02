@@ -1,0 +1,22 @@
+# dependencies
+node_modules/
+
+# build
+dist/
+dist-electron/
+out/
+build/
+
+# logs
+logs/
+*.log
+
+# electron-builder
+electron-builder.yaml
+
+# OS
+.DS_Store
+Thumb.db
+
+# local env
+.env*.local
