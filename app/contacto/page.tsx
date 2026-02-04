@@ -9,13 +9,22 @@ export default function ContactPage() {
     const [formData, setFormData] = useState({
         nombre: '',
         email: '',
+        telefono: '',
         centro: '',
         motivo: '',
-        mensaje: ''
+        mensaje: '',
+        website: '' // Honeypot
     });
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+
+        // Honeypot check
+        if (formData.website) {
+            setStatus('success');
+            return;
+        }
+
         setStatus('submitting');
 
         try {
@@ -25,7 +34,8 @@ export default function ContactPage() {
                 body: JSON.stringify({
                     nombre: formData.nombre,
                     email: formData.email,
-                    centro_educativo: formData.centro,
+                    telefono: formData.telefono,
+                    centro_institucion: formData.centro,
                     motivo_consulta: formData.motivo,
                     mensaje: formData.mensaje,
                     fecha: new Date().toISOString(),
@@ -52,7 +62,7 @@ export default function ContactPage() {
                 </div>
                 <h1 className="text-3xl font-black text-slate-900 mb-4 tracking-tight">¡Mensaje Recibido!</h1>
                 <p className="text-slate-500 max-w-md mx-auto mb-8 font-medium leading-relaxed">
-                    Gracias por contactar con HIPATIA. Nuestro equipo revisará tu solicitud y te responderemos en el email institucional proporcionado en breve.
+                    Gracias por contactar con HIPATIA. Nuestro equipo revisará tu solicitud y te responderemos en breve al email proporcionado.
                 </p>
                 <Link
                     href="/"
@@ -90,13 +100,13 @@ export default function ContactPage() {
                 <div className="text-center mb-16 space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-700">
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100 mb-2">
                         <Mail size={14} className="text-indigo-600" />
-                        <span className="text-[10px] uppercase font-bold text-indigo-600 tracking-widest">Atención al Docente</span>
+                        <span className="text-[10px] uppercase font-bold text-indigo-600 tracking-widest">Atención al Usuario</span>
                     </div>
                     <h1 className="text-4xl md:text-5xl font-black text-slate-900 tracking-tighter leading-tight">
                         Contacto y <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600">Soporte técnico</span>.
                     </h1>
                     <p className="text-slate-500 font-medium text-lg max-w-xl mx-auto leading-relaxed">
-                        ¿Tienes dudas sobre la implementación de la IA en tu aula o necesitas una demo personalizada para tu centro educativo?
+                        ¿Tienes dudas sobre HIPATIA, necesitas una demo personalizada o quieres proponer una colaboración?
                     </p>
                 </div>
 
@@ -108,82 +118,109 @@ export default function ContactPage() {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             {/* Nombre */}
                             <div className="space-y-3">
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 px-1">
+                                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2 px-1">
                                     <User size={12} className="text-indigo-500" />
                                     Nombre Completo
                                 </label>
                                 <input
                                     required
                                     type="text"
-                                    className="w-full h-14 px-5 bg-slate-50 border-2 border-slate-50 rounded-2xl focus:bg-white focus:border-indigo-500 focus:shadow-lg focus:shadow-indigo-500/5 outline-none transition-all font-bold text-slate-800 placeholder:text-slate-300 placeholder:font-normal"
+                                    className="w-full h-14 px-5 bg-slate-50 border-2 border-slate-50 rounded-2xl focus:bg-white focus:border-indigo-500 focus:shadow-lg focus:shadow-indigo-500/10 outline-none transition-all font-bold text-slate-800 placeholder:text-slate-300 placeholder:font-normal"
                                     value={formData.nombre}
                                     onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
-                                    placeholder="Ej. Prof. Arturo Pérez"
+                                    placeholder="Ej. Arturo Pérez"
                                 />
                             </div>
 
                             {/* Email */}
                             <div className="space-y-3">
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 px-1">
+                                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2 px-1">
                                     <Mail size={12} className="text-indigo-500" />
-                                    Email Institucional (preferible)
+                                    Email de contacto
                                 </label>
                                 <input
                                     required
                                     type="email"
-                                    className="w-full h-14 px-5 bg-slate-50 border-2 border-slate-50 rounded-2xl focus:bg-white focus:border-indigo-500 focus:shadow-lg focus:shadow-indigo-500/5 outline-none transition-all font-bold text-slate-800 placeholder:text-slate-300 placeholder:font-normal"
+                                    className="w-full h-14 px-5 bg-slate-50 border-2 border-slate-50 rounded-2xl focus:bg-white focus:border-indigo-500 focus:shadow-lg focus:shadow-indigo-500/10 outline-none transition-all font-bold text-slate-800 placeholder:text-slate-300 placeholder:font-normal"
                                     value={formData.email}
                                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                    placeholder="nombre@uclm.es"
+                                    placeholder="nombre@ejemplo.com"
                                 />
                             </div>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            {/* Centro Educativo */}
+                            {/* Teléfono */}
                             <div className="space-y-3">
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 px-1">
-                                    <School size={12} className="text-indigo-500" />
-                                    Centro Educativo
+                                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2 px-1">
+                                    <Send size={12} className="text-indigo-500 opacity-50" />
+                                    Teléfono (Opcional)
                                 </label>
                                 <input
-                                    required
-                                    type="text"
-                                    className="w-full h-14 px-5 bg-slate-50 border-2 border-slate-50 rounded-2xl focus:bg-white focus:border-indigo-500 focus:shadow-lg focus:shadow-indigo-500/5 outline-none transition-all font-bold text-slate-800 placeholder:text-slate-300 placeholder:font-normal"
-                                    value={formData.centro}
-                                    onChange={(e) => setFormData({ ...formData, centro: e.target.value })}
-                                    placeholder="Nombre del IES, Facultad o Colegio"
+                                    type="tel"
+                                    className="w-full h-14 px-5 bg-slate-50 border-2 border-slate-50 rounded-2xl focus:bg-white focus:border-indigo-500 focus:shadow-lg focus:shadow-indigo-500/10 outline-none transition-all font-bold text-slate-800 placeholder:text-slate-300 placeholder:font-normal"
+                                    value={formData.telefono}
+                                    onChange={(e) => setFormData({ ...formData, telefono: e.target.value })}
+                                    placeholder="+34 600 000 000"
                                 />
                             </div>
 
-                            {/* Motivo */}
+                            {/* Centro / Institución */}
                             <div className="space-y-3">
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 px-1">
-                                    <MessageSquare size={12} className="text-indigo-500" />
-                                    Motivo de consulta
+                                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2 px-1">
+                                    <School size={12} className="text-indigo-500" />
+                                    Centro o Institución (Opcional)
                                 </label>
-                                <div className="relative">
-                                    <select
-                                        required
-                                        className="w-full h-14 px-5 bg-slate-50 border-2 border-slate-50 rounded-2xl focus:bg-white focus:border-indigo-500 outline-none transition-all font-bold text-slate-800 appearance-none cursor-pointer"
-                                        value={formData.motivo}
-                                        onChange={(e) => setFormData({ ...formData, motivo: e.target.value })}
-                                    >
-                                        <option value="" disabled>Selecciona una opción</option>
-                                        <option value="Solicitar Demo para mi Centro.">Solicitar Demo para mi Centro.</option>
-                                        <option value="Problemas con mi Token.">Problemas con mi Token.</option>
-                                        <option value="Propuesta comercial personalizada.">Propuesta comercial personalizada.</option>
-                                    </select>
-                                    <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
-                                        <ChevronLeft size={16} className="-rotate-90" />
-                                    </div>
+                                <input
+                                    type="text"
+                                    className="w-full h-14 px-5 bg-slate-50 border-2 border-slate-50 rounded-2xl focus:bg-white focus:border-indigo-500 focus:shadow-lg focus:shadow-indigo-500/10 outline-none transition-all font-bold text-slate-800 placeholder:text-slate-300 placeholder:font-normal"
+                                    value={formData.centro}
+                                    onChange={(e) => setFormData({ ...formData, centro: e.target.value })}
+                                    placeholder="Nombre de tu centro o empresa"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Honeypot field - Hidden */}
+                        <div className="hidden">
+                            <input
+                                type="text"
+                                value={formData.website}
+                                onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+                                tabIndex={-1}
+                                autoComplete="off"
+                            />
+                        </div>
+
+                        {/* Motivo */}
+                        <div className="space-y-3">
+                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2 px-1">
+                                <MessageSquare size={12} className="text-indigo-500" />
+                                Motivo de consulta
+                            </label>
+                            <div className="relative">
+                                <select
+                                    required
+                                    className="w-full h-14 px-5 bg-slate-50 border-2 border-slate-50 rounded-2xl focus:bg-white focus:border-indigo-500 outline-none transition-all font-bold text-slate-800 appearance-none cursor-pointer"
+                                    value={formData.motivo}
+                                    onChange={(e) => setFormData({ ...formData, motivo: e.target.value })}
+                                >
+                                    <option value="" disabled>Selecciona una opción</option>
+                                    <option value="Información General">Información General</option>
+                                    <option value="Soporte para Docentes">Soporte para Docentes</option>
+                                    <option value="Demo para Centro/Institución">Solicitar Demo para Centro/Institución</option>
+                                    <option value="Problemas Técnicos">Problemas Técnicos / Acceso</option>
+                                    <option value="Propuesta de Colaboración">Propuesta de Colaboración</option>
+                                </select>
+                                <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                                    <ChevronLeft size={16} className="-rotate-90" />
                                 </div>
                             </div>
                         </div>
 
                         {/* Mensaje */}
                         <div className="space-y-3">
-                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 px-1">
+                            <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest flex items-center gap-2 px-1">
                                 <MessageSquare size={12} className="text-indigo-500" />
                                 Mensaje
                             </label>
@@ -192,8 +229,8 @@ export default function ContactPage() {
                                 rows={4}
                                 value={formData.mensaje}
                                 onChange={(e) => setFormData({ ...formData, mensaje: e.target.value })}
-                                className="w-full p-5 bg-slate-50 border-2 border-slate-50 rounded-2xl focus:bg-white focus:border-indigo-500 focus:shadow-lg focus:shadow-indigo-500/5 outline-none transition-all font-bold text-slate-800 resize-none placeholder:text-slate-300 placeholder:font-normal leading-relaxed"
-                                placeholder="Cuéntanos más sobre cómo podemos ayudarte..."
+                                className="w-full p-5 bg-slate-50 border-2 border-slate-50 rounded-2xl focus:bg-white focus:border-indigo-500 focus:shadow-lg focus:shadow-indigo-500/10 outline-none transition-all font-bold text-slate-800 resize-none placeholder:text-slate-300 placeholder:font-normal leading-relaxed"
+                                placeholder="Cuéntanos cómo podemos ayudarte..."
                             />
                         </div>
 
