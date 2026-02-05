@@ -78,7 +78,7 @@ export default function ExamCorrectionPage() {
                     <MainFormSecure
                         onBack={() => setActiveModule('landing')}
                         userToken={userToken}
-                        allowFileUploads={['test_01', 'rafa', 'admin'].some(t => userToken.toLowerCase().includes(t))}
+                        allowFileUploads={['test_01', 'rafa', 'admin', 'ma_01'].some(t => userToken.toLowerCase().includes(t))}
                     />
                 </div>
             ) : activeModule === 'forge-universal' ? (
