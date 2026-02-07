@@ -13,6 +13,7 @@ interface LandingPageProps {
     onSelectForgeUniversal: () => void;
     onSelectForgeSpecialist: () => void;
     onSelectGuideCreator: () => void;
+    onSelectSDAGenerator: () => void;
     onShowSample: () => void;
     userToken?: string;
 }
@@ -49,7 +50,7 @@ const RevealSection: React.FC<{ children: React.ReactNode, className?: string }>
     );
 };
 
-const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn, onSelectAuditor, onSelectForgeUniversal, onSelectForgeSpecialist, onSelectGuideCreator, onShowSample, userToken }) => {
+const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn, onSelectAuditor, onSelectForgeUniversal, onSelectForgeSpecialist, onSelectGuideCreator, onSelectSDAGenerator, onShowSample, userToken }) => {
     const [tokenInput, setTokenInput] = useState("");
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
@@ -412,6 +413,25 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin, onLogout, isLoggedIn
                                         </div>
                                         <div className="flex items-center gap-2 text-violet-600 font-bold text-sm uppercase tracking-widest pt-4 group-hover:gap-4 transition-all">
                                             Diseñar guía <ArrowRight size={18} />
+                                        </div>
+                                    </div>
+                                </button>
+
+                                <button onClick={onSelectSDAGenerator} className="group glass-amber rounded-[32px] p-10 text-left transition-all hover:scale-[1.02] hover:shadow-2xl hover:shadow-amber-200/50 flex flex-col gap-10 relative overflow-hidden bg-white/60 border border-amber-100">
+                                    <div className="absolute top-0 right-0 w-32 h-32 bg-amber-50 rounded-bl-[100px] opacity-50 z-0 group-hover:scale-110 transition-transform origin-top-right"></div>
+                                    <div className="relative z-10 flex flex-col gap-10">
+                                        <div className="flex justify-between items-start">
+                                            <div className="w-16 h-16 bg-gradient-to-br from-amber-500 to-amber-700 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-amber-200">
+                                                <Zap size={32} />
+                                            </div>
+                                            <div className="bg-amber-50 text-amber-700 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">NUEVO</div>
+                                        </div>
+                                        <div>
+                                            <h2 className="text-2xl font-bold text-slate-900 mb-3 tracking-tight text-amber-900 group-hover:text-amber-600 transition-colors">GENERADOR DE SDA</h2>
+                                            <p className="text-slate-500 font-medium leading-relaxed">Diseña Situaciones de Aprendizaje (SDA) LOMLOE de alta calidad basadas en tus centros de interés.</p>
+                                        </div>
+                                        <div className="flex items-center gap-2 text-amber-600 font-bold text-sm uppercase tracking-widest pt-4 group-hover:gap-4 transition-all">
+                                            Generar Situación <ArrowRight size={18} />
                                         </div>
                                     </div>
                                 </button>

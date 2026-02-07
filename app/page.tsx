@@ -7,12 +7,13 @@ import LandingPage from './LandingPage';
 import ForgeForm from './ForgeForm';
 import ForgeUniversalForm from './ForgeUniversalForm';
 import GuideCreatorForm from './GuideCreatorForm';
+import SDAGeneratorForm from './SDAGeneratorForm';
 import { ExamProvider } from './ExamContext';
 import { OnboardingModal } from './components/OnboardingModal';
 import { HelpFab } from './components/HelpFab';
 
 export default function ExamCorrectionPage() {
-    const [activeModule, setActiveModule] = useState<'landing' | 'auditor' | 'forge-universal' | 'forge-specialist' | 'guide-creator'>('landing');
+    const [activeModule, setActiveModule] = useState<'landing' | 'auditor' | 'forge-universal' | 'forge-specialist' | 'guide-creator' | 'sda-generator'>('landing');
     const [userToken, setUserToken] = useState<string>('');
 
     // RESTAURACIÓN DE SESIÓN GLOBAL
@@ -69,6 +70,7 @@ export default function ExamCorrectionPage() {
                         onSelectForgeUniversal={() => setActiveModule('forge-universal')}
                         onSelectForgeSpecialist={() => setActiveModule('forge-specialist')}
                         onSelectGuideCreator={() => setActiveModule('guide-creator')}
+                        onSelectSDAGenerator={() => setActiveModule('sda-generator')}
                         onShowSample={handleShowSample}
                         userToken={userToken}
                     />
@@ -88,6 +90,10 @@ export default function ExamCorrectionPage() {
             ) : activeModule === 'guide-creator' ? (
                 <div className="h-screen bg-gray-50 overflow-hidden flex flex-col">
                     <GuideCreatorForm userToken={userToken} onBack={() => setActiveModule('landing')} />
+                </div>
+            ) : activeModule === 'sda-generator' ? (
+                <div className="h-screen bg-gray-50 overflow-hidden flex flex-col">
+                    <SDAGeneratorForm userToken={userToken} onBack={() => setActiveModule('landing')} />
                 </div>
             ) : (
                 <div className="h-screen bg-gray-50 overflow-hidden flex flex-col">
