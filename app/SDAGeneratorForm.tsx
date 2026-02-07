@@ -53,7 +53,9 @@ export default function SDAGeneratorForm({ userToken, onBack }: SDAGeneratorForm
             }
 
             if (response.ok) {
-                const data = await response.json();
+                const rawData = await response.json();
+                const data = Array.isArray(rawData) ? rawData[0] : rawData;
+
                 if (data.html && typeof data.html === 'string') {
                     setHtmlContent(data.html);
                     if (data.fileName) setFileName(data.fileName);
